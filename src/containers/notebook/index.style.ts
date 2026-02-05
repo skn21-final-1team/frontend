@@ -4,6 +4,8 @@ export const container = cva(`
   h-[calc(100vh-3.5rem)]
   w-full
   overflow-hidden
+  bg-background
+  px-2
 `)
 
 export const panelContent = cva(`

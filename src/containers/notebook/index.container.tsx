@@ -1,10 +1,9 @@
 'use client'
 
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/shared/components/ui/resizable'
+import ChatView from './center/chat-view'
+import Source from './left/source'
+import Contents from './right/contents'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/shared/components'
 import * as s from './index.style'
 
 export default function NotebookContainer() {
@@ -12,40 +11,19 @@ export default function NotebookContainer() {
     <div className={s.container()}>
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel defaultSize={20} minSize={15}>
-          <div className={s.panelContent()}>
-            <h2>Left Section</h2>
-            <p className="space-y-4">
-              {Array.from({ length: 20 }).map((_, i) => (
-                <div key={i}>Scrollable Content {i}</div>
-              ))}
-            </p>
-          </div>
+          <Source />
         </ResizablePanel>
 
-        <ResizableHandle withHandle />
+        <ResizableHandle />
 
         <ResizablePanel defaultSize={50} minSize={30}>
-          <div className={s.panelContent()}>
-            <h2>Medium Section</h2>
-            <p className="space-y-4">
-              {Array.from({ length: 50 }).map((_, i) => (
-                <div key={i}>Main Content Area {i}</div>
-              ))}
-            </p>
-          </div>
+          <ChatView />
         </ResizablePanel>
 
-        <ResizableHandle withHandle />
+        <ResizableHandle />
 
         <ResizablePanel defaultSize={30} minSize={20}>
-          <div className={s.panelContent()}>
-            <h2>Right Section</h2>
-            <p className="space-y-4">
-              {Array.from({ length: 30 }).map((_, i) => (
-                <div key={i}>Right Sidebar {i}</div>
-              ))}
-            </p>
-          </div>
+          <Contents />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
