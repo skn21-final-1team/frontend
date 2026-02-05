@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/shared/components/ui/button'
+import { ThemeToggle } from '@/shared/components/theme-toggle'
 import * as s from './index.style'
 import { useState } from 'react'
 
@@ -28,6 +29,7 @@ export function Header() {
         </div>
 
         <div className={s.rightSection()}>
+          <ThemeToggle />
           {isLoggedIn ? (
             <div className={s.userInfo()}>
               <span>{user.name}</span>

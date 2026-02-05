@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/shared/components'
 import {
   Card,
   CardContent,
@@ -12,9 +12,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/shared/components/ui/card'
-import { Input } from '@/shared/components/ui/input'
-import { Label } from '@/shared/components/ui/label'
+} from '@/shared/components'
+import { Input } from '@/shared/components'
+import { Label } from '@/shared/components'
 import * as s from './index.style'
 
 export function SignupContainer() {

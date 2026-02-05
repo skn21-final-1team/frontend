@@ -6,7 +6,7 @@ export const wrapper = cva(`
   min-h-screen
   items-center
   justify-center
-  bg-gray-100
+  bg-background
   p-4
 `)
 
@@ -73,7 +73,6 @@ export const cardFooter = cva(`
 
 export const submitButton = cva(`
   w-full
-  text-white
 `)
 
 export const googleButton = cva(`
