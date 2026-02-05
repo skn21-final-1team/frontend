@@ -14,7 +14,7 @@ export const inner = cva(`
   py-8
   pb-4
   rounded-2xl
-  bg-popover
+  bg-card
   border
   border-border
 `)
