@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const header = cva(`
-  sticky
+  fixed
   top-0
   z-50
   w-full
