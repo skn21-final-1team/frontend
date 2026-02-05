@@ -30,10 +30,8 @@ export const headerLeft = cva(`
 `)
 
 export const loginLink = cva(`
-  text-sm
-  font-medium
-  underline
-  underline-offset-4
+  px-0
+  h-auto
 `)
 
 export const formContent = cva(`

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Button } from '@/shared/components/ui/button'
 import {
   Card,
@@ -27,9 +28,11 @@ export function LoginContainer() {
             <CardDescription>Enter your email below to login</CardDescription>
           </div>
           <div className={s.headerRight()}>
-            <Button variant="link" className={s.signUpButton()}>
-              Sign Up
-            </Button>
+            <Link href="/signup">
+              <Button variant="link" className={s.signUpButton()}>
+                Sign Up
+              </Button>
+            </Link>
           </div>
         </CardHeader>
 

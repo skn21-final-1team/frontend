@@ -27,8 +27,10 @@ export function SignupContainer() {
             <CardTitle>Create an account</CardTitle>
             <CardDescription>Enter your email below to create your account</CardDescription>
           </div>
-          <Link href="/login" className={s.loginLink()}>
-            Login
+          <Link href="/login">
+            <Button variant="link" className={s.loginLink()}>
+              Login
+            </Button>
           </Link>
         </CardHeader>
 
