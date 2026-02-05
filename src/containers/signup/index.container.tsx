@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/shared/components/ui/button'
 import {
   Card,
@@ -17,42 +17,47 @@ import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import * as s from './index.style'
 
-export function LoginContainer() {
+export function SignupContainer() {
   const [showPassword, setShowPassword] = useState(false)
   return (
     <div className={s.wrapper()}>
       <Card className={s.card()}>
         <CardHeader className={s.cardHeader()}>
           <div className={s.headerLeft()}>
-            <CardTitle>Login to your account</CardTitle>
-            <CardDescription>Enter your email below to login</CardDescription>
+            <CardTitle>Create an account</CardTitle>
+            <CardDescription>Enter your email below to create your account</CardDescription>
           </div>
-          <div className={s.headerRight()}>
-            <Link href="/signup">
-              <Button variant="link" className={s.signUpButton()}>
-                Sign Up
-              </Button>
-            </Link>
-          </div>
+          <Link href="/login">
+            <Button variant="link" className={s.loginLink()}>
+              Login
+            </Button>
+          </Link>
         </CardHeader>
 
         <CardContent>
           <form>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" required />
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" type="text" placeholder="Joshua Juwon Choi" required />
               </div>
               <div className={s.inputGroup()}>
-                <div className={s.passwordLabelWrapper()}>
-                  <Label htmlFor="password">Password</Label>
-                  <a href="#" className={s.forgotPasswordLink()}>
-                    Forgot password?
-                  </a>
-                </div>
-
+                <Label htmlFor="id">ID</Label>
+                <Input id="id" type="text" placeholder="SKN21" required />
+              </div>
+              <div className={s.inputGroup()}>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="final1@team.com" required />
+              </div>
+              <div className={s.inputGroup()}>
+                <Label htmlFor="password">Password</Label>
                 <div className={s.passwordInputWrapper()}>
-                  <Input id="password" type={showPassword ? 'text' : 'password'} required />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Create a password"
+                    required
+                  />
                   <Button
                     type="button"
                     variant="ghost"
@@ -69,16 +74,25 @@ export function LoginContainer() {
                   </Button>
                 </div>
               </div>
+              <div className={s.inputGroup()}>
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className={s.cardFooter()}>
-          <Button variant="default" type="submit" className={s.submitButton()}>
-            Login
+          <Button type="submit" className={s.submitButton()}>
+            Sign Up
           </Button>
-          <Button variant="outline" className={s.googleLoginButton()}>
+          <Button variant="outline" className={s.googleButton()}>
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
-            Login with Google
+            Sign up with Google
           </Button>
         </CardFooter>
       </Card>
