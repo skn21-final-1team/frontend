@@ -1,9 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import type { StudioFeatureList } from './types/studio'
+
 import StudioList from './components/studio-list'
+import StudioDetail from './components/studio-detail/studio-detail'
+import GeneratedList from './components/generated-list/generated-list'
 import * as S from './contents.style'
+
+import type { StudioFeatureList, GeneratedItem } from './types/studio'
+import type { BookmarkUrl } from '@/containers/notebook/left/types/bookmarks'
 
 const MOCK_FEATURES: StudioFeatureList = [
   {
@@ -29,19 +34,53 @@ const MOCK_FEATURES: StudioFeatureList = [
   },
 ]
 
-function Contents() {
+interface ContentsProps {
+  selectedUrls: BookmarkUrl[]
+  generatedItems: GeneratedItem[]
+  onAddGeneratedItem: (item: GeneratedItem) => void
+  onRemoveGeneratedItem: (itemId: string) => void
+}
+
+function Contents({
+  selectedUrls,
+  generatedItems,
+  onAddGeneratedItem,
+  onRemoveGeneratedItem,
+}: ContentsProps) {
   const [features] = useState<StudioFeatureList>(MOCK_FEATURES)
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null)
 
   const handleSelectFeature = (id: string) => {
     setSelectedFeature(id)
-    console.log('선택된 기능:', id)
+  }
+
+  const handleBack = () => {
+    setSelectedFeature(null)
+  }
+
+  if (selectedFeature) {
+    const feature = features.find((f) => f.id === selectedFeature)
+    if (!feature) return null
+
+    return (
+      <section className={S.section()}>
+        <div className={S.inner()}>
+          <StudioDetail
+            feature={feature}
+            selectedUrls={selectedUrls}
+            onBack={handleBack}
+            onAddGeneratedItem={onAddGeneratedItem}
+          />
+        </div>
+      </section>
+    )
   }
 
   return (
     <section className={S.section()}>
       <div className={S.inner()}>
         <StudioList features={features} onSelectFeature={handleSelectFeature} />
+        <GeneratedList items={generatedItems} onRemove={onRemoveGeneratedItem} />
       </div>
     </section>
   )

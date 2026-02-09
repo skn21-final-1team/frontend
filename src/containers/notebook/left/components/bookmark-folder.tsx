@@ -1,13 +1,18 @@
-import Image from 'next/image'
-import type { BookmarkFolder as BookmarkFolderType } from '../types/bookmarks'
+import { ChevronRight, Folder } from 'lucide-react'
+import { ItemMenu } from '@/shared/components'
+
 import BookmarkUrlItem from './bookmark-url-item'
 import * as S from './bookmark-folder.style'
+
+import type { BookmarkFolder as BookmarkFolderType } from '../types/bookmarks'
 
 interface BookmarkFolderProps {
   folder: BookmarkFolderType
   onToggleExpand: (folderId: string) => void
   onToggleUrl: (folderId: string, urlId: string) => void
   onToggleFolder: (folderId: string) => void
+  onDeleteUrl: (folderId: string, urlId: string) => void
+  onDeleteFolder: (folderId: string) => void
 }
 
 function BookmarkFolder({
@@ -15,26 +20,33 @@ function BookmarkFolder({
   onToggleExpand,
   onToggleUrl,
   onToggleFolder,
+  onDeleteUrl,
+  onDeleteFolder,
 }: BookmarkFolderProps) {
-  const allChecked = folder.urls.length > 0 && folder.urls.every((url) => url.isChecked)
+  const isAllCheckedRecursive = (f: BookmarkFolderType): boolean => {
+    const urlsChecked = f.urls.length === 0 || f.urls.every((url) => url.isChecked)
+    const foldersChecked = !f.folders || f.folders.every((sub) => isAllCheckedRecursive(sub))
+    return urlsChecked && foldersChecked
+  }
+  const hasAnyUrls = (f: BookmarkFolderType): boolean => {
+    if (f.urls.length > 0) return true
+    return f.folders?.some((sub) => hasAnyUrls(sub)) ?? false
+  }
+  const allChecked = hasAnyUrls(folder) && isAllCheckedRecursive(folder)
 
   return (
     <div className={S.wrapper()}>
       <div className={S.header()}>
-        <Image
-          src="/chevron-right.svg"
-          alt="expand"
-          width={16}
-          height={16}
+        <ItemMenu align="start" onDelete={() => onDeleteFolder(folder.id)} />
+
+        <ChevronRight
+          size={16}
           className={`${S.chevron()} ${folder.isExpanded ? S.chevronOpen() : ''}`}
           onClick={() => onToggleExpand(folder.id)}
         />
 
-        <div
-          className="flex flex-1 items-center gap-2 cursor-pointer"
-          onClick={() => onToggleExpand(folder.id)}
-        >
-          <Image src="/folder.svg" alt="folder" width={16} height={16} className={S.folderIcon()} />
+        <div className={S.folderInfo()} onClick={() => onToggleExpand(folder.id)}>
+          <Folder size={16} className={S.folderIcon()} />
           <span className={S.folderName()}>{folder.name}</span>
         </div>
 
@@ -58,6 +70,8 @@ function BookmarkFolder({
               onToggleExpand={onToggleExpand}
               onToggleUrl={onToggleUrl}
               onToggleFolder={onToggleFolder}
+              onDeleteUrl={onDeleteUrl}
+              onDeleteFolder={onDeleteFolder}
             />
           ))}
 
@@ -66,6 +80,7 @@ function BookmarkFolder({
               key={url.id}
               url={url}
               onToggle={() => onToggleUrl(folder.id, url.id)}
+              onDelete={() => onDeleteUrl(folder.id, url.id)}
             />
           ))}
         </div>

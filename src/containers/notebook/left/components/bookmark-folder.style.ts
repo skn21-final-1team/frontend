@@ -72,3 +72,11 @@ export const chevron = cva(`
 export const chevronOpen = cva(`
   rotate-90
 `)
+
+export const folderInfo = cva(`
+  flex
+  flex-1
+  items-center
+  gap-2
+  cursor-pointer
+`)

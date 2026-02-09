@@ -6,4 +6,12 @@ export interface StudioFeature {
   isEnabled: boolean
 }
 
+export interface GeneratedItem {
+  id: string
+  type: 'flashcard' | 'quiz' | 'summary'
+  title: string
+  sourceCount: number
+  createdAt: Date
+}
+
 export type StudioFeatureList = StudioFeature[]
