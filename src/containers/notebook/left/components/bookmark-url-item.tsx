@@ -14,7 +14,18 @@ function BookmarkUrlItem({ url, onToggle, onDelete }: BookmarkUrlItemProps) {
     <div className={S.wrapper()}>
       <ItemMenu align="start" size={12} onDelete={onDelete} />
       <Globe size={10} className={S.icon()} />
-      <span className={S.title()}>{url.title}</span>
+      <div className={S.content()}>
+        <span className={S.title()}>{url.title}</span>
+        {url.tags && url.tags.length > 0 && (
+          <div className={S.tagList()}>
+            {url.tags.map((tag) => (
+              <span key={tag} className={S.tagItem()}>
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
       <input type="checkbox" checked={url.isChecked} onChange={onToggle} className={S.checkbox()} />
     </div>
   )

@@ -2,6 +2,7 @@ export interface BookmarkUrl {
   id: string
   title: string
   url: string
+  tags?: string[]
   isChecked: boolean
 }
 
