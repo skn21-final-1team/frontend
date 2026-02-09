@@ -79,8 +79,14 @@ function Contents({
   return (
     <section className={S.section()}>
       <div className={S.inner()}>
-        <StudioList features={features} onSelectFeature={handleSelectFeature} />
-        <GeneratedList items={generatedItems} onRemove={onRemoveGeneratedItem} />
+        <div className={S.scrollArea()}>
+          <div className={S.studioSection()}>
+            <StudioList features={features} onSelectFeature={handleSelectFeature} />
+          </div>
+          <div className={S.generatedSection()}>
+            <GeneratedList items={generatedItems} onRemove={onRemoveGeneratedItem} />
+          </div>
+        </div>
       </div>
     </section>
   )

@@ -24,6 +24,7 @@ import type { GeneratedItem } from './right/types/studio'
 
 export default function NotebookContainer() {
   const [folders, setFolders] = useState<BookmarkFolderList>(MOCK_FOLDERS)
+  const [searchQuery, setSearchQuery] = useState('')
   const [generatedItems, setGeneratedItems] = useState<GeneratedItem[]>([])
 
   const selectedUrls = collectCheckedUrls(folders)
@@ -79,6 +80,8 @@ export default function NotebookContainer() {
         <ResizablePanel defaultSize={20} minSize={15}>
           <Source
             folders={folders}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
             onToggleExpand={handleToggleExpand}
             onToggleUrl={handleToggleUrl}
             onToggleFolder={handleToggleFolder}

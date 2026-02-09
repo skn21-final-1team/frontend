@@ -1,7 +1,10 @@
 import { cva } from 'class-variance-authority'
 
 export const wrapper = cva(`
-  mt-4
+  flex-1
+  min-h-0
+  flex
+  flex-col
   pt-4
   border-t
   border-border/50
@@ -13,9 +16,13 @@ export const title = cva(`
   text-muted-foreground
   mb-2
   px-1
+  flex-shrink-0
 `)
 
 export const list = cva(`
+  flex-1
+  min-h-0
+  overflow-y-auto
   space-y-2
 `)
 

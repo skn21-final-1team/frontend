@@ -8,6 +8,7 @@ import type { BookmarkFolder as BookmarkFolderType } from '../types/bookmarks'
 
 interface BookmarkFolderProps {
   folder: BookmarkFolderType
+  folderCheckedMap: Map<string, boolean>
   onToggleExpand: (folderId: string) => void
   onToggleUrl: (folderId: string, urlId: string) => void
   onToggleFolder: (folderId: string) => void
@@ -17,22 +18,14 @@ interface BookmarkFolderProps {
 
 function BookmarkFolder({
   folder,
+  folderCheckedMap,
   onToggleExpand,
   onToggleUrl,
   onToggleFolder,
   onDeleteUrl,
   onDeleteFolder,
 }: BookmarkFolderProps) {
-  const isAllCheckedRecursive = (f: BookmarkFolderType): boolean => {
-    const urlsChecked = f.urls.length === 0 || f.urls.every((url) => url.isChecked)
-    const foldersChecked = !f.folders || f.folders.every((sub) => isAllCheckedRecursive(sub))
-    return urlsChecked && foldersChecked
-  }
-  const hasAnyUrls = (f: BookmarkFolderType): boolean => {
-    if (f.urls.length > 0) return true
-    return f.folders?.some((sub) => hasAnyUrls(sub)) ?? false
-  }
-  const allChecked = hasAnyUrls(folder) && isAllCheckedRecursive(folder)
+  const allChecked = folderCheckedMap.get(folder.id) ?? false
 
   return (
     <div className={S.wrapper()}>
@@ -67,6 +60,7 @@ function BookmarkFolder({
             <BookmarkFolder
               key={subFolder.id}
               folder={subFolder}
+              folderCheckedMap={folderCheckedMap}
               onToggleExpand={onToggleExpand}
               onToggleUrl={onToggleUrl}
               onToggleFolder={onToggleFolder}
