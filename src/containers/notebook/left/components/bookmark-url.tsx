@@ -1,5 +1,5 @@
 import { Button, Checkbox } from '@/shared/components'
-import { FileIcon } from 'lucide-react'
+import { Bookmark as BookmarkIcon } from 'lucide-react'
 import type { Bookmark } from '../types/bookmarks'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import * as S from './bookmark-url.style'
@@ -15,10 +15,8 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
     <div className={S.fileRow()}>
       <Button key={data.id} variant="link" size="sm" className={S.file()}>
         <span className={S.fileInfo()}>
-          <span className={S.fileLeft()}>
-            <FileIcon />
-            <span>{data.title}</span>
-          </span>
+          <BookmarkIcon />
+          <span>{data.title}</span>
         </span>
       </Button>
       <Checkbox

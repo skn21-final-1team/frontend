@@ -26,9 +26,10 @@ export const content = cva(`
 `)
 
 export const fileRow = cva(`
-  flex
-  items-center
+  grid
+  grid-cols-[auto_16px]
   gap-2
+  items-center
 `)
 
 export const file = cva(`
@@ -36,16 +37,11 @@ export const file = cva(`
   cursor-pointer
 `)
 
-export const fileLeft = cva(`
-  flex
-  items-center
-  gap-2
-  text-foreground
-`)
-
 export const fileInfo = cva(`
   w-full
   flex
+  gap-2
   items-center
-  justify-between
+  flex-start
+  text-foreground
 `)
