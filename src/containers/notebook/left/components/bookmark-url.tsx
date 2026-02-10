@@ -18,15 +18,6 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
           <span className={S.fileLeft()}>
             <FileIcon />
             <span>{data.title}</span>
-            {data.tags && data.tags.length > 0 && (
-              <span className={S.tagList()}>
-                {data.tags.map((tag) => (
-                  <span key={tag} className={S.tagItem()}>
-                    #{tag}
-                  </span>
-                ))}
-              </span>
-            )}
           </span>
         </span>
       </Button>
