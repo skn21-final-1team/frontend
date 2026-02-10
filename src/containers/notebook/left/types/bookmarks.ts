@@ -15,10 +15,17 @@ export type BookmarkState = {
     children: string[]
   }
 }
+export type CheckedUrl = {
+  id: string
+  title: string
+  url: string
+}
+
 export type BookmarkStore = {
   bookmarks: BookmarkState
   initialize: (data: Bookmark[]) => void
   toggleExpand: (id: string) => void
   toggleCheck: (id: string, isChecked: boolean) => void
   searchBookmarks: (query: string) => void
+  getCheckedUrls: () => CheckedUrl[]
 }

@@ -1,19 +1,21 @@
 import { ArrowLeft, Sparkles } from 'lucide-react'
 import { Button } from '@/shared/components'
+import { useBookmarkStore } from '@/containers/notebook/left/store/bookmarks.store'
 
 import * as S from './studio-detail.style'
 
 import type { StudioFeature, GeneratedItem } from '../../types/studio'
-import type { BookmarkUrl } from '@/containers/notebook/left/types/bookmarks'
 
 interface StudioDetailProps {
   feature: StudioFeature
-  selectedUrls: BookmarkUrl[]
   onBack: () => void
   onAddGeneratedItem: (item: GeneratedItem) => void
 }
 
-function StudioDetail({ feature, selectedUrls, onBack, onAddGeneratedItem }: StudioDetailProps) {
+function StudioDetail({ feature, onBack, onAddGeneratedItem }: StudioDetailProps) {
+  const { getCheckedUrls } = useBookmarkStore()
+  const selectedUrls = getCheckedUrls()
+
   const handleGenerate = () => {
     const newItem: GeneratedItem = {
       id: crypto.randomUUID(),

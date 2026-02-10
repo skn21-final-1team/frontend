@@ -5,10 +5,9 @@ import { useState } from 'react'
 import StudioList from './components/studio-list'
 import StudioDetail from './components/studio-detail/studio-detail'
 import GeneratedList from './components/generated-list/generated-list'
-import * as S from './contents.style'
 
 import type { StudioFeatureList, GeneratedItem } from './types/studio'
-import type { BookmarkUrl } from '@/containers/notebook/left/types/bookmarks'
+import * as S from './contents.style'
 
 const MOCK_FEATURES: StudioFeatureList = [
   {
@@ -34,21 +33,18 @@ const MOCK_FEATURES: StudioFeatureList = [
   },
 ]
 
-interface ContentsProps {
-  selectedUrls: BookmarkUrl[]
-  generatedItems: GeneratedItem[]
-  onAddGeneratedItem: (item: GeneratedItem) => void
-  onRemoveGeneratedItem: (itemId: string) => void
-}
-
-function Contents({
-  selectedUrls,
-  generatedItems,
-  onAddGeneratedItem,
-  onRemoveGeneratedItem,
-}: ContentsProps) {
+function Contents() {
   const [features] = useState<StudioFeatureList>(MOCK_FEATURES)
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null)
+  const [generatedItems, setGeneratedItems] = useState<GeneratedItem[]>([])
+
+  const handleAddGeneratedItem = (item: GeneratedItem) => {
+    setGeneratedItems((prev) => [item, ...prev])
+  }
+
+  const handleRemoveGeneratedItem = (itemId: string) => {
+    setGeneratedItems((prev) => prev.filter((item) => item.id !== itemId))
+  }
 
   const handleSelectFeature = (id: string) => {
     setSelectedFeature(id)
@@ -67,9 +63,8 @@ function Contents({
         <div className={S.inner()}>
           <StudioDetail
             feature={feature}
-            selectedUrls={selectedUrls}
             onBack={handleBack}
-            onAddGeneratedItem={onAddGeneratedItem}
+            onAddGeneratedItem={handleAddGeneratedItem}
           />
         </div>
       </section>
@@ -84,7 +79,7 @@ function Contents({
             <StudioList features={features} onSelectFeature={handleSelectFeature} />
           </div>
           <div className={S.generatedSection()}>
-            <GeneratedList items={generatedItems} onRemove={onRemoveGeneratedItem} />
+            <GeneratedList items={generatedItems} onRemove={handleRemoveGeneratedItem} />
           </div>
         </div>
       </div>

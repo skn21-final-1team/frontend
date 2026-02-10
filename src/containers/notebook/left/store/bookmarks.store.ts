@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Bookmark, BookmarkState, BookmarkStore } from '../types/bookmarks'
+import type { Bookmark, BookmarkState, BookmarkStore, CheckedUrl } from '../types/bookmarks'
 
 const initialBookmarks: BookmarkState = {
   folder_1: {
@@ -98,4 +98,15 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
 
       return { bookmarks: filteredBookmarksMap }
     }),
+
+  getCheckedUrls: (): CheckedUrl[] => {
+    const { bookmarks } = useBookmarkStore.getState()
+    return Object.values(bookmarks)
+      .filter((node) => node.type === 'url' && node.isChecked)
+      .map((node) => ({
+        id: node.id,
+        title: node.title,
+        url: node.url ?? '',
+      }))
+  },
 }))

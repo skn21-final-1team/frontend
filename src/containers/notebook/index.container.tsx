@@ -5,6 +5,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/shared/c
 import ChatView from './center/chat-view'
 import SourceSection from './left/source-section'
 import type { Bookmark } from './left/types/bookmarks'
+import Contents from './right/contents'
 import * as s from './index.style'
 
 export default function NotebookContainer() {
@@ -23,7 +24,9 @@ export default function NotebookContainer() {
 
         <ResizableHandle />
 
-        <ResizablePanel defaultSize={30} minSize={20}></ResizablePanel>
+        <ResizablePanel defaultSize={30} minSize={20}>
+          <Contents />
+        </ResizablePanel>
       </ResizablePanelGroup>
     </div>
   )
