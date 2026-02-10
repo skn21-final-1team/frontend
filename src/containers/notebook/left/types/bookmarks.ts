@@ -28,4 +28,5 @@ export type BookmarkStore = {
   toggleCheck: (id: string, isChecked: boolean) => void
   searchBookmarks: (query: string) => void
   getCheckedUrls: () => CheckedUrl[]
+  deleteBookmark: (id: string) => void
 }

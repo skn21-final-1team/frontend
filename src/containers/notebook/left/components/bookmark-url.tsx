@@ -2,23 +2,25 @@ import { Button, Checkbox } from '@/shared/components'
 import { Bookmark as BookmarkIcon } from 'lucide-react'
 import type { Bookmark } from '../types/bookmarks'
 import { useBookmarkStore } from '../store/bookmarks.store'
+import HoverActions from './hover-actions'
 import * as S from './bookmark-url.style'
 
 type BookmarkUrlProps = {
-  data: Bookmark
+  data: Pick<Bookmark, 'id' | 'title' | 'url'>
 }
 
 function BookmarkUrl({ data }: BookmarkUrlProps) {
-  const { bookmarks, toggleCheck } = useBookmarkStore()
+  const { bookmarks, toggleCheck, deleteBookmark } = useBookmarkStore()
 
   return (
     <div className={S.fileRow()}>
-      <Button key={data.id} variant="link" size="sm" className={S.file()}>
-        <span className={S.fileInfo()}>
+      <div className={S.fileInfo()}>
+        <Button key={data.id} variant="link" size="sm" className={S.file()}>
           <BookmarkIcon />
-          <span>{data.title}</span>
-        </span>
-      </Button>
+          <span className={S.title()}>{data.title}</span>
+        </Button>
+        <HoverActions onClickDelete={() => deleteBookmark(data.id)} onClickEdit={() => {}} />
+      </div>
       <Checkbox
         checked={bookmarks[data.id]?.isChecked ?? false}
         onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}

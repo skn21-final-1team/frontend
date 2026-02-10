@@ -1,13 +1,5 @@
 import { cva } from 'class-variance-authority'
 
-export const folderList = cva(`
-  flex-1
-  overflow-y-auto
-  min-h-0
-  space-y-1
-  pr-2
-`)
-
 export const fileLeft = cva(`
   flex
   items-center
@@ -42,6 +34,6 @@ export const folder = cva(`
   hover:bg-accent
   hover:text-accent-foreground
   w-full
-  justify-between
+  justify-start
   transition-none
 `)

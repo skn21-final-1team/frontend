@@ -77,9 +77,10 @@ const mook = {
               parentId: 'folder_3',
               children: [
                 {
-                  id: 'url_122',
+                  id: 'url_090',
                   type: 'url' as const,
-                  title: 'url_122',
+                  title:
+                    '원하는 내용을 플래시카드로 제작할 수 있도록 도와주는 ‘Buffi’ | 지금 써보러 갑니다',
                   url: 'https://www.google.com',
                   isChecked: false,
                   parentId: 'folder_4',

@@ -109,4 +109,31 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
         url: node.url ?? '',
       }))
   },
+
+  deleteBookmark: (id: string) =>
+    set((state) => {
+      const newBookmarks = { ...state.bookmarks }
+      const node = newBookmarks[id]
+      if (!node) return state
+
+      if (node.parentId) {
+        const parent = newBookmarks[node.parentId]
+        if (parent) {
+          newBookmarks[node.parentId] = {
+            ...parent,
+            children: parent.children.filter((childId) => childId !== id),
+          }
+        }
+      }
+
+      const deleteChildren = (targetId: string) => {
+        const target = newBookmarks[targetId]
+        if (!target) return
+        delete newBookmarks[targetId]
+        target.children.forEach((childId) => deleteChildren(childId))
+      }
+
+      deleteChildren(id)
+      return { bookmarks: newBookmarks }
+    }),
 }))
