@@ -8,13 +8,27 @@ type hoverActionProps = {
 }
 
 function HoverActions({ onClickDelete, onClickEdit }: hoverActionProps) {
+  const clickEdit = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onClickEdit()
+  }
+
+  const clickDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onClickDelete()
+  }
+
   return (
     <span className={S.wrapper()}>
-      <Button variant="ghost" size="icon" className={S.actionButton()} onClick={onClickEdit}>
-        <PencilIcon className={S.actionIcon()} />
+      <Button variant="ghost" size="icon" asChild>
+        <span className={S.actionButton()} onClick={clickEdit}>
+          <PencilIcon className={S.actionIcon()} />
+        </span>
       </Button>
-      <Button variant="ghost" size="icon" className={S.actionButton()} onClick={onClickDelete}>
-        <Trash2Icon className={S.actionIcon()} />
+      <Button variant="ghost" size="icon" asChild>
+        <span className={S.actionButton()} onClick={clickDelete}>
+          <Trash2Icon className={S.actionIcon()} />
+        </span>
       </Button>
     </span>
   )

@@ -9,13 +9,13 @@ export const wrapper = cva(`
 `)
 
 export const actionButton = cva(`
-  h-6
-  w-6
+  w-[28px]
+  h-[28px]
   cursor-pointer
+  rounded-full
+  hover:rounded-xl
 `)
 
 export const actionIcon = cva(`
-  h-3.5
-  w-3.5
   text-muted-foreground
 `)
