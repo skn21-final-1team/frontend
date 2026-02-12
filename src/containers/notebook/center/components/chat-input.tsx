@@ -3,13 +3,18 @@ import { Button, Textarea } from '@/shared/components'
 import { Send } from 'lucide-react'
 import * as S from './chat-input.style'
 
-function ChatInput() {
+interface ChatInputProps {
+  onSend: (message: string) => void
+  disabled?: boolean
+}
+
+function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   const [value, setValue] = useState('')
 
   const handleSend = () => {
-    if (!value.trim()) return
+    if (!value.trim() || disabled) return
 
-    console.log('메시지 전송:', value)
+    onSend(value)
     setValue('')
   }
 
@@ -29,8 +34,14 @@ function ChatInput() {
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="메시지를 입력하세요."
+        disabled={disabled}
       />
-      <Button className={S.button()} onClick={handleSend} size="icon">
+      <Button
+        className={S.button()}
+        onClick={handleSend}
+        size="icon"
+        disabled={disabled || !value.trim()}
+      >
         <Send />
       </Button>
     </div>

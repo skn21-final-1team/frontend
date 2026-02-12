@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/shared/components'
 
 import ChatView from './center/chat-view'
@@ -7,8 +8,26 @@ import SourceSection from './left/source-section'
 import type { Bookmark } from './left/types/bookmarks'
 import Contents from './right/contents'
 import * as s from './index.style'
+import { getNotebooks } from '@/shared/api/notebook.api'
 
 export default function NotebookContainer() {
+  const [currentNotebookId, setCurrentNotebookId] = useState<number>(1)
+
+  useEffect(() => {
+    const fetchNotebooks = async () => {
+      try {
+        const notebooks = await getNotebooks()
+        if (notebooks.length > 0) {
+          setCurrentNotebookId(notebooks[0].id)
+        }
+      } catch (error) {
+        console.error('노트북 목록을 불러오는데 실패했습니다:', error)
+      }
+    }
+
+    fetchNotebooks()
+  }, [])
+
   return (
     <div className={s.container()}>
       <ResizablePanelGroup orientation="horizontal">
@@ -19,7 +38,7 @@ export default function NotebookContainer() {
         <ResizableHandle />
 
         <ResizablePanel defaultSize={50} minSize={30}>
-          <ChatView />
+          <ChatView notebookId={currentNotebookId} />
         </ResizablePanel>
 
         <ResizableHandle />
