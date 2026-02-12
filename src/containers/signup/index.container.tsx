@@ -17,8 +17,12 @@ import { Input } from '@/shared/components'
 import { Label } from '@/shared/components'
 import * as s from './index.style'
 
+import { useSignup } from './hooks/use-signup'
+
 export function SignupContainer() {
   const [showPassword, setShowPassword] = useState(false)
+  const { register, handleSubmit, onSubmit, isLoading } = useSignup()
+
   return (
     <div className={s.wrapper()}>
       <Card className={s.card()}>
@@ -35,20 +39,30 @@ export function SignupContainer() {
         </CardHeader>
 
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" type="text" placeholder="Joshua Juwon Choi" required />
+                <Input 
+                  id="name" 
+                  type="text" 
+                  placeholder="Joshua Juwon Choi" 
+                  required 
+                  {...register('name')}
+                />
               </div>
-              <div className={s.inputGroup()}>
-                <Label htmlFor="id">ID</Label>
-                <Input id="id" type="text" placeholder="SKN21" required />
-              </div>
+              
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="final1@team.com" required />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="final1@team.com" 
+                  required 
+                  {...register('email')}
+                />
               </div>
+
               <div className={s.inputGroup()}>
                 <Label htmlFor="password">Password</Label>
                 <div className={s.passwordInputWrapper()}>
@@ -57,6 +71,7 @@ export function SignupContainer() {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Create a password"
                     required
+                    {...register('password')}
                   />
                   <Button
                     type="button"
@@ -81,13 +96,19 @@ export function SignupContainer() {
                   type="password"
                   placeholder="Confirm your password"
                   required
+                  {...register('confirmPassword')}
                 />
               </div>
             </div>
-          </form>
+          </form> 
         </CardContent>
         <CardFooter className={s.cardFooter()}>
-          <Button type="submit" className={s.submitButton()}>
+          <Button 
+            type="submit" 
+            className={s.submitButton()}
+            onClick={handleSubmit(onSubmit)}
+            disabled={isLoading}
+          >
             Sign Up
           </Button>
           <Button variant="outline" className={s.googleButton()}>

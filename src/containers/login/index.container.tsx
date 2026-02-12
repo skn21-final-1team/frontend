@@ -16,10 +16,14 @@ import {
 import { Input } from '@/shared/components'
 import { Label } from '@/shared/components'
 
+import { useLogin } from './hooks/use-login'
+
 import * as s from './index.style'
 
 export function LoginContainer() {
   const [showPassword, setShowPassword] = useState(false)
+  const { register, handleSubmit, onSubmit, isLoading } = useLogin()
+
   return (
     <div className={s.wrapper()}>
       <Card className={s.card()}>
@@ -38,11 +42,17 @@ export function LoginContainer() {
         </CardHeader>
 
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" required />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="m@example.com" 
+                  required 
+                  {...register('email')} 
+                />
               </div>
               <div className={s.inputGroup()}>
                 <div className={s.passwordLabelWrapper()}>
@@ -53,7 +63,12 @@ export function LoginContainer() {
                 </div>
 
                 <div className={s.passwordInputWrapper()}>
-                  <Input id="password" type={showPassword ? 'text' : 'password'} required />
+                  <Input 
+                    id="password" 
+                    type={showPassword ? 'text' : 'password'} 
+                    required 
+                    {...register('password')}
+                  />
                   <Button
                     type="button"
                     variant="ghost"
@@ -71,11 +86,18 @@ export function LoginContainer() {
                 </div>
               </div>
             </div>
-          </form>
+          </form> 
         </CardContent>
+        
         <CardFooter className={s.cardFooter()}>
-          <Button variant="default" type="submit" className={s.submitButton()}>
-            Login
+          <Button 
+            variant="default" 
+            type="submit" 
+            className={s.submitButton()}
+            onClick={handleSubmit(onSubmit)}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
           </Button>
           <Button variant="outline" className={s.googleLoginButton()}>
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />

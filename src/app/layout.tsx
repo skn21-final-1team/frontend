@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import type { Metadata } from 'next'
 import { Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
@@ -20,15 +21,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${notoSansKR.className} antialiased`}>
-        <ThemeProvider>
-          <div className="min-w-5xl mt-14">
-            <Header />
-            {children}
-          </div>
-        </ThemeProvider>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <ThemeProvider>
+            <div className="min-w-5xl mt-14">
+              <Header />
+              {children}
+            </div>
+          </ThemeProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   )
