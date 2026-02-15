@@ -1,15 +1,14 @@
-import type { Message } from '../types/message'
 import * as S from './message-user.style'
 
 interface MessageUserProps {
-  message: Message
+  message: string
 }
 
 function MessageUser({ message }: MessageUserProps) {
   return (
     <div className={S.container()}>
       <div className={S.bubble()}>
-        <p className={S.content()}>{message.content}</p>
+        <p className={S.content()}>{message}</p>
       </div>
     </div>
   )

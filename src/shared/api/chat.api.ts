@@ -2,7 +2,7 @@ import { fetcher } from '@/shared/utils/fetcher'
 
 export interface Chat {
   id: number
-  role: string
+  role: 'user' | 'assistant'
   message: string
   created_at: string
   notebook_id: number
