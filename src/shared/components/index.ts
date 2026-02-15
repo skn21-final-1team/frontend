@@ -8,6 +8,7 @@ export * from './ui/badge'
 export * from './ui/dropdown-menu'
 export * from './ui/collapsible'
 export * from './ui/checkbox'
+export * from './ui/spinner'
 
 // custom components
 export * from './textarea'

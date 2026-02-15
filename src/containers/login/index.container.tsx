@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Button } from '@/shared/components'
 import {
   Card,
   CardContent,
@@ -12,17 +11,52 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  Input,
+  Spinner,
+  Label,
+  Button,
 } from '@/shared/components'
-import { Input } from '@/shared/components'
-import { Label } from '@/shared/components'
-
-import { useLogin } from './hooks/use-login'
-
+import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { login } from '@/shared/api/auth.api'
+import { useTokenStore } from '@/shared/store/token-store'
+import { useUserStore } from '@/shared/store/user-store'
+import { loginFormSchema, LoginFormValues } from './login.schema'
 import * as s from './index.style'
 
 export function LoginContainer() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
-  const { register, handleSubmit, onSubmit, isLoading } = useLogin()
+  const [isLoading, setIsLoading] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    resolver: zodResolver(loginFormSchema),
+  })
+
+  const onSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true)
+    try {
+      const result = await login(data.email, data.password)
+      useTokenStore.getState().setTokens(result.access_token)
+      useUserStore.getState().setUser(result.user)
+
+      alert('로그인 성공!')
+      router.push('/')
+    } catch (error) {
+      alert('로그인 실패: 이메일과 비밀번호를 확인해주세요.')
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className={s.wrapper()}>
@@ -46,13 +80,14 @@ export function LoginContainer() {
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="m@example.com" 
-                  required 
-                  {...register('email')} 
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  {...register('email')}
                 />
+                {errors.email && <p className={s.errorText()}>{errors.email.message}</p>}
               </div>
               <div className={s.inputGroup()}>
                 <div className={s.passwordLabelWrapper()}>
@@ -63,12 +98,13 @@ export function LoginContainer() {
                 </div>
 
                 <div className={s.passwordInputWrapper()}>
-                  <Input 
-                    id="password" 
-                    type={showPassword ? 'text' : 'password'} 
-                    required 
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
                     {...register('password')}
                   />
+                  {errors.password && <p className={s.errorText()}>{errors.password.message}</p>}
                   <Button
                     type="button"
                     variant="ghost"
@@ -86,18 +122,18 @@ export function LoginContainer() {
                 </div>
               </div>
             </div>
-          </form> 
+          </form>
         </CardContent>
-        
+
         <CardFooter className={s.cardFooter()}>
-          <Button 
-            variant="default" 
-            type="submit" 
+          <Button
+            variant="default"
+            type="submit"
             className={s.submitButton()}
             onClick={handleSubmit(onSubmit)}
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? <Spinner data-icon="inline-start" /> : 'Login'}
           </Button>
           <Button variant="outline" className={s.googleLoginButton()}>
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
