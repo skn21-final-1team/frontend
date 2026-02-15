@@ -6,12 +6,15 @@ import { Button } from '@/shared/components/ui/button'
 import { ThemeToggle } from '@/shared/components/theme-toggle'
 import * as s from './index.style'
 import { useUserStore } from '@/shared/store/user-store'
+import { useRouter } from 'next/navigation'
 
 export function Header() {
+  const router = useRouter()
   const user = useUserStore((state) => state.user)
 
   const handleLogout = () => {
     useUserStore.getState().clearUser()
+    router.push('/login')
   }
 
   return (
