@@ -2,12 +2,13 @@ import axios from 'axios'
 import { useTokenStore } from '@/shared/store/token-store'
 import { BaseResponse } from '@/shared/types/response'
 
-const api = axios.create({
+const config = {
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json',
   },
-})
+}
+const api = axios.create(config)
 
 api.interceptors.request.use((config) => {
   const token = useTokenStore.getState().accessToken
@@ -19,7 +20,18 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    if (error.response?.status === 401) {
+      await axios
+        .get<{ access_token: string }>('/api/refresh', config)
+        .then((res) => {
+          useTokenStore.getState().setTokens(res.data.access_token)
+        })
+        .catch(() => {
+          useTokenStore.getState().clearTokens()
+          window.location.href = '/login'
+        })
+    }
     return Promise.reject(error)
   },
 )
