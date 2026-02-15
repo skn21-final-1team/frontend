@@ -1,6 +1,6 @@
 import { fetcher } from '@/shared/utils/fetcher'
 
-type User = {
+export type User = {
   id: number
   name: string
   email: string

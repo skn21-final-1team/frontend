@@ -6,14 +6,12 @@ import { Button } from '@/shared/components/ui/button'
 import { ThemeToggle } from '@/shared/components/theme-toggle'
 import * as s from './index.style'
 import { useUserStore } from '@/shared/store/user-store'
-import { useTokenStore } from '@/shared/store/token-store'
 
 export function Header() {
   const user = useUserStore((state) => state.user)
 
   const handleLogout = () => {
-    useUserStore.setState({ user: null })
-    useTokenStore.setState({ accessToken: null })
+    useUserStore.getState().clearUser()
   }
 
   return (

@@ -20,7 +20,6 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { login } from '@/shared/api/auth.api'
-import { useTokenStore } from '@/shared/store/token-store'
 import { useUserStore } from '@/shared/store/user-store'
 import { loginFormSchema, LoginFormValues } from './login.schema'
 import * as s from './index.style'
@@ -45,8 +44,7 @@ export function LoginContainer() {
     setIsLoading(true)
     try {
       const result = await login(data.email, data.password)
-      useTokenStore.getState().setTokens(result.access_token)
-      useUserStore.getState().setUser(result.user)
+      useUserStore.getState().setUser(result.user, result.access_token)
 
       alert('로그인 성공!')
       router.push('/')

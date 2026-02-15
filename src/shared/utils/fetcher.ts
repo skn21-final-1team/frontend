@@ -1,6 +1,7 @@
 import axios from 'axios'
-import { useTokenStore } from '@/shared/store/token-store'
+import { useUserStore } from '@/shared/store/user-store'
 import { BaseResponse } from '@/shared/types/response'
+import { User } from '@/shared/api/auth.api'
 
 const config = {
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
@@ -11,7 +12,7 @@ const config = {
 const api = axios.create(config)
 
 api.interceptors.request.use((config) => {
-  const token = useTokenStore.getState().accessToken
+  const token = useUserStore.getState().accessToken
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -23,12 +24,12 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       await axios
-        .get<{ access_token: string }>('/api/refresh', config)
+        .get<{ access_token: string; user: User }>('/api/refresh', config)
         .then((res) => {
-          useTokenStore.getState().setTokens(res.data.access_token)
+          useUserStore.getState().setAccessToken(res.data.access_token)
         })
         .catch(() => {
-          useTokenStore.getState().clearTokens()
+          useUserStore.getState().clearUser()
           window.location.href = '/login'
         })
     }
