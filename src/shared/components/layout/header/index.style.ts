@@ -42,10 +42,11 @@ export const avatar = cva(`
   h-8
   w-8
   rounded-full
-  bg-primary/10
+  bg-primary/30
   flex
   items-center
   justify-center
-  text-xs
+  text-sm
   text-primary
+  font-bold
 `)
