@@ -1,11 +1,11 @@
-import { api } from '@/shared/utils/axios';
+import { fetcher } from '@/shared/utils/fetcher'
 
 export const login = async (email: string, password: string) => {
-  const response = await api.post('/login', { email, password });
-  return response.data.data; 
-};
+  const res = await fetcher.post('/login', { email, password })
+  return res
+}
 
 export const signup = async (data: { email: string; password: string; name: string }) => {
-  const response = await api.post('/signup', data);
-  return response.data;
-};
+  const res = await fetcher.post('/signup', data)
+  return res
+}

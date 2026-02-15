@@ -1,31 +1,31 @@
-import { api } from '@/shared/utils/axios';
+import { fetcher } from '@/shared/utils/fetcher'
 
 export interface Notebook {
-  id: number;
-  title: string;
+  id: number
+  title: string
 }
 
 export const getNotebooks = async (): Promise<Notebook[]> => {
-  const response = await api.get('/notebook/');
-  return response.data.data;
-};
+  const response = await fetcher.get<Notebook[]>('/notebook/')
+  return response.data
+}
 
 export const getNotebook = async (id: number): Promise<Notebook> => {
-  const response = await api.get(`/notebook/${id}`);
-  return response.data.data;
-};
+  const response = await fetcher.get<Notebook>(`/notebook/${id}`)
+  return response.data
+}
 
 export const createNotebook = async (title: string): Promise<Notebook> => {
-  const response = await api.post('/notebook/', { title });
-  return response.data.data;
-};
+  const response = await fetcher.post<Notebook>('/notebook/', { title })
+  return response.data
+}
 
 export const updateNotebook = async (id: number, title: string): Promise<Notebook> => {
-  const response = await api.patch(`/notebook/${id}`, { title });
-  return response.data.data;
-};
+  const response = await fetcher.patch<Notebook>(`/notebook/${id}`, { title })
+  return response.data
+}
 
-export const deleteNotebook = async (id: number): Promise<Notebook> => {
-  const response = await api.delete(`/notebook/${id}`);
-  return response.data.data;
-};
+export const deleteNotebook = async (id: number) => {
+  const response = await fetcher.delete(`/notebook/${id}`)
+  return response.data
+}
