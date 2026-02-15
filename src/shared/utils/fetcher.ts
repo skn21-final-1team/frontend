@@ -24,11 +24,13 @@ api.interceptors.response.use(
   },
 )
 
+const apiUrl = (url: string) => `/api${url}`
+
 export const fetcher = {
-  get: <T>(url: string) => api.get<BaseResponse<T>>(url).then((res) => res.data),
+  get: <T>(url: string) => api.get<BaseResponse<T>>(apiUrl(url)).then((res) => res.data),
   post: <T>(url: string, data?: unknown) =>
-    api.post<BaseResponse<T>>(url, data).then((res) => res.data),
+    api.post<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
   patch: <T>(url: string, data?: unknown) =>
-    api.patch<BaseResponse<T>>(url, data).then((res) => res.data),
-  delete: (url: string) => api.delete<BaseResponse<null>>(url).then((res) => res.data),
+    api.patch<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
+  delete: (url: string) => api.delete<BaseResponse<null>>(apiUrl(url)).then((res) => res.data),
 }
