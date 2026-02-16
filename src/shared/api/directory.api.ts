@@ -7,34 +7,28 @@ export interface Directory {
   parent_id: number | null;
 }
 
-export interface CreateDirectoryRequest {
-  title: string;
-  parent_id: number | null;
-}
-
-export interface UpdateDirectoryRequest {
+export interface DirectoryRequest {
   title: string;
   parent_id: number | null;
 }
 
 export const createDirectory = async (
   notebookId: number,
-  data: CreateDirectoryRequest
+  data: DirectoryRequest
 ): Promise<Directory> => {
-  const response = await api.post(`/directory/?notebook_id=${notebookId}`, data);
+  const response = await api.post('/directory/', { ...data, notebook_id: notebookId });
   return response.data.data;
 };
 
-export const getDirectoriesByNotebook = async (notebookId: number): Promise<Directory[]> => {
-  const response = await api.get(`/directory/notebook/${notebookId}`);
-  return response.data.data;
-};
-export const getDirectoriesByParent = async (
+export const getDirectories = async (
   notebookId: number,
-  parentId: number | null
+  parentId?: number | null
 ): Promise<Directory[]> => {
-  const params = parentId !== null ? `?notebook_id=${notebookId}&parent_id=${parentId}` : `?notebook_id=${notebookId}`;
-  const response = await api.get(`/directory/${params}`);
+  const params: Record<string, string | number> = { notebook_id: notebookId };
+  if (parentId !== undefined) {
+    params.parent_id = parentId ?? '';
+  }
+  const response = await api.get('/directory/', { params });
   return response.data.data;
 };
 
@@ -45,7 +39,7 @@ export const getDirectory = async (directoryId: number): Promise<Directory> => {
 
 export const updateDirectory = async (
   directoryId: number,
-  data: UpdateDirectoryRequest
+  data: DirectoryRequest
 ): Promise<Directory> => {
   const response = await api.patch(`/directory/${directoryId}`, data);
   return response.data.data;
