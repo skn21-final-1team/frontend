@@ -2,8 +2,9 @@ import axios from 'axios'
 import { useUserStore } from '@/shared/store/user-store'
 import { BaseResponse } from '@/shared/types/response'
 import { User } from '@/shared/api/auth.api'
+import { EventSourceMessage, fetchEventSource } from '@microsoft/fetch-event-source'
 
-const config = {
+export const config = {
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
   withCredentials: true,
   headers: {
@@ -46,7 +47,7 @@ api.interceptors.response.use(
   },
 )
 
-const apiUrl = (url: string) => `/api${url}`
+export const apiUrl = (url: string) => `/api${url}`
 
 export const fetcher = {
   get: <T>(url: string) => api.get<BaseResponse<T>>(apiUrl(url)).then((res) => res.data),
@@ -56,3 +57,30 @@ export const fetcher = {
     api.patch<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
   delete: (url: string) => api.delete<BaseResponse<null>>(apiUrl(url)).then((res) => res.data),
 }
+
+type RawAPIArgs = {
+  url: string
+  fetchConfig?: RequestInit
+  data: unknown
+  onMessage: (msg: EventSourceMessage) => void
+  onError?: () => void
+}
+
+export const SSE = ({ url, fetchConfig, data, onMessage, onError }: RawAPIArgs) =>
+  fetchEventSource(config.baseURL + apiUrl(url), {
+    method: 'POST',
+    ...fetchConfig,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${useUserStore.getState().accessToken}`,
+    },
+    body: JSON.stringify(data),
+    onopen: async (res) => {
+      if (res.status === 401) {
+        return Promise.reject(res)
+      }
+      return
+    },
+    onmessage: onMessage,
+    onerror: onError,
+  })
