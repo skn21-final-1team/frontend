@@ -1,11 +1,23 @@
-import { api } from '@/shared/utils/axios';
+import { fetcher } from '@/shared/utils/fetcher'
+
+export type User = {
+  id: number
+  name: string
+  email: string
+  auth_provider: string
+}
+
+type LoginResponse = {
+  access_token: string
+  user: User
+}
 
 export const login = async (email: string, password: string) => {
-  const response = await api.post('/login', { email, password });
-  return response.data.data; 
-};
+  const res = await fetcher.post<LoginResponse>('/login', { email, password })
+  return res.data
+}
 
 export const signup = async (data: { email: string; password: string; name: string }) => {
-  const response = await api.post('/signup', data);
-  return response.data;
-};
+  const res = await fetcher.post('/signup', data)
+  return res
+}

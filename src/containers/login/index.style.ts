@@ -103,3 +103,8 @@ export const googleIcon = cva(`
   h-4
   w-4
 `)
+
+export const errorText = cva(`
+  text-red-500
+  text-xs
+`)

@@ -5,13 +5,16 @@ import Image from 'next/image'
 import { Button } from '@/shared/components/ui/button'
 import { ThemeToggle } from '@/shared/components/theme-toggle'
 import * as s from './index.style'
-import { useState } from 'react'
+import { useUserStore } from '@/shared/store/user-store'
+import { useRouter } from 'next/navigation'
 
 export function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const user = {
-    name: 'Tera',
-    email: 'tera@example.com',
+  const router = useRouter()
+  const user = useUserStore((state) => state.user)
+
+  const handleLogout = () => {
+    useUserStore.getState().clearUser()
+    router.push('/login')
   }
 
   return (
@@ -30,16 +33,16 @@ export function Header() {
 
         <div className={s.rightSection()}>
           <ThemeToggle />
-          {isLoggedIn ? (
+          {user ? (
             <div className={s.userInfo()}>
-              <span>{user.name}</span>
-              <div className={s.avatar()}>{user.name[0]}</div>
+              <span className={s.avatar()}>{user.name[0]}</span>
+              <Button variant="ghost" onClick={handleLogout}>
+                Logout
+              </Button>
             </div>
           ) : (
             <Button asChild size="sm">
-              <Link href="/login" onClick={() => setIsLoggedIn(true)}>
-                Login
-              </Link>
+              <Link href="/login">Login</Link>
             </Button>
           )}
         </div>
