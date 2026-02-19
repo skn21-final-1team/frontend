@@ -1,10 +1,12 @@
 'use client'
 
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/shared/components'
+import { useState, useEffect } from 'react'
 
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/shared/components'
+import { getNotebookContent, ContentNode } from '@/shared/api/notebook-content.api'
+import type { Bookmark } from './left/types/bookmarks'
 import ChatView from './center/chat-view'
 import SourceSection from './left/source-section'
-import type { Bookmark } from './left/types/bookmarks'
 import Contents from './right/contents'
 import * as s from './index.style'
 
@@ -12,12 +14,48 @@ interface NotebookContainerProps {
   notebookId: number
 }
 
+const mapContentToBookmarks = (nodes: ContentNode[]): Bookmark[] => {
+  const bookmarks: Bookmark[] = []
+
+  for (const node of nodes) {
+    const folder: Bookmark = {
+      id: String(node.id),
+      type: 'folder',
+      title: node.title,
+      parentId: node.parent_id ? String(node.parent_id) : null,
+      isExpanded: false,
+      isChecked: false,
+      children: [
+        ...mapContentToBookmarks(node.children),
+        ...node.sources.map((s): Bookmark => ({
+          id: String(s.id),
+          type: 'url',
+          title: s.title ?? '',
+          url: s.url,
+          parentId: String(node.id),
+          isChecked: false,
+          children: [],
+        })),
+      ],
+    }
+    bookmarks.push(folder)
+  }
+
+  return bookmarks
+}
+
 export default function NotebookContainer({ notebookId }: NotebookContainerProps) {
+  const [contentNodes, setContentNodes] = useState<ContentNode[]>([])
+  useEffect(() => {
+    getNotebookContent(notebookId).then(setContentNodes)
+  }, [notebookId])
+  const bookmarks = mapContentToBookmarks(contentNodes)
+
   return (
     <div className={s.container()}>
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel defaultSize={20} minSize={15}>
-          <SourceSection data={mook.bookmarks} />
+          <SourceSection data={bookmarks} />
         </ResizablePanel>
 
         <ResizableHandle />
@@ -34,84 +72,4 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
       </ResizablePanelGroup>
     </div>
   )
-}
-
-const mook = {
-  bookmarks: [
-    {
-      id: 'folder_1',
-      type: 'folder' as const,
-      title: 'folder_1',
-      isExpanded: true,
-      isChecked: false,
-      parentId: null,
-      children: [
-        {
-          id: 'folder_2',
-          type: 'folder' as const,
-          title: 'folder_2',
-          isExpanded: false,
-          isChecked: false,
-          parentId: 'folder_1',
-          children: [
-            {
-              id: 'url_1',
-              type: 'url' as const,
-              title: 'url_1',
-              url: 'https://www.google.com',
-              isChecked: false,
-              parentId: 'folder_2',
-            },
-          ],
-        },
-        {
-          id: 'folder_3',
-          type: 'folder' as const,
-          title: 'folder_3',
-          isExpanded: false,
-          isChecked: false,
-          parentId: 'folder_1',
-          children: [
-            {
-              id: 'folder_4',
-              type: 'folder' as const,
-              title: 'folder_4',
-              isExpanded: false,
-              isChecked: false,
-              parentId: 'folder_3',
-              children: [
-                {
-                  id: 'url_090',
-                  type: 'url' as const,
-                  title:
-                    '원하는 내용을 플래시카드로 제작할 수 있도록 도와주는 ‘Buffi’ | 지금 써보러 갑니다',
-                  url: 'https://www.google.com',
-                  isChecked: false,
-                  parentId: 'folder_4',
-                  tags: ['tag1', 'tag2'],
-                },
-                {
-                  id: 'url_1223',
-                  type: 'url' as const,
-                  title: 'url_122',
-                  url: 'https://www.google.com',
-                  isChecked: false,
-                  parentId: 'folder_4',
-                },
-                {
-                  id: 'url_1242',
-                  type: 'url' as const,
-                  title: 'url_122',
-                  url: 'https://www.google.com',
-                  isChecked: false,
-                  parentId: 'folder_4',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ] as Bookmark[],
-  sources: [],
 }

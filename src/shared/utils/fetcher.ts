@@ -9,7 +9,7 @@ const config = {
     'Content-Type': 'application/json',
   },
 }
-const api = axios.create(config)
+export const api = axios.create(config)
 
 api.interceptors.request.use((config) => {
   const token = useUserStore.getState().accessToken
@@ -40,10 +40,12 @@ api.interceptors.response.use(
 const apiUrl = (url: string) => `/api${url}`
 
 export const fetcher = {
-  get: <T>(url: string) => api.get<BaseResponse<T>>(apiUrl(url)).then((res) => res.data),
+  get: <T>(url: string, params?: Record<string, string | number>) =>
+    api.get<BaseResponse<T>>(apiUrl(url), { params }).then((res) => res.data),
   post: <T>(url: string, data?: unknown) =>
     api.post<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
   patch: <T>(url: string, data?: unknown) =>
     api.patch<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
-  delete: (url: string) => api.delete<BaseResponse<null>>(apiUrl(url)).then((res) => res.data),
+  delete: (url: string) =>
+    api.delete<BaseResponse<null>>(apiUrl(url)).then((res) => res.data),
 }
