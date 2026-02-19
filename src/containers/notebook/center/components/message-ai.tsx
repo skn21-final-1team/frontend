@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown'
 import * as S from './message-ai.style'
 
 interface MessageAiProps {
@@ -14,12 +15,12 @@ function MessageAi({ message, isLoading = false }: MessageAiProps) {
             <div className={S.dot()} style={{ animationDelay: '0ms' }} />
             <div className={S.dot()} style={{ animationDelay: '150ms' }} />
             <div className={S.dot()} style={{ animationDelay: '300ms' }} />
-            <span className="ml-2 text-sm">AI가 응답 중입니다...</span>
+            <span className="ml-2 text-sm">Thinking...</span>
           </div>
         ) : (
-          <>
-            <p className={S.content()}>{message}</p>
-          </>
+          <div className={S.content()}>
+            <ReactMarkdown>{message}</ReactMarkdown>
+          </div>
         )}
       </div>
     </div>
