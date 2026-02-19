@@ -2,9 +2,8 @@
 
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@/shared/components'
+import Link from 'next/link'
 import {
   Card,
   CardContent,
@@ -12,16 +11,66 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  Input,
+  Spinner,
+  Label,
+  Button,
 } from '@/shared/components'
-import { Input } from '@/shared/components'
-import { Label } from '@/shared/components'
+import { useRouter } from 'next/navigation'
+import { signup } from '@/shared/api/auth.api'
+import { signupFormSchema } from './signup.schema'
 import * as s from './index.style'
 
-import { useSignup } from './hooks/use-signup'
+type FormData = { name: string; email: string; password: string; confirmPassword: string }
+type FormErrors = Partial<Record<keyof FormData, string>>
 
 export function SignupContainer() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
-  const { register, handleSubmit, onSubmit, isLoading } = useSignup()
+  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '', confirmPassword: '' })
+  const [errors, setErrors] = useState<FormErrors>({})
+
+  const validate = (data: FormData): FormErrors => {
+    const result = signupFormSchema.safeParse(data)
+    if (result.success) return {}
+    const fieldErrors: FormErrors = {}
+    result.error.issues.forEach((err) => {
+      const key = err.path[0] as keyof FormData
+      if (!fieldErrors[key]) fieldErrors[key] = err.message
+    })
+    return fieldErrors
+  }
+
+  const handleChange = (field: keyof FormData, value: string) => {
+    const newData = { ...formData, [field]: value }
+    setFormData(newData)
+    setErrors(validate(newData))
+  }
+
+  const handleSubmit = async () => {
+    const fieldErrors = validate(formData)
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors)
+      return
+    }
+    setIsLoading(true)
+    try {
+      await signup({ email: formData.email, password: formData.password, name: formData.name })
+      alert('회원가입 성공! 로그인해주세요.')
+      router.push('/login')
+    } catch (error) {
+      alert('회원가입 실패: 이미 사용 중인 이메일이거나 서버 오류입니다.')
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleSubmit()
+  }
 
   return (
     <div className={s.wrapper()}>
@@ -39,40 +88,43 @@ export function SignupContainer() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={onFormSubmit}>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="name">Name</Label>
-                <Input 
-                  id="name" 
-                  type="text" 
-                  placeholder="Joshua Juwon Choi" 
-                  required 
-                  {...register('name')}
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Joshua Juwon Choi"
+                  required
+                  value={formData.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
                 />
+                {errors.name && <p className={s.errorText()}>{errors.name}</p>}
               </div>
-              
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="final1@team.com" 
-                  required 
-                  {...register('email')}
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="final1@team.com"
+                  required
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
                 />
+                {errors.email && <p className={s.errorText()}>{errors.email}</p>}
               </div>
-
               <div className={s.inputGroup()}>
                 <Label htmlFor="password">Password</Label>
                 <div className={s.passwordInputWrapper()}>
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Create a password"
                     required
-                    {...register('password')}
+                    value={formData.password}
+                    onChange={(e) => handleChange('password', e.target.value)}
                   />
+                  {errors.password && <p className={s.errorText()}>{errors.password}</p>}
                   <Button
                     type="button"
                     variant="ghost"
@@ -94,22 +146,25 @@ export function SignupContainer() {
                 <Input
                   id="confirm-password"
                   type="password"
-                  placeholder="Confirm your password"
                   required
-                  {...register('confirmPassword')}
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
                 />
+                {errors.confirmPassword && <p className={s.errorText()}>{errors.confirmPassword}</p>}
               </div>
             </div>
-          </form> 
+          </form>
         </CardContent>
+
         <CardFooter className={s.cardFooter()}>
-          <Button 
-            type="submit" 
+          <Button
+            variant="default"
+            type="button"
             className={s.submitButton()}
-            onClick={handleSubmit(onSubmit)}
+            onClick={handleSubmit}
             disabled={isLoading}
           >
-            Sign Up
+            {isLoading ? <Spinner data-icon="inline-start" /> : 'Sign Up'}
           </Button>
           <Button variant="outline" className={s.googleButton()}>
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />

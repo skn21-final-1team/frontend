@@ -18,6 +18,6 @@ export const login = async (email: string, password: string) => {
 }
 
 export const signup = async (data: { email: string; password: string; name: string }) => {
-  const res = await fetcher.post('/signup', data)
-  return res
+  const res = await fetcher.post<{ message: string }>('/signup', data)
+  return res.data
 }
