@@ -22,13 +22,13 @@ export function Header() {
       <div className={s.container()}>
         <div className={s.leftSection()}>
           <Image
-            src="/notebooklm_logo.png"
+            src="/kalpi.png"
             alt="Logo"
-            width={40}
-            height={40}
-            className="h-10 w-10 object-contain"
+            width={60}
+            height={60}
+            className="h-12 w-12 object-contain"
           />
-          <span>NotebookLM</span>
+          <span>KALPIE</span>
         </div>
 
         <div className={s.rightSection()}>

@@ -6,6 +6,7 @@ export const header = cva(`
   z-50
   w-full
   bg-background
+  pt-2
 `)
 
 export const container = cva(`
@@ -22,6 +23,7 @@ export const leftSection = cva(`
   items-center
   gap-2
   font-semibold
+  [&_span]:text-3xl
 `)
 
 export const rightSection = cva(`
