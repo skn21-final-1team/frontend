@@ -5,6 +5,7 @@ import { User } from '@/shared/api/auth.api'
 
 const config = {
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,16 +23,24 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      await axios
-        .get<{ access_token: string; user: User }>('/api/refresh', config)
-        .then((res) => {
-          useUserStore.getState().setAccessToken(res.data.access_token)
+    if (error.response?.status === 401 && !error.config._retry) {
+      const refreshTokenResult = await axios
+        .get<BaseResponse<{ access_token: string; user: User }>>('/api/auth/refresh', config)
+        .then((res) => res.data.data.access_token)
+        .then((token) => {
+          useUserStore.getState().setAccessToken(token)
+          error.config.headers.Authorization = `Bearer ${token}`
+          error.config._retry = true
+          return true
         })
         .catch(() => {
           useUserStore.getState().clearUser()
           window.location.href = '/login'
+          return false
         })
+      if (refreshTokenResult) {
+        return api(error.config)
+      }
     }
     return Promise.reject(error)
   },
