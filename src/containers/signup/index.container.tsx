@@ -19,6 +19,9 @@ import {
 import { useRouter } from 'next/navigation'
 import { signup } from '@/shared/api/auth.api'
 import { signupFormSchema } from './signup.schema'
+import { useGoogleLogin as useGoogleAuth } from '@react-oauth/google'
+import { api } from '@/shared/utils/fetcher'
+import { useUserStore } from '@/shared/store/user-store'
 import * as s from './index.style'
 
 type FormData = { name: string; email: string; password: string; confirmPassword: string }
@@ -71,6 +74,26 @@ export function SignupContainer() {
     e.preventDefault()
     handleSubmit()
   }
+
+  const handleGoogleLogin = useGoogleAuth({
+    onSuccess: async (codeResponse) => {
+      try {
+        const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
+        const { access_token, user } = response.data.data
+        useUserStore.getState().setUser(user, access_token)
+        alert('구글 로그인(회원가입) 성공!')
+        router.push('/')
+      } catch (error) {
+        console.error('구글 로그인 서버 연동 실패:', error)
+        alert('구글 로그인에 실패했습니다.')
+      }
+    },
+    onError: (error) => {
+      console.error('구글 로그인 팝업 실패:', error)
+      alert('구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.')
+    },
+  })
+ 
 
   return (
     <div className={s.wrapper()}>
@@ -166,7 +189,11 @@ export function SignupContainer() {
           >
             {isLoading ? <Spinner data-icon="inline-start" /> : 'Sign Up'}
           </Button>
-          <Button variant="outline" className={s.googleButton()}>
+          <Button
+            variant="outline"
+            className={s.googleButton()}
+            onClick={() => handleGoogleLogin()}
+          >
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
             Sign up with Google
           </Button>

@@ -20,6 +20,8 @@ import { useRouter } from 'next/navigation'
 import { login } from '@/shared/api/auth.api'
 import { useUserStore } from '@/shared/store/user-store'
 import { loginFormSchema } from './login.schema'
+import { useGoogleLogin as useGoogleAuth } from '@react-oauth/google'
+import { api } from '@/shared/utils/fetcher'
 import * as s from './index.style'
 
 type FormData = { email: string; password: string }
@@ -75,6 +77,25 @@ export function LoginContainer() {
     e.preventDefault()
     handleSubmit()
   }
+
+  const handleGoogleLogin = useGoogleAuth({
+    onSuccess: async (codeResponse) => {
+      try {
+        const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
+        const { access_token, user } = response.data.data
+        useUserStore.getState().setUser(user, access_token)
+        alert('구글 로그인 성공!')
+        router.push('/')
+      } catch (error) {
+        console.error('구글 로그인 서버 연동 실패:', error)
+        alert('구글 로그인에 실패했습니다.')
+      }
+    },
+    onError: (error) => {
+      console.error('구글 로그인 팝업 실패:', error)
+      alert('구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.')
+    },
+  })
 
   return (
     <div className={s.wrapper()}>
@@ -154,7 +175,11 @@ export function LoginContainer() {
           >
             {isLoading ? <Spinner data-icon="inline-start" /> : 'Login'}
           </Button>
-          <Button variant="outline" className={s.googleLoginButton()}>
+          <Button
+            variant="outline"
+            className={s.googleLoginButton()}
+            onClick={() => handleGoogleLogin()}
+          >
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
             Login with Google
           </Button>
