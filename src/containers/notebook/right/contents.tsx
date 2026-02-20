@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Loader2, X } from 'lucide-react'
+import { useState } from 'react'
+import Image from 'next/image'
 
 import StudioList from './components/studio-list'
 import GeneratedList from './components/generated-list/generated-list'
 import { QuizViewer } from './components/quiz-viewer'
+import { FlashcardViewer } from './components/flashcard-viewer'
 
-import type { StudioFeatureList, GeneratedItem, QuizStudioContent } from './types/studio'
+import type { StudioFeatureList, GeneratedItem, QuizStudioContent, FlashcardStudioContent } from './types/studio'
 import { MOCK_STUDIO_CONTENTS } from '../utils/studio.mock'
 import * as S from './contents.style'
 
@@ -33,23 +34,25 @@ interface ContentsProps {
 }
 
 interface GeneratingState {
+  id: string
   featureId: string
   featureName: string
+  timerId: ReturnType<typeof setTimeout>
 }
 
 function Contents({ onSendToChat }: ContentsProps) {
   const [features] = useState<StudioFeatureList>(MOCK_FEATURES)
   const [generatedItems, setGeneratedItems] = useState<GeneratedItem[]>([])
   const [activeQuiz, setActiveQuiz] = useState<QuizStudioContent | null>(null)
-  const [generating, setGenerating] = useState<GeneratingState | null>(null)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [activeFlashcard, setActiveFlashcard] = useState<FlashcardStudioContent | null>(null)
+  const [generatingList, setGeneratingList] = useState<GeneratingState[]>([])
   const handleSelectFeature = (featureId: string) => {
     const feature = features.find((f) => f.id === featureId)
-    if (!feature || generating) return
+    if (!feature) return
 
-    setGenerating({ featureId, featureName: feature.name })
+    const generatingId = crypto.randomUUID()
 
-    timerRef.current = setTimeout(() => {
+    const timerId = setTimeout(() => {
       const newItem: GeneratedItem = {
         id: crypto.randomUUID(),
         type: featureId as GeneratedItem['type'],
@@ -58,13 +61,21 @@ function Contents({ onSendToChat }: ContentsProps) {
         sourceCount: 0,
       }
       setGeneratedItems((prev) => [newItem, ...prev])
-      setGenerating(null)
+      setGeneratingList((prev) => prev.filter((g) => g.id !== generatingId))
     }, 3000)
+
+    setGeneratingList((prev) => [
+      ...prev,
+      { id: generatingId, featureId, featureName: feature.name, timerId },
+    ])
   }
 
-  const handleCancelGenerating = () => {
-    if (timerRef.current) clearTimeout(timerRef.current)
-    setGenerating(null)
+  const handleCancelGenerating = (generatingId: string) => {
+    const generating = generatingList.find((g) => g.id === generatingId)
+    if (generating) {
+      clearTimeout(generating.timerId)
+      setGeneratingList((prev) => prev.filter((g) => g.id !== generatingId))
+    }
   }
 
   const handleRemoveGeneratedItem = (itemId: string) => {
@@ -86,11 +97,17 @@ function Contents({ onSendToChat }: ContentsProps) {
       if (quizContent && quizContent.type === 'quiz') {
         setActiveQuiz(quizContent)
       }
+    } else if (item.type === 'flashcard') {
+      const flashcardContent = MOCK_STUDIO_CONTENTS.find((c) => c.type === 'flashcard')
+      if (flashcardContent && flashcardContent.type === 'flashcard') {
+        setActiveFlashcard(flashcardContent)
+      }
     }
   }
 
   const handleBack = () => {
     setActiveQuiz(null)
+    setActiveFlashcard(null)
   }
 
   if (activeQuiz) {
@@ -107,6 +124,20 @@ function Contents({ onSendToChat }: ContentsProps) {
     )
   }
 
+  if (activeFlashcard) {
+    return (
+      <section className={S.section()}>
+        <div className={S.inner()}>
+          <FlashcardViewer
+            flashcardContent={activeFlashcard}
+            onBack={handleBack}
+            onSendToChat={onSendToChat}
+          />
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className={S.section()}>
       <div className={S.inner()}>
@@ -115,20 +146,20 @@ function Contents({ onSendToChat }: ContentsProps) {
           <div className={S.studioSection()}>
             <StudioList features={features} onSelectFeature={handleSelectFeature} />
           </div>
-          {generating && (
-            <div className={S.generatingBanner()}>
+          {generatingList.map((generating) => (
+            <div key={generating.id} className={S.generatingBanner()}>
               <div className={S.generatingInfo()}>
-                <Loader2 size={14} className={S.generatingSpinner()} />
+                <Image src="/loader.svg" alt="loading" width={14} height={14} className={S.generatingSpinner()} />
                 <span>{generating.featureName} 생성 중...</span>
               </div>
               <button
-                onClick={handleCancelGenerating}
+                onClick={() => handleCancelGenerating(generating.id)}
                 className={S.cancelButton()}
               >
-                <X size={14} />
+                <Image src="/x.svg" alt="cancel" width={14} height={14} />
               </button>
             </div>
-          )}
+          ))}
 
           <div className={S.generatedSection()}>
             <GeneratedList
