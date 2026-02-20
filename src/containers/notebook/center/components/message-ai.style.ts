@@ -7,19 +7,30 @@ export const container = cva(`
 `)
 
 export const bubble = cva(`
-  max-w-[70%]
+  max-w-[80%]
   bg-muted
   text-foreground
   rounded-lg
-  px-4
-  py-2
+  p-3
   shadow-sm
 `)
 
 export const content = cva(`
+  prose
+  prose-invert
+  max-w-none
   text-sm
   whitespace-pre-wrap
-  break-words
+  wrap-break-word
+  [&_h3]:mt-0 [&_h3]:font-bold
+  [&_h2]:mt-0 [&_h2]:font-bold
+  [&_h1]:mt-0 [&_h1]:font-bold
+  [&_ul]:list-disc [&_ul]:whitespace-normal
+  [&_ul]:list-inside
+  [&_ul]:pl-2
+  [&_ol]:list-decimal
+  [&_ol]:list-inside
+  [&_ol]:pl-2
 `)
 
 export const timestamp = cva(`

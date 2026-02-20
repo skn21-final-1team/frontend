@@ -9,7 +9,6 @@ export interface Chat {
 }
 
 export interface CreateChatRequest {
-  role: string
   message: string
   notebook_id: number
 }
@@ -24,7 +23,28 @@ export const getChatsByNotebook = async (notebookId: number): Promise<Chat[]> =>
   return response.data
 }
 
-export const createChat = async (data: CreateChatRequest): Promise<Chat> => {
-  const response = await fetcher.post<Chat>('/chat/', data)
-  return response.data
+export type StreamChatResponse = {
+  event: 'messages' | 'end'
+  data: string
 }
+
+// export const streamChat = async (
+//   data: CreateChatRequest,
+//   onMessage: (msg: string) => void,
+//   onFinish?: () => void,
+// ) => {
+//   try {
+//     await rawAPI.post('/api/chat', data, {
+//       onDownloadProgress: (progressEvent) => {
+//         const response = progressEvent.event.target.responseText
+//         const parsedResponse = JSON.parse(response)
+//         onMessage(parsedResponse.data)
+//       },
+//     })
+
+//     onFinish?.()
+//   } catch (error) {
+//     console.error('Stream error:', error)
+//     throw error
+//   }
+// }

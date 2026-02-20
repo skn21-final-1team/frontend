@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ChatInput from './components/chat-input'
 import MessageUser from './components/message-user'
 import MessageAi from './components/message-ai'
 import * as S from './chat-view.style'
-import { getChatsByNotebook, Chat } from '@/shared/api/chat.api'
+import { getChatsByNotebook, Chat, StreamChatResponse } from '@/shared/api/chat.api'
+import { SSE } from '@/shared/utils/fetcher'
 
 interface ChatViewProps {
   notebookId: number
@@ -13,7 +14,13 @@ interface ChatViewProps {
 
 export default function ChatView({ notebookId }: ChatViewProps) {
   const [messages, setMessages] = useState<Chat[]>([])
+  const [streamingMessage, setStreamingMessage] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -30,16 +37,55 @@ export default function ChatView({ notebookId }: ChatViewProps) {
     }
   }, [notebookId])
 
-  const handleSendMessage = async (message: string) => {
-    if (!message.trim()) return
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, streamingMessage])
 
-    try {
-      setIsLoading(true)
-    } catch (error) {
-      console.error('메시지 전송에 실패했습니다:', error)
-    } finally {
-      setIsLoading(false)
-    }
+  const updateNewMessage = (message: string, role: 'user' | 'assistant') => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        role,
+        message,
+        created_at: new Date().toISOString(),
+        notebook_id: notebookId,
+      },
+    ])
+  }
+
+  const handleSendMessage = async (input: string) => {
+    if (!input.trim()) return
+
+    setIsLoading(true)
+    updateNewMessage(input, 'user')
+
+    let aiMessage = ''
+    await SSE({
+      url: '/chat',
+      data: {
+        notebook_id: notebookId,
+        message: input,
+      },
+      onMessage: (event) => {
+        if (event.data === '') {
+          setStreamingMessage((prev) => prev + '\n')
+          aiMessage += '\n'
+        }
+        if (event.event === 'messages') {
+          setStreamingMessage((prev) => prev + event.data)
+          aiMessage += event.data
+        }
+      },
+      onError: () => {
+        setIsLoading(false)
+        setStreamingMessage('')
+      },
+    })
+
+    updateNewMessage(aiMessage.trim(), 'assistant')
+    setStreamingMessage('')
+    setIsLoading(false)
   }
 
   return (
@@ -53,6 +99,9 @@ export default function ChatView({ notebookId }: ChatViewProps) {
               <MessageUser key={chat.id} message={chat.message} />
             ),
           )}
+          {isLoading && !streamingMessage && <MessageAi isLoading={true} message="" />}
+          {streamingMessage && <MessageAi message={streamingMessage} />}
+          <div ref={messagesEndRef} />
         </div>
         <ChatInput onSend={handleSendMessage} disabled={isLoading} />
       </div>

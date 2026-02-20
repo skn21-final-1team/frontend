@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={`${notoSansKR.className} antialiased`}>
         <GoogleOAuthProvider clientId={googleClientId}>
           <ThemeProvider>
-            <div className="min-w-5xl mt-14">
+            <div className="min-w-5xl mt-16">
               <Header />
               {children}
             </div>
