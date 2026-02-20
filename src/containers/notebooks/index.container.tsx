@@ -8,8 +8,8 @@ import {
   deleteNotebook,
   type Notebook,
 } from '@/shared/api/notebook.api'
-import NotebookCard from './ui/notebook-card'
-import CreateCard from './ui/create-card'
+import NotebookCard from './components/notebook-card'
+import CreateCard from './components/create-notebook-card'
 
 import * as s from './index.style'
 

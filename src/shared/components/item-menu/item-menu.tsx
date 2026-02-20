@@ -17,12 +17,12 @@ interface ItemMenuProps {
 function ItemMenu({ align = 'start', size = 14, onRename, onDelete }: ItemMenuProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
         <button className={S.trigger()}>
           <MoreHorizontal size={size} className={S.icon()} />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align}>
+      <DropdownMenuContent align={align} onClick={(e) => e.stopPropagation()}>
         <DropdownMenuItem onClick={onRename ?? (() => alert('이름 바꾸기 기능 추후 구현'))}>
           <Pencil size={14} />
           <span>이름 바꾸기</span>

@@ -18,5 +18,5 @@ export interface ContentNode {
 
 export const getNotebookContent = async (id: number): Promise<ContentNode[]> => {
   const response = await fetcher.get<ContentNode[]>(`/notebook/${id}/content`)
-  return response.data
+  return response
 }
