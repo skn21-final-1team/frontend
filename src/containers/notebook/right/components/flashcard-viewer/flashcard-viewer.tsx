@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import type { FlashcardStudioContent, FlashcardContent } from '../../types/studio'
 import FlashcardCard from './flashcard-card'
 import * as S from './flashcard-viewer.style'
+import { Slider } from '@/shared/components/ui/slider'
 
 interface FlashcardViewerProps {
   flashcardContent: FlashcardStudioContent
@@ -16,7 +17,6 @@ function FlashcardViewer({ flashcardContent, onBack, onSendToChat }: FlashcardVi
   const [cards, setCards] = useState<FlashcardContent[]>(flashcardContent.contents)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
-  const progressRef = useRef<HTMLDivElement>(null)
 
   const currentCard = cards[currentIndex]
   if (!currentCard) return null
@@ -42,29 +42,6 @@ function FlashcardViewer({ flashcardContent, onBack, onSendToChat }: FlashcardVi
     const message = `자료를 바탕으로 플래시카드를 검토 중인데 그중 하나를 더 잘 이해하고 싶어.\n\n앞면에는 이렇게 적혀 있어. "${currentCard.question}"\n뒷면에 답은 이렇게 적혀 있어. "${currentCard.answer}"\n\n이 주제에 대해 더 자세히 설명해 줘.`
     onSendToChat(message)
   }
-
-  const calcIndexFromX = (clientX: number) => {
-    if (!progressRef.current) return currentIndex
-    const rect = progressRef.current.getBoundingClientRect()
-    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
-    return Math.round(ratio * (cards.length - 1))
-  }
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault()
-    goTo(calcIndexFromX(e.clientX))
-
-    const onMove = (ev: MouseEvent) => goTo(calcIndexFromX(ev.clientX))
-    const onUp = () => {
-      document.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseup', onUp)
-    }
-
-    document.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseup', onUp)
-  }
-
-  const progressPercent = cards.length > 1 ? (currentIndex / (cards.length - 1)) * 100 : 100
 
   return (
     <div className={S.wrapper()}>
@@ -103,19 +80,13 @@ function FlashcardViewer({ flashcardContent, onBack, onSendToChat }: FlashcardVi
       </div>
 
       <div className={S.footer()}>
-        <div
-          ref={progressRef}
-          className={S.progressBarWrapper()}
-          onClick={(e) => goTo(calcIndexFromX(e.clientX))}
-          onMouseDown={handleMouseDown}
-        >
-          <div
-            className={S.progressBarFill()}
-            style={{ width: `${progressPercent}%` }}
-          />
-          <div
-            className={S.progressBarThumb()}
-            style={{ left: `${progressPercent}%` }}
+        <div className="flex-1 px-3 flex items-center">
+          <Slider
+            value={[currentIndex]}
+            max={cards.length > 0 ? cards.length - 1 : 0}
+            step={1}
+            onValueChange={(val) => goTo(val[0])}
+            className="w-full cursor-pointer"
           />
         </div>
         <span className={S.cardCount()}>

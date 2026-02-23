@@ -67,41 +67,9 @@ export const footer = cva(`
   border-border/50
 `)
 
-export const progressBarWrapper = cva(`
-  flex-1
-  h-1
-  bg-muted
-  rounded-full
-  cursor-pointer
-  relative
-  overflow-hidden
-`)
-
-export const progressBarFill = cva(`
-  h-full
-  bg-primary
-  rounded-full
-  transition-[width]
-  duration-200
-`)
-
-export const progressBarThumb = cva(`
-  absolute
-  top-1/2
-  -translate-y-1/2
-  -translate-x-1/2
-  w-2.5
-  h-2.5
-  bg-primary
-  rounded-full
-  cursor-grab
-  active:cursor-grabbing
-  hover:scale-125
-  transition-transform
-`)
-
 export const cardCount = cva(`
   text-xs
   text-muted-foreground
   whitespace-nowrap
 `)
+
