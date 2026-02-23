@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/shared/components'
 import { getNotebookContent, ContentNode } from '@/shared/api/notebook-content.api'
@@ -46,10 +46,34 @@ const mapContentToBookmarks = (nodes: ContentNode[]): Bookmark[] => {
 
 export default function NotebookContainer({ notebookId }: NotebookContainerProps) {
   const [contentNodes, setContentNodes] = useState<ContentNode[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
   useEffect(() => {
-    getNotebookContent(notebookId).then(setContentNodes)
+    const fetchContent = async () => {
+      setIsLoading(true)
+      try {
+        const data = await getNotebookContent(notebookId)
+        setContentNodes(data)
+      } catch (error) {
+        console.error('Failed to fetch notebook content:', error)
+        setContentNodes([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    fetchContent()
   }, [notebookId])
-  const bookmarks = mapContentToBookmarks(contentNodes)
+
+  const bookmarks = useMemo(() => mapContentToBookmarks(contentNodes), [contentNodes])
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[calc(100vh-100px)] w-full items-center justify-center">
+        <div className="text-gray-500">노트북 데이터를 불러오는 중입니다...</div>
+      </div>
+    )
+  }
 
   return (
     <div className={s.container()}>
