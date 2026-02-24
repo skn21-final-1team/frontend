@@ -25,7 +25,7 @@ import { api } from '@/shared/utils/fetcher'
 import * as s from './index.style'
 
 type FormData = { email: string; password: string }
-type FormErrors = Partial<Record<keyof FormData, string>>
+type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function LoginContainer() {
   const router = useRouter()
@@ -66,7 +66,7 @@ export function LoginContainer() {
       alert('로그인 성공!')
       router.push('/')
     } catch (error) {
-      alert('로그인 실패: 이메일과 비밀번호를 확인해주세요.')
+      setErrors({ general: '이메일 또는 비밀번호를 다시 확인해주세요.' })
       console.error(error)
     } finally {
       setIsLoading(false)
@@ -166,6 +166,7 @@ export function LoginContainer() {
         </CardContent>
 
         <CardFooter className={s.cardFooter()}>
+          {errors.general && <p className={s.errorText()}>{errors.general}</p>}
           <Button
             variant="default"
             type="button"
