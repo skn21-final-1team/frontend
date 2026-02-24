@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { createSyncKey } from '@/shared/api/directory.api';
+import { createExtensionSyncKey } from '@/shared/api/extension.api';
 import { copyToClipboard } from '@/shared/utils/copy-to-clipboard';
 import type { SyncKeyState } from '@/shared/types/extension';
 
@@ -27,11 +27,11 @@ export const useExtension = (notebookId: number) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const data = await createSyncKey(notebookId);
+      const data = await createExtensionSyncKey(notebookId);
       setState({
         key: data.sync_key,
         expiresAt: data.expires_at,
-        isLoading: false,
+        isLoading: false, 
         error: null,
       });
     } catch (error) {

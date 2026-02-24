@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
 import { Copy, Check } from 'lucide-react';
 import { getTimeRemaining } from '@/shared/utils/format-date';
 import * as S from './extension-key.style'
@@ -29,11 +30,13 @@ export function ExtensionKey({ syncKey, expiresAt, isCopied, onCopy }: Extension
   return (
     <div className={S.container()}>
       <div className={S.keyRow()}>
-        <code className={S.codeBlock()}>
-          {syncKey}
-        </code>
+        <Input
+          readOnly
+          value={syncKey}
+          className={S.keyInput()}
+        />
         <Button onClick={onCopy} variant="outline" size="icon" aria-label="복사" className={S.copyButton()}>
-          {isCopied ? <Check className="text-green-600 h-3 w-3" /> : <Copy className="h-3 w-3" />}
+          {isCopied ? <Check className={S.checkIcon()} /> : <Copy className={S.copyIcon()} />}
         </Button>
       </div>
 

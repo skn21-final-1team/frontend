@@ -1,7 +1,8 @@
 'use client';
 
-import { Key, RefreshCw } from 'lucide-react';
+import { Key } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
+import { Spinner } from '@/shared/components/ui/spinner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,7 @@ export function ExtensionCard({ notebookId }: ExtensionCardProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className={S.triggerButton()}>
-          <Key className="h-4 w-4" />
+          <Key className={S.triggerIcon()} />
           Bookalpie 연동
         </Button>
       </DropdownMenuTrigger>
@@ -52,7 +53,7 @@ export function ExtensionCard({ notebookId }: ExtensionCardProps) {
               className={S.generateButton()}
             >
               {isLoading ? (
-                <><RefreshCw className="animate-spin mr-1 h-3 w-3" />발급 중...</>
+                <><Spinner className={S.spinnerIcon()} />발급 중...</>
               ) : (
                 <>{key ? '새 키 발급' : '키 발급'}</>
               )}

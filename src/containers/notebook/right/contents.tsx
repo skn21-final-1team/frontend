@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 
+import { Spinner } from '@/shared/components/ui/spinner'
 import StudioList from './components/studio-list'
 import GeneratedList from './components/generated-list/generated-list'
 import { QuizViewer } from './components/quiz-viewer'
@@ -149,7 +150,7 @@ function Contents({ onSendToChat }: ContentsProps) {
           {generatingList.map((generating) => (
             <div key={generating.id} className={S.generatingBanner()}>
               <div className={S.generatingInfo()}>
-                <Image src="/loader.svg" alt="loading" width={14} height={14} className={S.generatingSpinner()} />
+                <Spinner className={S.generatingSpinner()} />
                 <span>{generating.featureName} 생성 중...</span>
               </div>
               <button

@@ -1,5 +1,4 @@
 import { fetcher } from '@/shared/utils/fetcher';
-import type { SyncKeyResponse } from '@/shared/types/extension-sync';
 
 export interface Directory {
   id: number
@@ -53,10 +52,3 @@ export const deleteDirectory = async (directoryId: number) => {
   const response = await fetcher.delete(`/directory/${directoryId}`)
   return response
 }
-
-export const createSyncKey = async (notebookId: number): Promise<SyncKeyResponse> => {
-  const response = await fetcher.post<SyncKeyResponse>('/directory/key', {
-    notebook_id: notebookId,
-  });
-  return response;
-};
