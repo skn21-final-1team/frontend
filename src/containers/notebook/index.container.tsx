@@ -79,7 +79,7 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
     <div className={s.container()}>
       <ResizablePanelGroup orientation="horizontal">
         <ResizablePanel defaultSize={20} minSize={15}>
-          <SourceSection data={bookmarks} />
+          <SourceSection notebookId={notebookId} data={bookmarks} />
         </ResizablePanel>
 
         <ResizableHandle />

@@ -27,8 +27,7 @@ export function ExtensionCard({ notebookId }: ExtensionCardProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className={S.triggerButton()}>
-          <Key className={S.triggerIcon()} />
-          Bookalpie 연동
+          <Key className={S.triggerIcon()} /> 
         </Button>
       </DropdownMenuTrigger>
       
