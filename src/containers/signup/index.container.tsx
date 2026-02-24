@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,10 +25,19 @@ import { useUserStore } from '@/shared/store/user-store'
 import * as s from './index.style'
 
 type FormData = { name: string; email: string; password: string; confirmPassword: string }
-type FormErrors = Partial<Record<keyof FormData, string>>
+type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function SignupContainer() {
   const router = useRouter()
+  const hasToken = useUserStore((state) => !!state.accessToken)
+
+  useEffect(() => {
+    if (hasToken) {
+      alert('이미 로그인되어 있습니다.')
+      router.replace('/')
+    }
+  }, [hasToken, router])
+
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '', confirmPassword: '' })
@@ -63,7 +72,7 @@ export function SignupContainer() {
       alert('회원가입 성공! 로그인해주세요.')
       router.push('/login')
     } catch (error) {
-      alert('회원가입 실패: 이미 사용 중인 이메일이거나 서버 오류입니다.')
+      setErrors({ general: '회원가입 실패: 이미 사용 중인 이메일이거나 서버 오류입니다.' })
       console.error(error)
     } finally {
       setIsLoading(false)
@@ -85,12 +94,12 @@ export function SignupContainer() {
         router.push('/')
       } catch (error) {
         console.error('구글 로그인 서버 연동 실패:', error)
-        alert('구글 로그인에 실패했습니다.')
+        setErrors({ general: '구글 로그인에 실패했습니다.' })
       }
     },
     onError: (error) => {
       console.error('구글 로그인 팝업 실패:', error)
-      alert('구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.')
+      setErrors({ general: '구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.' })
     },
   })
  
@@ -180,6 +189,7 @@ export function SignupContainer() {
         </CardContent>
 
         <CardFooter className={s.cardFooter()}>
+          {errors.general && <p className={s.errorText()}>{errors.general}</p>}
           <Button
             variant="default"
             type="button"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,10 +25,19 @@ import { api } from '@/shared/utils/fetcher'
 import * as s from './index.style'
 
 type FormData = { email: string; password: string }
-type FormErrors = Partial<Record<keyof FormData, string>>
+type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function LoginContainer() {
   const router = useRouter()
+  const hasToken = useUserStore((state) => !!state.accessToken)
+
+  useEffect(() => {
+    if (hasToken) {
+      alert('이미 로그인되어 있습니다.')
+      router.replace('/')
+    }
+  }, [hasToken, router])
+
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<FormData>({ email: '', password: '' })
@@ -66,7 +75,7 @@ export function LoginContainer() {
       alert('로그인 성공!')
       router.push('/')
     } catch (error) {
-      alert('로그인 실패: 이메일과 비밀번호를 확인해주세요.')
+      setErrors({ general: '이메일 또는 비밀번호를 다시 확인해주세요.' })
       console.error(error)
     } finally {
       setIsLoading(false)
@@ -114,8 +123,8 @@ export function LoginContainer() {
           </div>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={onFormSubmit}>
+        <form onSubmit={onFormSubmit}>
+          <CardContent>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
@@ -162,10 +171,11 @@ export function LoginContainer() {
                 </div>
               </div>
             </div>
-          </form>
-        </CardContent>
+          </CardContent>
 
+<<<<<<< Updated upstream
         <CardFooter className={s.cardFooter()}>
+          {errors.general && <p className={s.errorText()}>{errors.general}</p>}
           <Button
             variant="default"
             type="button"
@@ -184,6 +194,28 @@ export function LoginContainer() {
             Login with Google
           </Button>
         </CardFooter>
+=======
+          <CardFooter className={s.cardFooter()}>
+            <Button
+              variant="default"
+              type="submit"
+              className={s.submitButton()}
+              disabled={isLoading}
+            >
+              {isLoading ? <Spinner data-icon="inline-start" /> : 'Login'}
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              className={s.googleLoginButton()}
+              onClick={() => handleGoogleLogin()}
+            >
+              <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
+              Login with Google
+            </Button>
+          </CardFooter>
+        </form>
+>>>>>>> Stashed changes
       </Card>
     </div>
   )
