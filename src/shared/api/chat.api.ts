@@ -15,12 +15,12 @@ export interface CreateChatRequest {
 
 export const getChat = async (chatId: number): Promise<Chat> => {
   const response = await fetcher.get<Chat>(`/chat/${chatId}`)
-  return response.data
+  return response
 }
 
 export const getChatsByNotebook = async (notebookId: number): Promise<Chat[]> => {
   const response = await fetcher.get<Chat[]>(`/chat/notebook/${notebookId}`)
-  return response.data
+  return response
 }
 
 export type StreamChatResponse = {

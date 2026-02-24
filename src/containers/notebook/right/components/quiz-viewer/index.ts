@@ -1,0 +1,1 @@
+export { default as QuizViewer } from './quiz-viewer'

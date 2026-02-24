@@ -16,36 +16,53 @@ import {
   Label,
   Button,
 } from '@/shared/components'
-import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { login } from '@/shared/api/auth.api'
 import { useUserStore } from '@/shared/store/user-store'
-import { loginFormSchema, LoginFormValues } from './login.schema'
+import { loginFormSchema } from './login.schema'
+import { useGoogleLogin as useGoogleAuth } from '@react-oauth/google'
+import { api } from '@/shared/utils/fetcher'
 import * as s from './index.style'
+
+type FormData = { email: string; password: string }
+type FormErrors = Partial<Record<keyof FormData, string>>
 
 export function LoginContainer() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormValues>({
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-    resolver: zodResolver(loginFormSchema),
-  })
+  const [formData, setFormData] = useState<FormData>({ email: '', password: '' })
+  const [errors, setErrors] = useState<FormErrors>({})
 
-  const onSubmit = async (data: LoginFormValues) => {
+  const validate = (data: FormData): FormErrors => {
+    const result = loginFormSchema.safeParse(data)
+    if (result.success) return {}
+    const fieldErrors: FormErrors = {}
+    result.error.issues.forEach((err) => {
+      const key = err.path[0] as keyof FormData
+      if (!fieldErrors[key]) fieldErrors[key] = err.message
+    })
+    return fieldErrors
+  }
+
+  const handleChange = (field: keyof FormData, value: string) => {
+    const newData = { ...formData, [field]: value }
+    setFormData(newData)
+    if (Object.keys(errors).length > 0) {
+      setErrors(validate(newData))
+    }
+  }
+
+  const handleSubmit = async () => {
+    const fieldErrors = validate(formData)
+    if (Object.keys(fieldErrors).length > 0) {
+      setErrors(fieldErrors)
+      return
+    }
     setIsLoading(true)
     try {
-      const result = await login(data.email, data.password)
-      useUserStore.getState().setUser(result.user, result.access_token)
-
+      const loginResult = await login(formData.email, formData.password)
+      useUserStore.getState().setUser(loginResult.user, loginResult.access_token)
       alert('로그인 성공!')
       router.push('/')
     } catch (error) {
@@ -55,6 +72,30 @@ export function LoginContainer() {
       setIsLoading(false)
     }
   }
+
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleSubmit()
+  }
+
+  const handleGoogleLogin = useGoogleAuth({
+    onSuccess: async (codeResponse) => {
+      try {
+        const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
+        const { access_token, user } = response.data.data
+        useUserStore.getState().setUser(user, access_token)
+        alert('구글 로그인 성공!')
+        router.push('/')
+      } catch (error) {
+        console.error('구글 로그인 서버 연동 실패:', error)
+        alert('구글 로그인에 실패했습니다.')
+      }
+    },
+    onError: (error) => {
+      console.error('구글 로그인 팝업 실패:', error)
+      alert('구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.')
+    },
+  })
 
   return (
     <div className={s.wrapper()}>
@@ -74,7 +115,7 @@ export function LoginContainer() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={onFormSubmit}>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
@@ -83,9 +124,10 @@ export function LoginContainer() {
                   type="email"
                   placeholder="m@example.com"
                   required
-                  {...register('email')}
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
                 />
-                {errors.email && <p className={s.errorText()}>{errors.email.message}</p>}
+                {errors.email && <p className={s.errorText()}>{errors.email}</p>}
               </div>
               <div className={s.inputGroup()}>
                 <div className={s.passwordLabelWrapper()}>
@@ -94,15 +136,15 @@ export function LoginContainer() {
                     Forgot password?
                   </a>
                 </div>
-
                 <div className={s.passwordInputWrapper()}>
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     required
-                    {...register('password')}
+                    value={formData.password}
+                    onChange={(e) => handleChange('password', e.target.value)}
                   />
-                  {errors.password && <p className={s.errorText()}>{errors.password.message}</p>}
+                  {errors.password && <p className={s.errorText()}>{errors.password}</p>}
                   <Button
                     type="button"
                     variant="ghost"
@@ -126,14 +168,18 @@ export function LoginContainer() {
         <CardFooter className={s.cardFooter()}>
           <Button
             variant="default"
-            type="submit"
+            type="button"
             className={s.submitButton()}
-            onClick={handleSubmit(onSubmit)}
+            onClick={handleSubmit}
             disabled={isLoading}
           >
             {isLoading ? <Spinner data-icon="inline-start" /> : 'Login'}
           </Button>
-          <Button variant="outline" className={s.googleLoginButton()}>
+          <Button
+            variant="outline"
+            className={s.googleLoginButton()}
+            onClick={() => handleGoogleLogin()}
+          >
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
             Login with Google
           </Button>

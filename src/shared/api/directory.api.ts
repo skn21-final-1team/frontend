@@ -1,57 +1,54 @@
-import { api } from '@/shared/utils/axios';
+import { fetcher } from '@/shared/utils/fetcher';
 
 export interface Directory {
-  id: number;
-  title: string;
-  notebook_id: number;
-  parent_id: number | null;
+  id: number
+  title: string
+  notebook_id: number
+  parent_id: number | null
 }
 
-export interface CreateDirectoryRequest {
-  title: string;
-  parent_id: number | null;
-}
-
-export interface UpdateDirectoryRequest {
-  title: string;
-  parent_id: number | null;
+export interface DirectoryRequest {
+  title: string
+  parent_id: number | null
 }
 
 export const createDirectory = async (
   notebookId: number,
-  data: CreateDirectoryRequest
+  data: DirectoryRequest
 ): Promise<Directory> => {
-  const response = await api.post(`/directory/?notebook_id=${notebookId}`, data);
-  return response.data.data;
-};
+  const response = await fetcher.post<Directory>('/directory/', {
+    ...data,
+    notebook_id: notebookId,
+  })
+  return response
+}
 
-export const getDirectoriesByNotebook = async (notebookId: number): Promise<Directory[]> => {
-  const response = await api.get(`/directory/notebook/${notebookId}`);
-  return response.data.data;
-};
-export const getDirectoriesByParent = async (
+export const getDirectories = async (
   notebookId: number,
-  parentId: number | null
+  parentId?: number | null
 ): Promise<Directory[]> => {
-  const params = parentId !== null ? `?notebook_id=${notebookId}&parent_id=${parentId}` : `?notebook_id=${notebookId}`;
-  const response = await api.get(`/directory/${params}`);
-  return response.data.data;
-};
+  const params: Record<string, string | number> = { notebook_id: notebookId }
+  if (parentId !== undefined && parentId !== null) {
+    params.parent_id = parentId
+  }
+  const response = await fetcher.get<Directory[]>('/directory/', params)
+  return response
+}
 
 export const getDirectory = async (directoryId: number): Promise<Directory> => {
-  const response = await api.get(`/directory/${directoryId}`);
-  return response.data.data;
-};
+  const response = await fetcher.get<Directory>(`/directory/${directoryId}`)
+  return response
+}
 
 export const updateDirectory = async (
   directoryId: number,
-  data: UpdateDirectoryRequest
+  data: DirectoryRequest
 ): Promise<Directory> => {
-  const response = await api.patch(`/directory/${directoryId}`, data);
-  return response.data.data;
-};
+  const response = await fetcher.patch<Directory>(`/directory/${directoryId}`, data)
+  return response
+}
 
-export const deleteDirectory = async (directoryId: number): Promise<Directory> => {
-  const response = await api.delete(`/directory/${directoryId}`);
-  return response.data.data;
-};
+export const deleteDirectory = async (directoryId: number) => {
+  const response = await fetcher.delete(`/directory/${directoryId}`)
+  return response
+}

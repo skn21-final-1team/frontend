@@ -14,10 +14,10 @@ type LoginResponse = {
 
 export const login = async (email: string, password: string) => {
   const res = await fetcher.post<LoginResponse>('/login', { email, password })
-  return res.data
+  return res
 }
 
 export const signup = async (data: { email: string; password: string; name: string }) => {
-  const res = await fetcher.post('/signup', data)
+  const res = await fetcher.post<{ message: string }>('/signup', data)
   return res
 }

@@ -40,3 +40,35 @@ export const generatedSection = cva(`
   flex
   flex-col
 `)
+
+export const generatingBanner = cva(`
+  flex
+  items-center
+  justify-between
+  px-3
+  py-2
+  rounded-lg
+  bg-muted/60
+  border
+  border-border/50
+  text-sm
+`)
+
+export const generatingInfo = cva(`
+  flex
+  items-center
+  gap-2
+  text-muted-foreground
+`)
+
+export const generatingSpinner = cva(`
+  animate-spin
+`)
+
+export const cancelButton = cva(`
+  p-1
+  hover:bg-muted
+  rounded
+  transition-colors
+  text-muted-foreground
+`)

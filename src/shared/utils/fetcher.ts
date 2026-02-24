@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { useUserStore } from '@/shared/store/user-store'
 import { BaseResponse } from '@/shared/types/response'
 import { User } from '@/shared/api/auth.api'
@@ -11,7 +11,7 @@ export const config = {
     'Content-Type': 'application/json',
   },
 }
-const api = axios.create(config)
+export const api = axios.create(config)
 
 api.interceptors.request.use((config) => {
   const token = useUserStore.getState().accessToken
@@ -50,12 +50,25 @@ api.interceptors.response.use(
 export const apiUrl = (url: string) => `/api${url}`
 
 export const fetcher = {
-  get: <T>(url: string) => api.get<BaseResponse<T>>(apiUrl(url)).then((res) => res.data),
-  post: <T>(url: string, data?: unknown) =>
-    api.post<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
-  patch: <T>(url: string, data?: unknown) =>
-    api.patch<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
-  delete: (url: string) => api.delete<BaseResponse<null>>(apiUrl(url)).then((res) => res.data),
+  get: async <T>(url: string, config?: AxiosRequestConfig) => {
+    const response = await api.get(apiUrl(url), config as any)
+    return response.data.data as T
+  },
+
+  post: async <T>(url: string, data?: any, config?: AxiosRequestConfig) => {
+    const response = await api.post(apiUrl(url), data, config as any)
+    return response.data.data as T
+  },
+
+  patch: async <T>(url: string, data?: any, config?: AxiosRequestConfig) => {
+    const response = await api.patch(apiUrl(url), data, config as any)
+    return response.data.data as T
+  },
+
+  delete: async <T>(url: string, config?: AxiosRequestConfig) => {
+    const response = await api.delete(apiUrl(url), config as any)
+    return response.data.data as T
+  },
 }
 
 type RawAPIArgs = {
