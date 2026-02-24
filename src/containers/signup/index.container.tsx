@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,6 +29,15 @@ type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function SignupContainer() {
   const router = useRouter()
+  const hasToken = useUserStore((state) => !!state.accessToken)
+
+  useEffect(() => {
+    if (hasToken) {
+      alert('이미 로그인되어 있습니다.')
+      router.replace('/')
+    }
+  }, [hasToken, router])
+
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '', confirmPassword: '' })
