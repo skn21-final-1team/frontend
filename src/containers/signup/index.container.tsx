@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import * as z from 'zod'
 import {
   Card,
   CardContent,
@@ -19,9 +20,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { signup } from '@/shared/api/auth.api'
 import { signupFormSchema } from './signup.schema'
-import { useGoogleLogin as useGoogleAuth } from '@react-oauth/google'
-import { api } from '@/shared/utils/fetcher'
-import { useUserStore } from '@/shared/store/user-store'
+import { googleAuthService } from '@/shared/hooks/google-auth'
 import * as s from './index.style'
 
 type FormData = { name: string; email: string; password: string; confirmPassword: string }
@@ -44,7 +43,7 @@ export function SignupContainer() {
     const result = signupFormSchema.safeParse(data)
     if (result.success) return {}
     const fieldErrors: FormErrors = {}
-    result.error.issues.forEach((err) => {
+    result.error.issues.forEach((err: z.core.$ZodIssue) => {
       const key = err.path[0] as keyof FormData
       if (!fieldErrors[key]) fieldErrors[key] = err.message
     })
@@ -83,23 +82,10 @@ export function SignupContainer() {
     handleSubmit()
   }
 
-  const handleGoogleLogin = useGoogleAuth({
-    onSuccess: async (codeResponse) => {
-      try {
-        const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
-        const { access_token, user } = response.data.data
-        useUserStore.getState().setUser(user, access_token)
-        router.push('/')
-      } catch (error) {
-        console.error('구글 로그인 서버 연동 실패:', error)
-        setErrors({ general: '구글 로그인에 실패했습니다.' })
-      }
-    },
-    onError: (error) => {
-      console.error('구글 로그인 팝업 실패:', error)
-      setErrors({ general: '구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.' })
-    },
-  })
+  const handleGoogleLogin = () => {
+    const startUrl = googleAuthService.buildStartUrl(window.location.origin)
+    window.location.assign(startUrl)
+  }
 
   return (
     <div className={s.wrapper()}>
@@ -198,11 +184,7 @@ export function SignupContainer() {
           >
             {isLoading ? <Spinner data-icon="inline-start" /> : 'Sign Up'}
           </Button>
-          <Button
-            variant="outline"
-            className={s.googleButton()}
-            onClick={() => handleGoogleLogin()}
-          >
+          <Button variant="outline" className={s.googleButton()} onClick={handleGoogleLogin}>
             <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
             Sign up with Google
           </Button>

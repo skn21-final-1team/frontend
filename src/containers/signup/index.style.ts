@@ -79,12 +79,6 @@ export const googleButton = cva(`
   w-full
 `)
 
-export const googleIcon = cva(`
-  mr-2
-  h-4
-  w-4
-`)
-
 export const errorText = cva(`
   text-red-500
   text-xs

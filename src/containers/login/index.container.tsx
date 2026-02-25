@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import * as z from 'zod'
 import {
   Card,
   CardContent,
@@ -20,8 +21,7 @@ import { useRouter } from 'next/navigation'
 import { login } from '@/shared/api/auth.api'
 import { useUserStore } from '@/shared/store/user-store'
 import { loginFormSchema } from './login.schema'
-import { useGoogleLogin as useGoogleAuth } from '@react-oauth/google'
-import { api } from '@/shared/utils/fetcher'
+import { useGoogleAuth } from '@/shared/hooks/google-auth'
 import * as s from './index.style'
 
 type FormData = { email: string; password: string }
@@ -29,6 +29,7 @@ type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function LoginContainer() {
   const router = useRouter()
+  const { loginWithGoogle } = useGoogleAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -39,7 +40,7 @@ export function LoginContainer() {
     const result = loginFormSchema.safeParse(data)
     if (result.success) return {}
     const fieldErrors: FormErrors = {}
-    result.error.issues.forEach((err) => {
+    result.error.issues.forEach((err: z.core.$ZodIssue) => {
       const key = err.path[0] as keyof FormData
       if (!fieldErrors[key]) fieldErrors[key] = err.message
     })
@@ -80,24 +81,6 @@ export function LoginContainer() {
     e.preventDefault()
     handleSubmit()
   }
-
-  const handleGoogleLogin = useGoogleAuth({
-    onSuccess: async (codeResponse) => {
-      try {
-        const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
-        const { access_token, user } = response.data.data
-        useUserStore.getState().setUser(user, access_token)
-        router.push('/')
-      } catch (error) {
-        console.error('구글 로그인 서버 연동 실패:', error)
-        setErrors({ general: '구글 로그인에 실패했습니다.' })
-      }
-    },
-    onError: (error) => {
-      console.error('구글 로그인 팝업 실패:', error)
-      setErrors({ general: '구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.' })
-    },
-  })
 
   return (
     <div className={s.wrapper()}>
@@ -180,7 +163,7 @@ export function LoginContainer() {
               variant="outline"
               type="button"
               className={s.googleLoginButton()}
-              onClick={() => handleGoogleLogin()}
+              onClick={loginWithGoogle}
             >
               <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
               Login with Google
