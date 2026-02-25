@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,14 +29,6 @@ type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function SignupContainer() {
   const router = useRouter()
-  const hasToken = useUserStore((state) => !!state.accessToken)
-
-  useEffect(() => {
-    if (hasToken) {
-      alert('이미 로그인되어 있습니다.')
-      router.replace('/')
-    }
-  }, [hasToken, router])
 
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -66,10 +58,12 @@ export function SignupContainer() {
       setErrors(fieldErrors)
       return
     }
+
     setIsLoading(true)
+    setErrors({})
+
     try {
       await signup({ email: formData.email, password: formData.password, name: formData.name })
-      alert('회원가입 성공! 로그인해주세요.')
       router.push('/login')
     } catch (error) {
       setErrors({ general: '회원가입 실패: 이미 사용 중인 이메일이거나 서버 오류입니다.' })
@@ -90,8 +84,7 @@ export function SignupContainer() {
         const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
         const { access_token, user } = response.data.data
         useUserStore.getState().setUser(user, access_token)
-        alert('구글 로그인(회원가입) 성공!')
-        router.push('/')
+        router.push('/notebooks')
       } catch (error) {
         console.error('구글 로그인 서버 연동 실패:', error)
         setErrors({ general: '구글 로그인에 실패했습니다.' })

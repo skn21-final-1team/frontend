@@ -22,8 +22,35 @@ export const leftSection = cva(`
   flex
   items-center
   gap-2
+`)
+
+export const logoLink = cva(`
+  flex
+  items-center
+  gap-2
+`)
+
+export const logoText = cva(`
   font-semibold
-  [&_span]:text-3xl
+  text-3xl
+`)
+
+export const titleDivider = cva(`
+  h-6
+  w-[2px]
+  bg-slate-300
+  mx-2
+  dark:bg-slate-700
+`)
+
+export const notebookTitle = cva(`
+  text-xl
+  font-medium
+  text-slate-700
+  truncate
+  max-w-[200px]
+  md:max-w-[400px]
+  dark:text-slate-300
 `)
 
 export const rightSection = cva(`

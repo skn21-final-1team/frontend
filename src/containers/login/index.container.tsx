@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,14 +29,6 @@ type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function LoginContainer() {
   const router = useRouter()
-  const hasToken = useUserStore((state) => !!state.accessToken)
-
-  useEffect(() => {
-    if (hasToken) {
-      alert('이미 로그인되어 있습니다.')
-      router.replace('/')
-    }
-  }, [hasToken, router])
 
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -68,12 +60,14 @@ export function LoginContainer() {
       setErrors(fieldErrors)
       return
     }
+
     setIsLoading(true)
+    setErrors({})
+
     try {
       const loginResult = await login(formData.email, formData.password)
       useUserStore.getState().setUser(loginResult.user, loginResult.access_token)
-      alert('로그인 성공!')
-      router.push('/')
+      router.push('/notebooks')
     } catch (error) {
       setErrors({ general: '이메일 또는 비밀번호를 다시 확인해주세요.' })
       console.error(error)
@@ -93,16 +87,15 @@ export function LoginContainer() {
         const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
         const { access_token, user } = response.data.data
         useUserStore.getState().setUser(user, access_token)
-        alert('구글 로그인 성공!')
-        router.push('/')
+        router.push('/notebooks')
       } catch (error) {
         console.error('구글 로그인 서버 연동 실패:', error)
-        alert('구글 로그인에 실패했습니다.')
+        setErrors({ general: '구글 로그인에 실패했습니다.' })
       }
     },
     onError: (error) => {
       console.error('구글 로그인 팝업 실패:', error)
-      alert('구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.')
+      setErrors({ general: '구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.' })
     },
   })
 
@@ -173,29 +166,8 @@ export function LoginContainer() {
             </div>
           </CardContent>
 
-<<<<<<< Updated upstream
-        <CardFooter className={s.cardFooter()}>
-          {errors.general && <p className={s.errorText()}>{errors.general}</p>}
-          <Button
-            variant="default"
-            type="button"
-            className={s.submitButton()}
-            onClick={handleSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? <Spinner data-icon="inline-start" /> : 'Login'}
-          </Button>
-          <Button
-            variant="outline"
-            className={s.googleLoginButton()}
-            onClick={() => handleGoogleLogin()}
-          >
-            <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
-            Login with Google
-          </Button>
-        </CardFooter>
-=======
           <CardFooter className={s.cardFooter()}>
+            {errors.general && <p className={s.errorText()}>{errors.general}</p>}
             <Button
               variant="default"
               type="submit"
@@ -215,7 +187,6 @@ export function LoginContainer() {
             </Button>
           </CardFooter>
         </form>
->>>>>>> Stashed changes
       </Card>
     </div>
   )
