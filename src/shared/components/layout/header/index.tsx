@@ -54,7 +54,7 @@ export function Header() {
     <header className={s.header()}>
       <div className={s.container()}>
         <div className={s.leftSection()}>
-          <Link href="/notebooks" className={s.logoLink()}>
+          <Link href="/" className={s.logoLink()}>
             <Image
               src="/kalpi.png"
               alt="Logo"
@@ -67,9 +67,7 @@ export function Header() {
           {notebookName && (
             <>
               <div className={s.titleDivider()} />
-              <span className={s.notebookTitle()}>
-                {notebookName}
-              </span>
+              <span className={s.notebookTitle()}>{notebookName}</span>
             </>
           )}
         </div>

@@ -32,7 +32,12 @@ export function SignupContainer() {
 
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState<FormData>({ name: '', email: '', password: '', confirmPassword: '' })
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
   const [errors, setErrors] = useState<FormErrors>({})
 
   const validate = (data: FormData): FormErrors => {
@@ -84,7 +89,7 @@ export function SignupContainer() {
         const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
         const { access_token, user } = response.data.data
         useUserStore.getState().setUser(user, access_token)
-        router.push('/notebooks')
+        router.push('/')
       } catch (error) {
         console.error('구글 로그인 서버 연동 실패:', error)
         setErrors({ general: '구글 로그인에 실패했습니다.' })
@@ -95,7 +100,6 @@ export function SignupContainer() {
       setErrors({ general: '구글 로그인 팝업이 닫혔거나 에러가 발생했습니다.' })
     },
   })
- 
 
   return (
     <div className={s.wrapper()}>
@@ -175,7 +179,9 @@ export function SignupContainer() {
                   value={formData.confirmPassword}
                   onChange={(e) => handleChange('confirmPassword', e.target.value)}
                 />
-                {errors.confirmPassword && <p className={s.errorText()}>{errors.confirmPassword}</p>}
+                {errors.confirmPassword && (
+                  <p className={s.errorText()}>{errors.confirmPassword}</p>
+                )}
               </div>
             </div>
           </form>

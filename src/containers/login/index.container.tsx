@@ -67,7 +67,7 @@ export function LoginContainer() {
     try {
       const loginResult = await login(formData.email, formData.password)
       useUserStore.getState().setUser(loginResult.user, loginResult.access_token)
-      router.push('/notebooks')
+      router.push('/')
     } catch (error) {
       setErrors({ general: '이메일 또는 비밀번호를 다시 확인해주세요.' })
       console.error(error)
@@ -87,7 +87,7 @@ export function LoginContainer() {
         const response = await api.post('/auth/google', { id_token: codeResponse.access_token })
         const { access_token, user } = response.data.data
         useUserStore.getState().setUser(user, access_token)
-        router.push('/notebooks')
+        router.push('/')
       } catch (error) {
         console.error('구글 로그인 서버 연동 실패:', error)
         setErrors({ general: '구글 로그인에 실패했습니다.' })

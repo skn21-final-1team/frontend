@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import NotebooksContainer from '@/containers/notebooks/index.container'
 
-export default function Home() {
-  redirect("/notebooks");
+export default function NotebooksPage() {
+  return <NotebooksContainer />
 }
