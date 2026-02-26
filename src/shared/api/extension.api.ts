@@ -5,5 +5,5 @@ export const createExtensionSyncKey = async (notebookId: number): Promise<SyncKe
   const response = await fetcher.post<SyncKeyResponse>('/directory/key', {
     notebook_id: notebookId,
   });
-  return response;
+  return response.data;
 };
