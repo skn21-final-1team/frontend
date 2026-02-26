@@ -20,7 +20,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { signup } from '@/shared/api/auth.api'
 import { signupFormSchema } from './signup.schema'
-import { googleAuthService } from '@/shared/hooks/google-auth'
+import { useGoogleAuth } from '@/shared/hooks/google-auth'
 import * as s from './index.style'
 
 type FormData = { name: string; email: string; password: string; confirmPassword: string }
@@ -28,6 +28,7 @@ type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function SignupContainer() {
   const router = useRouter()
+  const { loginWithGoogle } = useGoogleAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -53,7 +54,9 @@ export function SignupContainer() {
   const handleChange = (field: keyof FormData, value: string) => {
     const newData = { ...formData, [field]: value }
     setFormData(newData)
-    setErrors(validate(newData))
+    if (Object.keys(errors).length > 0) {
+      setErrors(validate(newData))
+    }
   }
 
   const handleSubmit = async () => {
@@ -80,11 +83,6 @@ export function SignupContainer() {
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     handleSubmit()
-  }
-
-  const handleGoogleLogin = () => {
-    const startUrl = googleAuthService.buildStartUrl(window.location.origin)
-    window.location.assign(startUrl)
   }
 
   return (
@@ -117,6 +115,7 @@ export function SignupContainer() {
                 />
                 {errors.name && <p className={s.errorText()}>{errors.name}</p>}
               </div>
+
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -129,6 +128,7 @@ export function SignupContainer() {
                 />
                 {errors.email && <p className={s.errorText()}>{errors.email}</p>}
               </div>
+
               <div className={s.inputGroup()}>
                 <Label htmlFor="password">Password</Label>
                 <div className={s.passwordInputWrapper()}>
@@ -139,7 +139,6 @@ export function SignupContainer() {
                     value={formData.password}
                     onChange={(e) => handleChange('password', e.target.value)}
                   />
-                  {errors.password && <p className={s.errorText()}>{errors.password}</p>}
                   <Button
                     type="button"
                     variant="ghost"
@@ -155,40 +154,62 @@ export function SignupContainer() {
                     <span className="sr-only">Toggle password visibility</span>
                   </Button>
                 </div>
+                {errors.password && <p className={s.errorText()}>{errors.password}</p>}
               </div>
+
               <div className={s.inputGroup()}>
                 <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                />
+                <div className={s.passwordInputWrapper()}>
+                  <Input
+                    id="confirm-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={s.showPasswordButton()}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className={s.eyeIcon()} />
+                    ) : (
+                      <Eye className={s.eyeIcon()} />
+                    )}
+                    <span className="sr-only">Toggle password visibility</span>
+                  </Button>
+                </div>
                 {errors.confirmPassword && (
                   <p className={s.errorText()}>{errors.confirmPassword}</p>
                 )}
               </div>
             </div>
+
+            <CardFooter className={s.cardFooter()}>
+              {errors.general && <p className={s.errorText()}>{errors.general}</p>}
+              <Button
+                variant="default"
+                type="submit" 
+                className={s.submitButton()}
+                disabled={isLoading}
+              >
+                {isLoading ? <Spinner data-icon="inline-start" /> : 'Sign Up'}
+              </Button>
+              <Button 
+                variant="outline" 
+                type="button" 
+                className={s.googleButton()} 
+                onClick={loginWithGoogle}
+              >
+                <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
+                Sign up with Google
+              </Button>
+            </CardFooter>
           </form>
         </CardContent>
-
-        <CardFooter className={s.cardFooter()}>
-          {errors.general && <p className={s.errorText()}>{errors.general}</p>}
-          <Button
-            variant="default"
-            type="button"
-            className={s.submitButton()}
-            onClick={handleSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? <Spinner data-icon="inline-start" /> : 'Sign Up'}
-          </Button>
-          <Button variant="outline" className={s.googleButton()} onClick={handleGoogleLogin}>
-            <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
-            Sign up with Google
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   )
