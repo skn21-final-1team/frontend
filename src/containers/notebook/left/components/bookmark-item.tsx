@@ -8,18 +8,20 @@ import BookmarkUrl from './bookmark-url'
 import * as S from './bookmark-item.style'
 
 type BookmarkItemProps = {
-  id: string
+  id: number
 }
 
 function BookmarkItem({ id }: BookmarkItemProps) {
-  const { bookmarks, toggleExpand, toggleCheck, deleteBookmark } = useBookmarkStore()
-  const data = bookmarks[id]
+  const data = useBookmarkStore((state) => state.bookmarks[id])
+  const toggleExpand = useBookmarkStore((state) => state.toggleExpand)
+  const toggleCheck = useBookmarkStore((state) => state.toggleCheck)
+  const deleteBookmark = useBookmarkStore((state) => state.deleteBookmark)
 
   if (!data) return null
 
   if (data.type === 'folder') {
     return (
-      <Collapsible key={data.id} open={data.isExpanded ?? false}>
+      <Collapsible key={data.id} open={data.isExpanded}>
         <div className={S.folderRow()}>
           <CollapsibleTrigger asChild>
             <Button
@@ -38,13 +40,13 @@ function BookmarkItem({ id }: BookmarkItemProps) {
           </CollapsibleTrigger>
 
           <Checkbox
-            checked={data.isChecked ?? false}
+            checked={data.isChecked}
             onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
           />
         </div>
         <CollapsibleContent className={S.subList()}>
           <span className={S.subFolder()}>
-            {data.children?.map((childId) => (
+            {data.children.map((childId) => (
               <BookmarkItem key={childId} id={childId} />
             ))}
           </span>

@@ -1,12 +1,12 @@
 import { Button, Checkbox } from '@/shared/components'
 import { Bookmark as BookmarkIcon } from 'lucide-react'
-import type { Bookmark } from '../types/bookmarks'
+import type { FlatBookmarkNode } from '../types/bookmarks.typs'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import HoverActions from './hover-actions'
 import * as S from './bookmark-url.style'
 
 type BookmarkUrlProps = {
-  data: Pick<Bookmark, 'id' | 'title' | 'url'>
+  data: Pick<FlatBookmarkNode, 'id' | 'title' | 'url'>
 }
 
 function BookmarkUrl({ data }: BookmarkUrlProps) {

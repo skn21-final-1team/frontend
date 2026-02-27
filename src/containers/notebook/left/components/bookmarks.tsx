@@ -1,24 +1,25 @@
 import { useEffect } from 'react'
 import { useBookmarkStore } from '../store/bookmarks.store'
-import type { Bookmark } from '../types/bookmarks'
 import BookmarkItem from './bookmark-item'
 import * as S from './bookmarks.style'
 
-type BookmardProps = {
-  data: Bookmark[]
+type BookmarksProps = {
+  notebookId: number
 }
 
-function Bookmarks({ data }: BookmardProps) {
-  const { initialize } = useBookmarkStore()
+function Bookmarks({ notebookId }: BookmarksProps) {
+  const { rootIds, fetchAndInitialize, isLoading } = useBookmarkStore()
 
   useEffect(() => {
-    initialize(data)
-  }, [data, initialize])
+    fetchAndInitialize(notebookId)
+  }, [notebookId])
+
+  if (isLoading) return null
 
   return (
     <div className={S.folderList()}>
-      {data.map((item) => (
-        <BookmarkItem key={item.id} id={item.id} />
+      {rootIds.map((id) => (
+        <BookmarkItem key={id} id={id} />
       ))}
     </div>
   )

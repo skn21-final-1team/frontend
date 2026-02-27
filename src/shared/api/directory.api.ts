@@ -1,54 +1,36 @@
-import { fetcher } from '@/shared/utils/fetcher';
-
-export interface Directory {
-  id: number
-  title: string
-  notebook_id: number
-  parent_id: number | null
-}
+import { fetcher } from '@/shared/utils/fetcher'
 
 export interface DirectoryRequest {
   title: string
   parent_id: number | null
 }
 
-export const createDirectory = async (
-  notebookId: number,
-  data: DirectoryRequest
-): Promise<Directory> => {
-  const response = await fetcher.post<Directory>('/directory/', {
-    ...data,
-    notebook_id: notebookId,
-  })
-  return response.data
+export type directory = {
+  id: number
+  title: string
+  url: null
+  parent_id: number
+  notebook_id: number
+  children: Array<directory>
+  sources: Array<source>
 }
 
-export const getDirectories = async (
-  notebookId: number,
-  parentId?: number | null
-): Promise<Directory[]> => {
-  const params: Record<string, string | number> = { notebook_id: notebookId }
-  if (parentId !== undefined && parentId !== null) {
-    params.parent_id = parentId
-  }
-  const response = await fetcher.get<Directory[]>('/directory/', params)
-  return response.data
+export type source = {
+  id: number
+  url: string
+  title: string
+  summary: string
+  directory_id: number
+  is_active: boolean
+  created_at: string
 }
 
-export const getDirectory = async (directoryId: number): Promise<Directory> => {
-  const response = await fetcher.get<Directory>(`/directory/${directoryId}`)
-  return response.data
+export type DerectoryResponse = {
+  directories: directory[]
+  sources: source[]
 }
 
-export const updateDirectory = async (
-  directoryId: number,
-  data: DirectoryRequest
-): Promise<Directory> => {
-  const response = await fetcher.patch<Directory>(`/directory/${directoryId}`, data)
-  return response.data
-}
-
-export const deleteDirectory = async (directoryId: number) => {
-  const response = await fetcher.delete(`/directory/${directoryId}`)
+export const getDirectories = async (notebook_id: number): Promise<DerectoryResponse> => {
+  const response = await fetcher.get<DerectoryResponse>(`/directory/${notebook_id}`)
   return response.data
 }
