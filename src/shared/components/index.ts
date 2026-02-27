@@ -13,3 +13,4 @@ export * from './ui/spinner'
 // custom components
 export * from './textarea'
 export * from './item-menu'
+export * from './auth-guard'

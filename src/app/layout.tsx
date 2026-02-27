@@ -3,6 +3,7 @@ import { Noto_Sans_KR } from 'next/font/google'
 import './globals.css'
 import { Header } from '@/shared/components/layout/header'
 import { ThemeProvider } from '@/shared/components/theme-provider'
+import { AuthGuard } from '@/shared/components/auth-guard'
 
 const notoSansKR = Noto_Sans_KR({
   subsets: ['latin'],
@@ -24,10 +25,12 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body className={`${notoSansKR.className} antialiased`}>
         <ThemeProvider>
-          <div className="min-w-5xl mt-16">
-            <Header />
-            {children}
-          </div>
+          <AuthGuard>
+            <div className="min-w-5xl mt-16">
+              <Header />
+              {children}
+            </div>
+          </AuthGuard>
         </ThemeProvider>
       </body>
     </html>

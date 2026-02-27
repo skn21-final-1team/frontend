@@ -20,7 +20,7 @@ export const createDirectory = async (
     ...data,
     notebook_id: notebookId,
   })
-  return response
+  return response.data
 }
 
 export const getDirectories = async (
@@ -32,12 +32,12 @@ export const getDirectories = async (
     params.parent_id = parentId
   }
   const response = await fetcher.get<Directory[]>('/directory/', params)
-  return response
+  return response.data
 }
 
 export const getDirectory = async (directoryId: number): Promise<Directory> => {
   const response = await fetcher.get<Directory>(`/directory/${directoryId}`)
-  return response
+  return response.data
 }
 
 export const updateDirectory = async (
@@ -45,10 +45,10 @@ export const updateDirectory = async (
   data: DirectoryRequest
 ): Promise<Directory> => {
   const response = await fetcher.patch<Directory>(`/directory/${directoryId}`, data)
-  return response
+  return response.data
 }
 
 export const deleteDirectory = async (directoryId: number) => {
   const response = await fetcher.delete(`/directory/${directoryId}`)
-  return response
+  return response.data
 }
