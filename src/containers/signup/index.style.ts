@@ -38,6 +38,7 @@ export const formContent = cva(`
   flex
   flex-col
   gap-6
+  mb-8
 `)
 
 export const inputGroup = cva(`

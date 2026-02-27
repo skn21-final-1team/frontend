@@ -27,15 +27,17 @@ const mapContentToBookmarks = (nodes: ContentNode[]): Bookmark[] => {
       isChecked: false,
       children: [
         ...mapContentToBookmarks(node.children),
-        ...node.sources.map((s): Bookmark => ({
-          id: String(s.id),
-          type: 'url',
-          title: s.title ?? '',
-          url: s.url,
-          parentId: String(node.id),
-          isChecked: false,
-          children: [],
-        })),
+        ...node.sources.map(
+          (s): Bookmark => ({
+            id: String(s.id),
+            type: 'url',
+            title: s.title ?? '',
+            url: s.url,
+            parentId: String(node.id),
+            isChecked: false,
+            children: [],
+          }),
+        ),
       ],
     }
     bookmarks.push(folder)
@@ -61,7 +63,7 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
         setIsLoading(false)
       }
     }
-    
+
     fetchContent()
   }, [notebookId])
 
