@@ -25,12 +25,12 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body className={`${notoSansKR.className} antialiased`}>
         <ThemeProvider>
-          <AuthGuard>
-            <div className="min-w-5xl mt-16">
-              <Header />
-              {children}
-            </div>
-          </AuthGuard>
+          {/* <AuthGuard> */}
+          <div className="min-w-5xl mt-16">
+            <Header />
+            {children}
+          </div>
+          {/* </AuthGuard> */}
         </ThemeProvider>
       </body>
     </html>
