@@ -1,6 +1,6 @@
 import { Button, Checkbox } from '@/shared/components'
 import { Bookmark as BookmarkIcon } from 'lucide-react'
-import type { FlatBookmarkNode } from '../types/bookmarks.typs'
+import type { FlatBookmarkNode } from '../types/bookmarks.types'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import HoverActions from './hover-actions'
 import * as S from './bookmark-url.style'
