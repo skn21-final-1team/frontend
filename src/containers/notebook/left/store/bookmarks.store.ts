@@ -6,7 +6,7 @@ import type {
   BookmarkStore,
   CheckedSource,
   FlatBookmarkNode,
-} from '../types/bookmarks.typs'
+} from '../types/bookmarks.types'
 
 /**
  * 중첩된 directory 트리를 평탄화하여 BookmarkState 맵으로 변환한다.

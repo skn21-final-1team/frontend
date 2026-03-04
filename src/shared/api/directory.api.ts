@@ -25,12 +25,12 @@ export type source = {
   created_at: string
 }
 
-export type DerectoryResponse = {
+export type DirectoryResponse = {
   directories: directory[]
   sources: source[]
 }
 
-export const getDirectories = async (notebook_id: number): Promise<DerectoryResponse> => {
-  const response = await fetcher.get<DerectoryResponse>(`/directory/${notebook_id}`)
+export const getDirectories = async (notebook_id: number): Promise<DirectoryResponse> => {
+  const response = await fetcher.get<DirectoryResponse>(`/directory/${notebook_id}`)
   return response.data
 }
