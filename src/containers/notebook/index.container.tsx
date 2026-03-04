@@ -1,9 +1,11 @@
 'use client'
 
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/shared/components'
+import { notFound } from 'next/navigation'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, Spinner } from '@/shared/components'
 import ChatView from './center/chat-view'
 import SourceSection from './left/source-section'
 import Contents from './right/contents'
+import { useNotebook } from './utils/use-notebook'
 import * as s from './index.style'
 
 interface NotebookContainerProps {
@@ -11,6 +13,15 @@ interface NotebookContainerProps {
 }
 
 export default function NotebookContainer({ notebookId }: NotebookContainerProps) {
+  const { is404, isLoading } = useNotebook(notebookId)
+
+  if (is404) notFound()
+  if (isLoading) return (
+    <div className="flex items-center justify-center h-full">
+      <Spinner className="size-6" />
+    </div>
+  )
+
   return (
     <div className={s.container()}>
       <ResizablePanelGroup orientation="horizontal">
