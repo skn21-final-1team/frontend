@@ -47,8 +47,11 @@ function Contents({ onSendToChat }: ContentsProps) {
   const [activeQuiz, setActiveQuiz] = useState<QuizStudioContent | null>(null)
   const [activeFlashcard, setActiveFlashcard] = useState<FlashcardStudioContent | null>(null)
   const [generatingList, setGeneratingList] = useState<GeneratingState[]>([])
-  const generatingListRef = useRef(generatingList)
-  generatingListRef.current = generatingList
+  const generatingListRef = useRef<GeneratingState[]>(generatingList)
+
+  useEffect(() => {
+    generatingListRef.current = generatingList
+  }, [generatingList])
 
   useEffect(() => {
     return () => {

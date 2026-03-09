@@ -17,6 +17,13 @@ export default function ChatView({ notebookId }: ChatViewProps) {
   const [streamingMessage, setStreamingMessage] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort()
+    }
+  }, [])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -60,6 +67,10 @@ export default function ChatView({ notebookId }: ChatViewProps) {
     setIsLoading(true)
     updateNewMessage(input, 'user')
 
+    abortControllerRef.current?.abort()
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     let aiMessage = ''
     await SSE({
       url: '/chat',
@@ -67,6 +78,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
         notebook_id: notebookId,
         message: input,
       },
+      signal: controller.signal,
       onMessage: (event) => {
         if (event.data === '') {
           setStreamingMessage((prev) => prev + '\n')

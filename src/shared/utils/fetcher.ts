@@ -23,15 +23,40 @@ api.interceptors.request.use((config) => {
 })
 
 let isRefreshing = false
-let refreshQueue: Array<(token: string) => void> = []
+let refreshQueue: Array<{
+  resolve: (token: string) => void
+  reject: (err: unknown) => void
+}> = []
 
-const processQueue = (token: string) => {
-  refreshQueue.forEach((cb) => cb(token))
-  refreshQueue = []
-}
+/**
+ * 토큰 갱신 — 동시 호출 시 하나만 실행되고 나머지는 대기 큐에서 결과를 공유한다.
+ */
+const refreshAccessToken = (): Promise<string> => {
+  if (isRefreshing) {
+    return new Promise<string>((resolve, reject) => {
+      refreshQueue.push({ resolve, reject })
+    })
+  }
 
-const failQueue = () => {
-  refreshQueue = []
+  isRefreshing = true
+  return axios
+    .get<BaseResponse<{ access_token: string; user: User }>>('/api/auth/refresh', config)
+    .then((res) => {
+      const token = res.data.data.access_token
+      useUserStore.getState().setAccessToken(token)
+      refreshQueue.forEach((q) => q.resolve(token))
+      return token
+    })
+    .catch((err) => {
+      refreshQueue.forEach((q) => q.reject(err))
+      useUserStore.getState().clearUser()
+      window.location.href = '/login'
+      throw err
+    })
+    .finally(() => {
+      isRefreshing = false
+      refreshQueue = []
+    })
 }
 
 api.interceptors.response.use(
@@ -39,34 +64,12 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401 && !error.config._retry) {
       error.config._retry = true
-
-      if (isRefreshing) {
-        return new Promise<string>((resolve) => {
-          refreshQueue.push(resolve)
-        }).then((token) => {
-          error.config.headers.Authorization = `Bearer ${token}`
-          return api(error.config)
-        })
-      }
-
-      isRefreshing = true
       try {
-        const res = await axios.get<BaseResponse<{ access_token: string; user: User }>>(
-          '/api/auth/refresh',
-          config,
-        )
-        const token = res.data.data.access_token
-        useUserStore.getState().setAccessToken(token)
+        const token = await refreshAccessToken()
         error.config.headers.Authorization = `Bearer ${token}`
-        processQueue(token)
         return api(error.config)
       } catch {
-        failQueue()
-        useUserStore.getState().clearUser()
-        window.location.href = '/login'
         return Promise.reject(error)
-      } finally {
-        isRefreshing = false
       }
     }
     return Promise.reject(error)
@@ -90,26 +93,44 @@ type RawAPIArgs = {
   data: unknown
   onMessage: (msg: EventSourceMessage) => void
   onError?: () => void
+  signal?: AbortSignal
 }
 
-export const SSE = ({ url, fetchConfig, data, onMessage, onError }: RawAPIArgs) =>
-  fetchEventSource(config.baseURL + apiUrl(url), {
-    method: 'POST',
-    ...fetchConfig,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${useUserStore.getState().accessToken}`,
-    },
-    body: JSON.stringify(data),
-    onopen: async (res) => {
-      if (res.status === 401) {
-        return Promise.reject(res)
+export const SSE = async ({ url, fetchConfig, data, onMessage, onError, signal }: RawAPIArgs) => {
+  const runSSE = (token: string | null) =>
+    fetchEventSource(config.baseURL + apiUrl(url), {
+      method: 'POST',
+      ...fetchConfig,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(data),
+      signal,
+      onopen: async (res) => {
+        if (res.ok) return
+        if (res.status === 401) throw res
+        throw new Error(`SSE open failed: ${res.status}`)
+      },
+      onmessage: onMessage,
+      onerror: (err) => {
+        onError?.()
+        throw err ?? new Error('SSE connection failed')
+      },
+    })
+
+  try {
+    await runSSE(useUserStore.getState().accessToken)
+  } catch (err) {
+    if (err instanceof Response && err.status === 401) {
+      try {
+        const newToken = await refreshAccessToken()
+        await runSSE(newToken)
+      } catch {
+        onError?.()
       }
       return
-    },
-    onmessage: onMessage,
-    onerror: (err) => {
-      onError?.()
-      throw err ?? new Error('SSE connection failed')
-    },
-  })
+    }
+    onError?.()
+  }
+}
