@@ -1,5 +1,4 @@
 import axios from 'axios'
-import type { AxiosRequestConfig } from 'axios'
 import { useUserStore } from '@/shared/store/user-store'
 import { BaseResponse } from '@/shared/types/response'
 import { User } from '@/shared/api/auth.api'

@@ -1,7 +1,8 @@
 'use client'
 
-import { notFound } from 'next/navigation'
+import { notFound, useRouter } from 'next/navigation'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup, Spinner } from '@/shared/components'
+import { ErrorAlert } from '@/shared/components/error-alert'
 import ChatView from './center/chat-view'
 import SourceSection from './left/source-section'
 import Contents from './right/contents'
@@ -13,12 +14,20 @@ interface NotebookContainerProps {
 }
 
 export default function NotebookContainer({ notebookId }: NotebookContainerProps) {
-  const { is404, isLoading } = useNotebook(notebookId)
+  const router = useRouter()
+  const { is404, isLoading, isError } = useNotebook(notebookId)
+
   if (is404) notFound()
   if (isLoading) return (
     <div className="flex items-center justify-center h-full">
       <Spinner className="size-6" />
     </div>
+  )
+  if (isError) return (
+    <ErrorAlert
+      error={{ title: '노트북 로딩 실패', description: '노트북을 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.' }}
+      onClose={() => router.push('/')}
+    />
   )
 
   return (

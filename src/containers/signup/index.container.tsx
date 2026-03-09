@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import * as z from 'zod'
 import {
   Card,
   CardContent,
@@ -19,70 +20,33 @@ import {
 } from '@/shared/components'
 import { useRouter } from 'next/navigation'
 import { signup } from '@/shared/api/auth.api'
-import { signupFormSchema } from './signup.schema'
+import { signupFormSchema, type SignupFormValues } from './signup.schema'
 import { useGoogleAuth } from '@/shared/hooks/google-auth'
 import * as s from './index.style'
-
-type FormData = { name: string; email: string; password: string; confirmPassword: string }
-type FormErrors = Partial<Record<keyof FormData | 'general', string>>
 
 export function SignupContainer() {
   const router = useRouter()
   const { loginWithGoogle } = useGoogleAuth()
-
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupFormSchema),
+    mode: 'onChange',
   })
-  const [errors, setErrors] = useState<FormErrors>({})
 
-  const validate = (data: FormData): FormErrors => {
-    const result = signupFormSchema.safeParse(data)
-    if (result.success) return {}
-    const fieldErrors: FormErrors = {}
-    result.error.issues.forEach((err: z.core.$ZodIssue) => {
-      const key = err.path[0] as keyof FormData
-      if (!fieldErrors[key]) fieldErrors[key] = err.message
-    })
-    return fieldErrors
-  }
-
-  const handleChange = (field: keyof FormData, value: string) => {
-    const newData = { ...formData, [field]: value }
-    setFormData(newData)
-    if (Object.keys(errors).length > 0) {
-      setErrors(validate(newData))
-    }
-  }
-
-  const handleSubmit = async () => {
-    const fieldErrors = validate(formData)
-    if (Object.keys(fieldErrors).length > 0) {
-      setErrors(fieldErrors)
-      return
-    }
-
-    setIsLoading(true)
-    setErrors({})
-
+  const onSubmit = async (data: SignupFormValues) => {
     try {
-      await signup({ email: formData.email, password: formData.password, name: formData.name })
+      await signup({ email: data.email, password: data.password, name: data.name })
       router.push('/login')
     } catch (error) {
-      setErrors({ general: '회원가입 실패: 이미 사용 중인 이메일이거나 서버 오류입니다.' })
+      setError('root', { message: '회원가입 실패: 이미 사용 중인 이메일이거나 서버 오류입니다.' })
       console.error(error)
-    } finally {
-      setIsLoading(false)
     }
-  }
-
-  const onFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    handleSubmit()
   }
 
   return (
@@ -101,7 +65,7 @@ export function SignupContainer() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={onFormSubmit}>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="name">Name</Label>
@@ -109,11 +73,9 @@ export function SignupContainer() {
                   id="name"
                   type="text"
                   placeholder="Joshua Juwon Choi"
-                  required
-                  value={formData.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
+                  {...register('name')}
                 />
-                {errors.name && <p className={s.errorText()}>{errors.name}</p>}
+                {errors.name && <p className={s.errorText()}>{errors.name.message}</p>}
               </div>
 
               <div className={s.inputGroup()}>
@@ -122,11 +84,9 @@ export function SignupContainer() {
                   id="email"
                   type="email"
                   placeholder="final1@team.com"
-                  required
-                  value={formData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
+                  {...register('email')}
                 />
-                {errors.email && <p className={s.errorText()}>{errors.email}</p>}
+                {errors.email && <p className={s.errorText()}>{errors.email.message}</p>}
               </div>
 
               <div className={s.inputGroup()}>
@@ -135,9 +95,7 @@ export function SignupContainer() {
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    required
-                    value={formData.password}
-                    onChange={(e) => handleChange('password', e.target.value)}
+                    {...register('password')}
                   />
                   <Button
                     type="button"
@@ -154,18 +112,16 @@ export function SignupContainer() {
                     <span className="sr-only">Toggle password visibility</span>
                   </Button>
                 </div>
-                {errors.password && <p className={s.errorText()}>{errors.password}</p>}
+                {errors.password && <p className={s.errorText()}>{errors.password.message}</p>}
               </div>
 
               <div className={s.inputGroup()}>
-                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className={s.passwordInputWrapper()}>
                   <Input
-                    id="confirm-password"
+                    id="confirmPassword"
                     type={showPassword ? 'text' : 'password'}
-                    required
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                    {...register('confirmPassword')}
                   />
                   <Button
                     type="button"
@@ -183,25 +139,25 @@ export function SignupContainer() {
                   </Button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className={s.errorText()}>{errors.confirmPassword}</p>
+                  <p className={s.errorText()}>{errors.confirmPassword.message}</p>
                 )}
               </div>
             </div>
 
             <CardFooter className={s.cardFooter()}>
-              {errors.general && <p className={s.errorText()}>{errors.general}</p>}
+              {errors.root && <p className={s.errorText()}>{errors.root.message}</p>}
               <Button
                 variant="default"
-                type="submit" 
+                type="submit"
                 className={s.submitButton()}
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
-                {isLoading ? <Spinner data-icon="inline-start" /> : 'Sign Up'}
+                {isSubmitting ? <Spinner data-icon="inline-start" /> : 'Sign Up'}
               </Button>
-              <Button 
-                variant="outline" 
-                type="button" 
-                className={s.googleButton()} 
+              <Button
+                variant="outline"
+                type="button"
+                className={s.googleButton()}
                 onClick={loginWithGoogle}
               >
                 <Image src="/google_icon.svg" alt="Google" width={20} height={20} />
