@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import ChatInput from './components/chat-input'
 import MessageUser from './components/message-user'
 import MessageAi from './components/message-ai'
+import { ErrorAlert } from '@/shared/components/error-alert'
 import * as S from './chat-view.style'
 import { useChatStore } from '../store/chat.store'
 
@@ -12,15 +13,8 @@ interface ChatViewProps {
 }
 
 export default function ChatView({ notebookId }: ChatViewProps) {
-  const { messages, streamingMessage, isLoading, init, sendMessage } = useChatStore()
+  const { messages, streamingMessage, isLoading, error, init, sendMessage, setError } = useChatStore()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const abortControllerRef = useRef<AbortController | null>(null)
-
-  useEffect(() => {
-    return () => {
-      abortControllerRef.current?.abort()
-    }
-  }, [])
 
   useEffect(() => {
     init(notebookId)

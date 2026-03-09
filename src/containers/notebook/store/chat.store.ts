@@ -1,15 +1,18 @@
 import { create } from 'zustand'
 import { Chat, getChatsByNotebook } from '@/shared/api/chat.api'
 import { SSE } from '@/shared/utils/fetcher'
+import { ErrorAlertState } from '@/shared/components/error-alert'
 
 interface ChatStore {
   messages: Chat[]
   streamingMessage: string
   isLoading: boolean
   notebookId: number | null
+  error: ErrorAlertState | null
 
   init: (notebookId: number) => Promise<void>
   sendMessage: (message: string) => Promise<void>
+  setError: (error: ErrorAlertState | null) => void
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -17,14 +20,16 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   streamingMessage: '',
   isLoading: false,
   notebookId: null,
+  error: null,
+  setError: (error) => set({ error }),
 
   init: async (notebookId) => {
     set({ notebookId, messages: [], streamingMessage: '', isLoading: false })
     try {
       const chats = await getChatsByNotebook(notebookId)
       set({ messages: chats })
-    } catch (error) {
-      console.error('채팅 내역을 불러오는데 실패했습니다:', error)
+    } catch {
+      set({ error: { title: '불러오기 실패', description: '채팅 내역을 불러오는데 실패했습니다.' } })
     }
   },
 
@@ -64,7 +69,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }
       },
       onError: () => {
-        set({ isLoading: false, streamingMessage: '' })
+        set({ isLoading: false, streamingMessage: '', error: { title: '전송 실패', description: '메시지 전송에 실패했습니다. 다시 시도해주세요.' } })
       },
     })
 
