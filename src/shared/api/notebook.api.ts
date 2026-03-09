@@ -1,15 +1,12 @@
 import { fetcher } from '@/shared/utils/fetcher'
-import { useUserStore } from '@/shared/store/user-store'
 
 export interface Notebook {
   id: number
   title: string
 }
 
-const getUserId = () => useUserStore.getState().user?.id
-
 export const getNotebooks = async (): Promise<Notebook[]> => {
-  const response = await fetcher.get<Notebook[]>(`/notebook/list?user_id=${getUserId()}`)
+  const response = await fetcher.get<Notebook[]>(`/notebook/list`)
   return response.data
 }
 
@@ -19,7 +16,7 @@ export const getNotebook = async (id: number): Promise<Notebook> => {
 }
 
 export const createNotebook = async (title: string): Promise<Notebook> => {
-  const response = await fetcher.post<Notebook>(`/notebook?user_id=${getUserId()}`, { title })
+  const response = await fetcher.post<Notebook>(`/notebook`, { title })
   return response.data
 }
 

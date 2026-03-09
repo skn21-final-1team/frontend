@@ -14,6 +14,13 @@ interface ChatViewProps {
 export default function ChatView({ notebookId }: ChatViewProps) {
   const { messages, streamingMessage, isLoading, init, sendMessage } = useChatStore()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort()
+    }
+  }, [])
 
   useEffect(() => {
     init(notebookId)
@@ -25,6 +32,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
 
   return (
     <section className={S.section()}>
+      <ErrorAlert error={error} onClose={() => setError(null)} />
       <div className={S.inner()}>
         <div className={S.messages()}>
           {messages.map((chat) =>
