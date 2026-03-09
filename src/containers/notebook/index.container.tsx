@@ -14,7 +14,6 @@ interface NotebookContainerProps {
 
 export default function NotebookContainer({ notebookId }: NotebookContainerProps) {
   const { is404, isLoading } = useNotebook(notebookId)
-
   if (is404) notFound()
   if (isLoading) return (
     <div className="flex items-center justify-center h-full">
