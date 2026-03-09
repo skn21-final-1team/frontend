@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import ChatInput from './components/chat-input'
 import MessageUser from './components/message-user'
 import MessageAi from './components/message-ai'
 import * as S from './chat-view.style'
 import { getChatsByNotebook, Chat, StreamChatResponse } from '@/shared/api/chat.api'
 import { SSE } from '@/shared/utils/fetcher'
+import { ErrorAlert, type ErrorAlertState } from '@/shared/components'
 
 interface ChatViewProps {
   notebookId: number
@@ -16,6 +17,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
   const [messages, setMessages] = useState<Chat[]>([])
   const [streamingMessage, setStreamingMessage] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<ErrorAlertState | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -34,8 +36,8 @@ export default function ChatView({ notebookId }: ChatViewProps) {
       try {
         const chats = await getChatsByNotebook(notebookId)
         setMessages(chats)
-      } catch (error) {
-        console.error('채팅 내역을 불러오는데 실패했습니다:', error)
+      } catch {
+        setError({ title: '채팅 불러오기 실패', description: '채팅 내역을 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.' })
       }
     }
 
@@ -102,6 +104,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
 
   return (
     <section className={S.section()}>
+      <ErrorAlert error={error} onClose={() => setError(null)} />
       <div className={S.inner()}>
         <div className={S.messages()}>
           {messages.map((chat) =>
