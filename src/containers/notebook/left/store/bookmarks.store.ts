@@ -86,9 +86,15 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
 
   fetchAndInitialize: async (notebookId: number) => {
     set({ isLoading: true })
-    const response = await getDirectories(notebookId)
-    const { bookmarks, rootIds } = flattenDirectoryTree(response.directories, response.sources)
-    set({ responseData: response, bookmarks, rootIds, isLoading: false })
+    try {
+      const response = await getDirectories(notebookId)
+      const { bookmarks, rootIds } = flattenDirectoryTree(response.directories, response.sources)
+      set({ responseData: response, bookmarks, rootIds })
+    } catch (error) {
+      console.error('북마크 로딩 실패:', error)
+    } finally {
+      set({ isLoading: false })
+    }
   },
 
   toggleExpand: (id: number) =>

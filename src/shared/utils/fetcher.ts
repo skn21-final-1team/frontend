@@ -22,26 +22,51 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+let isRefreshing = false
+let refreshQueue: Array<(token: string) => void> = []
+
+const processQueue = (token: string) => {
+  refreshQueue.forEach((cb) => cb(token))
+  refreshQueue = []
+}
+
+const failQueue = () => {
+  refreshQueue = []
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401 && !error.config._retry) {
-      const refreshTokenResult = await axios
-        .get<BaseResponse<{ access_token: string; user: User }>>('/api/auth/refresh', config)
-        .then((res) => res.data.data.access_token)
-        .then((token) => {
-          useUserStore.getState().setAccessToken(token)
+      error.config._retry = true
+
+      if (isRefreshing) {
+        return new Promise<string>((resolve) => {
+          refreshQueue.push(resolve)
+        }).then((token) => {
           error.config.headers.Authorization = `Bearer ${token}`
-          error.config._retry = true
-          return true
+          return api(error.config)
         })
-        .catch(() => {
-          useUserStore.getState().clearUser()
-          window.location.href = '/login'
-          return false
-        })
-      if (refreshTokenResult) {
+      }
+
+      isRefreshing = true
+      try {
+        const res = await axios.get<BaseResponse<{ access_token: string; user: User }>>(
+          '/api/auth/refresh',
+          config,
+        )
+        const token = res.data.data.access_token
+        useUserStore.getState().setAccessToken(token)
+        error.config.headers.Authorization = `Bearer ${token}`
+        processQueue(token)
         return api(error.config)
+      } catch {
+        failQueue()
+        useUserStore.getState().clearUser()
+        window.location.href = '/login'
+        return Promise.reject(error)
+      } finally {
+        isRefreshing = false
       }
     }
     return Promise.reject(error)
@@ -83,5 +108,8 @@ export const SSE = ({ url, fetchConfig, data, onMessage, onError }: RawAPIArgs) 
       return
     },
     onmessage: onMessage,
-    onerror: onError,
+    onerror: (err) => {
+      onError?.()
+      throw err ?? new Error('SSE connection failed')
+    },
   })

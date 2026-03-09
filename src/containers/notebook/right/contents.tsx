@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 
 import { Spinner } from '@/shared/components/ui/spinner'
@@ -47,6 +47,15 @@ function Contents({ onSendToChat }: ContentsProps) {
   const [activeQuiz, setActiveQuiz] = useState<QuizStudioContent | null>(null)
   const [activeFlashcard, setActiveFlashcard] = useState<FlashcardStudioContent | null>(null)
   const [generatingList, setGeneratingList] = useState<GeneratingState[]>([])
+  const generatingListRef = useRef(generatingList)
+  generatingListRef.current = generatingList
+
+  useEffect(() => {
+    return () => {
+      generatingListRef.current.forEach((g) => clearTimeout(g.timerId))
+    }
+  }, [])
+
   const handleSelectFeature = (featureId: string) => {
     const feature = features.find((f) => f.id === featureId)
     if (!feature) return
