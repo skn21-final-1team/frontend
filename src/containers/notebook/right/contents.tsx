@@ -11,6 +11,7 @@ import { FlashcardViewer } from './components/flashcard-viewer'
 
 import type { StudioFeatureList, GeneratedItem, QuizStudioContent, FlashcardStudioContent } from './types/studio'
 import { MOCK_STUDIO_CONTENTS } from '../utils/studio.mock'
+import { useChatStore } from '../store/chat.store'
 import * as S from './contents.style'
 
 const MOCK_FEATURES: StudioFeatureList = [
@@ -30,10 +31,6 @@ const MOCK_FEATURES: StudioFeatureList = [
   },
 ]
 
-interface ContentsProps {
-  onSendToChat?: (message: string) => void
-}
-
 interface GeneratingState {
   id: string
   featureId: string
@@ -41,7 +38,8 @@ interface GeneratingState {
   timerId: ReturnType<typeof setTimeout>
 }
 
-function Contents({ onSendToChat }: ContentsProps) {
+function Contents() {
+  const sendMessage = useChatStore((state) => state.sendMessage)
   const [features] = useState<StudioFeatureList>(MOCK_FEATURES)
   const [generatedItems, setGeneratedItems] = useState<GeneratedItem[]>([])
   const [activeQuiz, setActiveQuiz] = useState<QuizStudioContent | null>(null)
@@ -118,7 +116,7 @@ function Contents({ onSendToChat }: ContentsProps) {
           <QuizViewer
             quizContent={activeQuiz}
             onBack={handleBack}
-            onSendToChat={onSendToChat}
+            onSendToChat={sendMessage}
           />
         </div>
       </section>
@@ -132,7 +130,7 @@ function Contents({ onSendToChat }: ContentsProps) {
           <FlashcardViewer
             flashcardContent={activeFlashcard}
             onBack={handleBack}
-            onSendToChat={onSendToChat}
+            onSendToChat={sendMessage}
           />
         </div>
       </section>
