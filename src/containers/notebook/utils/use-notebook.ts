@@ -7,6 +7,7 @@ interface NotebookState {
   notebook: Notebook | null
   isLoading: boolean
   is404: boolean
+  isError: boolean
 }
 
 export const useNotebook = (notebookId: number): NotebookState => {
@@ -14,14 +15,15 @@ export const useNotebook = (notebookId: number): NotebookState => {
     notebook: null,
     isLoading: true,
     is404: false,
+    isError: false,
   })
 
   useEffect(() => {
     getNotebook(notebookId)
-      .then((notebook) => setState({ notebook, isLoading: false, is404: false }))
+      .then((notebook) => setState({ notebook, isLoading: false, is404: false, isError: false }))
       .catch((err) => {
         const is404 = err?.response?.status === 404
-        setState({ notebook: null, isLoading: false, is404 })
+        setState({ notebook: null, isLoading: false, is404, isError: !is404 })
       })
   }, [notebookId])
 

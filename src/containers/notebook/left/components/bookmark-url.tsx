@@ -10,19 +10,21 @@ type BookmarkUrlProps = {
 }
 
 function BookmarkUrl({ data }: BookmarkUrlProps) {
-  const { bookmarks, toggleCheck, deleteBookmark } = useBookmarkStore()
+  const isChecked = useBookmarkStore((s) => s.bookmarks[data.id]?.isChecked ?? false)
+  const toggleCheck = useBookmarkStore((s) => s.toggleCheck)
+  const deleteBookmark = useBookmarkStore((s) => s.deleteBookmark)
 
   return (
     <div className={S.fileRow()}>
       <div className={S.fileInfo()}>
-        <Button key={data.id} variant="link" size="sm" className={S.file()}>
+        <Button variant="link" size="sm" className={S.file()}>
           <BookmarkIcon />
           <span className={S.title()}>{data.title}</span>
         </Button>
         <HoverActions onClickDelete={() => deleteBookmark(data.id)} onClickEdit={() => {}} />
       </div>
       <Checkbox
-        checked={bookmarks[data.id]?.isChecked ?? false}
+        checked={isChecked}
         onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
       />
     </div>
