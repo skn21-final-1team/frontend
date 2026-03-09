@@ -6,7 +6,7 @@ export const signupFormSchema = z
       .string()
       .min(2, { message: '이름은 최소 2자 이상이어야 합니다.' })
       .max(20, { message: '이름은 최대 20자 이하여야 합니다.' }),
-    email: z.string().email({ message: '이메일이 유효하지 않습니다.' }).max(30, { message: '이메일은 최대 30자 이하여야 합니다.' }),
+    email: z.string().email({ message: '이메일이 유효하지 않습니다.' }).max(254, { message: '이메일은 최대 254자 이하여야 합니다.' }),
     password: z
       .string()
       .min(8, { message: '비밀번호는 최소 8자리 이상이어야 합니다.' })

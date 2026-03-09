@@ -1,8 +1,3 @@
-export interface SyncKeyRequest {
-  notebook_id: number;
-}
-
-
 export interface SyncKeyResponse {
   sync_key: string;
   expires_at: string;
