@@ -2,10 +2,8 @@ import { cva } from 'class-variance-authority'
 
 export const inner = cva(`
   h-full
-  overflow-y-auto
-  px-4
-  py-8
-  pb-4
+  flex
+  flex-col
   rounded-2xl
   bg-card
   border
@@ -13,16 +11,19 @@ export const inner = cva(`
 `)
 
 export const messages = cva(`
-  min-h-full
+  flex-1
+  overflow-y-auto
   flex
   flex-col
-  justify-end
+  px-4
+  pt-8
+  pb-4
 `)
 
 export const inputWrapper = cva(`
-  sticky
-  bottom-0
-  pt-4
+  shrink-0
+  px-4
+  pb-4
   bg-card
 `)
 
