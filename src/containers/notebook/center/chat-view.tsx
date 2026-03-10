@@ -40,7 +40,9 @@ export default function ChatView({ notebookId }: ChatViewProps) {
           {streamingMessage && <MessageAi message={streamingMessage} />}
           <div ref={messagesEndRef} />
         </div>
-        <ChatInput onSend={sendMessage} onStop={abort} isLoading={isLoading} />
+        <div className={S.inputWrapper()}>
+          <ChatInput onSend={sendMessage} onStop={abort} isLoading={isLoading} />
+        </div>
       </div>
     </section>
   )

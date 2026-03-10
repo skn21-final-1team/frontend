@@ -1,4 +1,5 @@
 import { useBookmarkStore } from '../store/bookmarks.store'
+import { useSearchContext } from '../contexts/search-context'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/components'
 import { Button } from '@/shared/components/ui/button'
 import { Checkbox } from '@/shared/components/ui/checkbox'
@@ -16,12 +17,20 @@ function BookmarkItem({ id }: BookmarkItemProps) {
   const toggleExpand = useBookmarkStore((state) => state.toggleExpand)
   const toggleCheck = useBookmarkStore((state) => state.toggleCheck)
   const deleteBookmark = useBookmarkStore((state) => state.deleteBookmark)
+  const { matchedIds } = useSearchContext()
 
   if (!data) return null
 
   if (data.type === 'folder') {
+    const isSearching = matchedIds !== null
+    const isOpen = isSearching || data.isExpanded
+
+    const visibleChildren = isSearching
+      ? data.children.filter((childId) => matchedIds.has(childId))
+      : data.children
+
     return (
-      <Collapsible key={data.id} open={data.isExpanded}>
+      <Collapsible key={data.id} open={isOpen}>
         <div className={S.folderRow()}>
           <CollapsibleTrigger asChild>
             <Button
@@ -46,7 +55,7 @@ function BookmarkItem({ id }: BookmarkItemProps) {
         </div>
         <CollapsibleContent className={S.subList()}>
           <span className={S.subFolder()}>
-            {data.children.map((childId) => (
+            {visibleChildren.map((childId) => (
               <BookmarkItem key={childId} id={childId} />
             ))}
           </span>

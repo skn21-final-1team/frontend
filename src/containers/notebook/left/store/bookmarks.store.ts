@@ -8,12 +8,6 @@ import type {
   FlatBookmarkNode,
 } from '../types/bookmarks.types'
 
-/**
- * 중첩된 directory 트리를 평탄화하여 BookmarkState 맵으로 변환한다.
- * @param directories - API에서 받은 최상위 디렉토리 배열
- * @param rootSources - 최상위 소스(디렉토리에 속하지 않는) 배열
- * @returns 평탄화된 BookmarkState와 최상위 노드 ID 배열
- */
 const flattenDirectoryTree = (
   directories: directory[],
   rootSources: source[],
@@ -71,11 +65,6 @@ const flattenDirectoryTree = (
   return { bookmarks, rootIds }
 }
 
-/**
- * source ID를 directory ID와 충돌하지 않도록 변환한다.
- * @param sourceId - source의 원본 ID
- * @returns 음수로 변환된 고유 ID
- */
 const toSourceNodeId = (sourceId: number): number => -sourceId
 
 export const useBookmarkStore = create<BookmarkStore>((set) => ({
@@ -83,6 +72,9 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
   bookmarks: {},
   rootIds: [],
   isLoading: false,
+  searchQuery: '',
+
+  setSearchQuery: (query: string) => set({ searchQuery: query }),
 
   fetchAndInitialize: async (notebookId: number) => {
     set({ isLoading: true })

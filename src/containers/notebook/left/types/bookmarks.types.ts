@@ -28,9 +28,11 @@ export type BookmarkStore = {
   bookmarks: BookmarkState
   rootIds: number[]
   isLoading: boolean
+  searchQuery: string
   fetchAndInitialize: (notebookId: number) => Promise<void>
   toggleExpand: (id: number) => void
   toggleCheck: (id: number, isChecked: boolean) => void
   getCheckedSources: () => CheckedSource[]
   deleteBookmark: (id: number) => void
+  setSearchQuery: (query: string) => void
 }
