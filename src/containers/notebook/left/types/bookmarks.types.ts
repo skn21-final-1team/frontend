@@ -1,5 +1,3 @@
-import type { directory, source } from '@/shared/api/directory.api'
-
 export type BookmarkNodeType = 'folder' | 'source'
 
 export type FlatBookmarkNode = {
@@ -24,7 +22,6 @@ export type CheckedSource = {
 }
 
 export type BookmarkStore = {
-  responseData: { directories: directory[]; sources: source[] }
   bookmarks: BookmarkState
   rootIds: number[]
   isLoading: boolean

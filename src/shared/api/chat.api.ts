@@ -27,24 +27,3 @@ export type StreamChatResponse = {
   event: 'messages' | 'end'
   data: string
 }
-
-// export const streamChat = async (
-//   data: CreateChatRequest,
-//   onMessage: (msg: string) => void,
-//   onFinish?: () => void,
-// ) => {
-//   try {
-//     await rawAPI.post('/api/chat', data, {
-//       onDownloadProgress: (progressEvent) => {
-//         const response = progressEvent.event.target.responseText
-//         const parsedResponse = JSON.parse(response)
-//         onMessage(parsedResponse.data)
-//       },
-//     })
-
-//     onFinish?.()
-//   } catch (error) {
-//     console.error('Stream error:', error)
-//     throw error
-//   }
-// }
