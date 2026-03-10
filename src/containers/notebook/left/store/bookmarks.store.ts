@@ -68,7 +68,6 @@ const flattenDirectoryTree = (
 const toSourceNodeId = (sourceId: number): number => -sourceId
 
 export const useBookmarkStore = create<BookmarkStore>((set) => ({
-  responseData: { directories: [], sources: [] },
   bookmarks: {},
   rootIds: [],
   isLoading: false,
@@ -81,7 +80,7 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
     try {
       const response = await getDirectories(notebookId)
       const { bookmarks, rootIds } = flattenDirectoryTree(response.directories, response.sources)
-      set({ responseData: response, bookmarks, rootIds })
+      set({ bookmarks, rootIds })
     } catch (error) {
       console.error('북마크 로딩 실패:', error)
     } finally {

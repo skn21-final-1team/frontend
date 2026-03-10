@@ -3,6 +3,9 @@ import { Chat, getChatsByNotebook } from '@/shared/api/chat.api'
 import { SSE } from '@/shared/utils/fetcher'
 import { ErrorAlertState } from '@/shared/components/error-alert'
 
+let tempId = 0
+const nextTempId = () => --tempId
+
 interface ChatStore {
   messages: Chat[]
   streamingMessage: string
@@ -57,7 +60,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       messages: [
         ...state.messages,
         {
-          id: Date.now(),
+          id: nextTempId(),
           role: 'user' as const,
           message,
           created_at: new Date().toISOString(),
@@ -89,32 +92,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       onError: () => {
         if (abortController.signal.aborted) return
 
-        const partial = aiMessage.trim()
-        if (partial) {
-          set((state) => ({
-            messages: [
-              ...state.messages,
-              {
-                id: Date.now() + 1,
-                role: 'assistant' as const,
-                message: partial,
-                created_at: new Date().toISOString(),
-                notebook_id: notebookId,
-              },
-            ],
-            streamingMessage: '',
-            isLoading: false,
-            abortController: null,
-            error: { title: '전송 중단', description: '응답이 중단되었습니다. 일부 내용만 표시됩니다.' },
-          }))
-        } else {
-          set({
-            isLoading: false,
-            streamingMessage: '',
-            abortController: null,
-            error: { title: '전송 실패', description: '메시지 전송에 실패했습니다. 다시 시도해주세요.' },
-          })
-        }
+        set({
+          streamingMessage: '',
+          isLoading: false,
+          abortController: null,
+          error: { title: '전송 실패', description: '메시지 전송에 실패했습니다. 다시 시도해주세요.' },
+        })
       },
     })
 
@@ -124,7 +107,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       messages: [
         ...state.messages,
         {
-          id: Date.now() + 1,
+          id: nextTempId(),
           role: 'assistant' as const,
           message: aiMessage.trim(),
           created_at: new Date().toISOString(),
