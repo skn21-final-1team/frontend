@@ -12,10 +12,8 @@ export const config = {
   },
 }
 
-/** interceptor 있는 인스턴스 — 일반 API 요청용 */
 export const api = axios.create(config)
 
-/** interceptor 없는 인스턴스 — refresh 등 인증 우회 요청용 */
 const plainApi = axios.create(config)
 
 api.interceptors.request.use((config) => {
@@ -32,9 +30,6 @@ let refreshQueue: Array<{
   reject: (err: unknown) => void
 }> = []
 
-/**
- * 토큰 갱신 — 동시 호출 시 하나만 실행되고 나머지는 대기 큐에서 결과를 공유한다.
- */
 const refreshAccessToken = (): Promise<string> => {
   if (isRefreshing) {
     return new Promise<string>((resolve, reject) => {
@@ -123,7 +118,6 @@ export const SSE = async ({ url, fetchConfig, data, onMessage, onError, signal }
       },
       onmessage: onMessage,
       onerror: (err) => {
-        onError?.()
         throw err ?? new Error('SSE connection failed')
       },
     })

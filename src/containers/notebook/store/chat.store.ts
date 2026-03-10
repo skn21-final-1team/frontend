@@ -35,7 +35,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   init: async (notebookId) => {
-    // 이전 SSE 연결이 있으면 abort (H-2: 노트북 전환 시 데이터 오염 방지)
     get().abort()
     set({ notebookId, messages: [], streamingMessage: '', isLoading: false })
     try {
@@ -50,7 +49,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     const { notebookId, isLoading } = get()
     if (!message.trim() || !notebookId || isLoading) return
 
-    // H-1: AbortController로 SSE 연결 관리
     const abortController = new AbortController()
 
     set((state) => ({
@@ -77,7 +75,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       },
       signal: abortController.signal,
       onMessage: (event) => {
-        // H-2: 노트북이 바뀌었으면 무시
         if (get().notebookId !== notebookId) return
 
         if (event.data === '') {
@@ -90,7 +87,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }
       },
       onError: () => {
-        // H-3: 에러 시 부분 AI 메시지가 있으면 보존
+        if (abortController.signal.aborted) return
+
         const partial = aiMessage.trim()
         if (partial) {
           set((state) => ({
@@ -120,7 +118,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       },
     })
 
-    // abort된 경우 후처리 스킵
     if (abortController.signal.aborted) return
 
     set((state) => ({
