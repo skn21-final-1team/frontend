@@ -13,7 +13,7 @@ interface ChatViewProps {
 }
 
 export default function ChatView({ notebookId }: ChatViewProps) {
-  const { messages, streamingMessage, isLoading, error, init, sendMessage, setError } = useChatStore()
+  const { messages, streamingMessage, isLoading, error, init, sendMessage, setError, abort } = useChatStore()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
           {streamingMessage && <MessageAi message={streamingMessage} />}
           <div ref={messagesEndRef} />
         </div>
-        <ChatInput onSend={sendMessage} disabled={isLoading} />
+        <ChatInput onSend={sendMessage} onStop={abort} isLoading={isLoading} />
       </div>
     </section>
   )
