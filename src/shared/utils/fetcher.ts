@@ -11,7 +11,12 @@ export const config = {
     'Content-Type': 'application/json',
   },
 }
+
+/** interceptor 있는 인스턴스 — 일반 API 요청용 */
 export const api = axios.create(config)
+
+/** interceptor 없는 인스턴스 — refresh 등 인증 우회 요청용 */
+const plainApi = axios.create(config)
 
 api.interceptors.request.use((config) => {
   const token = useUserStore.getState().accessToken
@@ -38,23 +43,28 @@ const refreshAccessToken = (): Promise<string> => {
   }
 
   isRefreshing = true
-  return axios
-    .get<BaseResponse<{ access_token: string; user: User }>>('/api/auth/refresh', config)
+
+  return plainApi
+    .get<BaseResponse<{ access_token: string; user: User }>>('/api/auth/refresh', {
+      baseURL: config.baseURL,
+      withCredentials: true,
+    })
     .then((res) => {
       const token = res.data.data.access_token
       useUserStore.getState().setAccessToken(token)
-      refreshQueue.forEach((q) => q.resolve(token))
+      const queue = refreshQueue
+      refreshQueue = []
+      isRefreshing = false
+      queue.forEach((q) => q.resolve(token))
       return token
     })
     .catch((err) => {
-      refreshQueue.forEach((q) => q.reject(err))
-      useUserStore.getState().clearUser()
-      window.location.href = '/login'
-      throw err
-    })
-    .finally(() => {
-      isRefreshing = false
+      const queue = refreshQueue
       refreshQueue = []
+      isRefreshing = false
+      queue.forEach((q) => q.reject(err))
+      useUserStore.getState().clearUser()
+      throw err
     })
 }
 
