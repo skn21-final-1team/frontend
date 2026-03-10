@@ -1,11 +1,19 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useBookmarkStore } from '../store/bookmarks.store'
 import * as S from './search-bookmark.style'
 
 function SearchBookmark() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const setSearchQuery = useBookmarkStore((state) => state.setSearchQuery)
+  const [inputValue, setInputValue] = useState('')
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(null)
 
-  const onSearch = (query: string) => {
-    setSearchQuery(query)
+  const handleChange = (value: string) => {
+    setInputValue(value)
+
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      setSearchQuery(value)
+    }, 250)
   }
 
   return (
@@ -13,8 +21,8 @@ function SearchBookmark() {
       <input
         type="text"
         placeholder="북마크 검색..."
-        value={searchQuery}
-        onChange={(e) => onSearch(e.target.value)}
+        value={inputValue}
+        onChange={(e) => handleChange(e.target.value)}
         className={S.searchInput()}
       />
     </div>
