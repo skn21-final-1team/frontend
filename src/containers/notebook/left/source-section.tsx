@@ -19,7 +19,7 @@ function SourceSection({ notebookId }: SourceSectionProps) {
         </div>
         <SearchBookmark />
         <Bookmarks notebookId={notebookId} />
-        <AddUrlButton />
+        <AddUrlButton notebookId={notebookId} />
       </div>
     </section>
   )
