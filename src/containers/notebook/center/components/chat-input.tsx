@@ -1,5 +1,5 @@
 import { useState, type KeyboardEvent } from 'react'
-import { Button, Textarea } from '@/shared/components'
+import { Button } from '@/shared/components'
 import { Send, Square } from 'lucide-react'
 import ModelSelector from './model-selector'
 import { DEFAULT_MODEL, type AIModel } from '../../constants/models-mock'
@@ -32,11 +32,8 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
 
   return (
     <div className={S.container()}>
-      <div className={S.toolbar()}>
-        <ModelSelector selected={model} onSelect={setModel} disabled={isLoading} />
-      </div>
-      <Textarea
-        rows={6}
+      <textarea
+        rows={4}
         className={S.textarea()}
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -44,25 +41,17 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
         placeholder="메시지를 입력하세요."
         disabled={disabled}
       />
-      {isLoading ? (
+      <div className={S.bottomBar()}>
+        <ModelSelector selected={model} onSelect={setModel} disabled={isLoading} />
         <Button
           className={S.button()}
-          onClick={onStop}
+          onClick={isLoading ? onStop : handleSend}
           size="icon"
-          variant="destructive"
+          disabled={!isLoading && (disabled || !value.trim())}
         >
-          <Square className="size-4" />
+          {isLoading ? <Square className="size-3" fill="currentColor" /> : <Send className="size-4" />}
         </Button>
-      ) : (
-        <Button
-          className={S.button()}
-          onClick={handleSend}
-          size="icon"
-          disabled={disabled || !value.trim()}
-        >
-          <Send />
-        </Button>
-      )}
+      </div>
     </div>
   )
 }
