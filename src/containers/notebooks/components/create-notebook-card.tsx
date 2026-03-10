@@ -26,6 +26,7 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
   }
 
   const handleSubmit = async () => {
+    if (isLoading) return
     const trimmed = title.trim()
     if (!trimmed) {
       setIsEditing(false)
