@@ -10,6 +10,7 @@ export * from './ui/dropdown-menu'
 export * from './ui/collapsible'
 export * from './ui/checkbox'
 export * from './ui/spinner'
+export * from './ui/dialog'
 
 // custom components
 export * from './textarea'
