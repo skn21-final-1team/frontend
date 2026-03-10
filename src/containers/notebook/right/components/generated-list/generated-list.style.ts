@@ -63,3 +63,16 @@ export const itemSubtitle = cva(`
   text-xs
   text-muted-foreground
 `)
+
+export const renameInput = cva(`
+  text-sm
+  font-medium
+  w-full
+  bg-transparent
+  border
+  border-primary
+  rounded
+  px-1
+  py-0.5
+  outline-none
+`)
