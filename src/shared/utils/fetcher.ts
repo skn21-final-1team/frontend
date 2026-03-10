@@ -11,7 +11,10 @@ export const config = {
     'Content-Type': 'application/json',
   },
 }
+
 export const api = axios.create(config)
+
+const plainApi = axios.create(config)
 
 api.interceptors.request.use((config) => {
   const token = useUserStore.getState().accessToken
@@ -27,9 +30,6 @@ let refreshQueue: Array<{
   reject: (err: unknown) => void
 }> = []
 
-/**
- * 토큰 갱신 — 동시 호출 시 하나만 실행되고 나머지는 대기 큐에서 결과를 공유한다.
- */
 const refreshAccessToken = (): Promise<string> => {
   if (isRefreshing) {
     return new Promise<string>((resolve, reject) => {
@@ -38,23 +38,28 @@ const refreshAccessToken = (): Promise<string> => {
   }
 
   isRefreshing = true
-  return axios
-    .get<BaseResponse<{ access_token: string; user: User }>>('/api/auth/refresh', config)
+
+  return plainApi
+    .get<BaseResponse<{ access_token: string; user: User }>>('/api/auth/refresh', {
+      baseURL: config.baseURL,
+      withCredentials: true,
+    })
     .then((res) => {
       const token = res.data.data.access_token
       useUserStore.getState().setAccessToken(token)
-      refreshQueue.forEach((q) => q.resolve(token))
+      const queue = refreshQueue
+      refreshQueue = []
+      isRefreshing = false
+      queue.forEach((q) => q.resolve(token))
       return token
     })
     .catch((err) => {
-      refreshQueue.forEach((q) => q.reject(err))
-      useUserStore.getState().clearUser()
-      window.location.href = '/login'
-      throw err
-    })
-    .finally(() => {
-      isRefreshing = false
+      const queue = refreshQueue
       refreshQueue = []
+      isRefreshing = false
+      queue.forEach((q) => q.reject(err))
+      useUserStore.getState().clearUser()
+      throw err
     })
 }
 
@@ -113,7 +118,6 @@ export const SSE = async ({ url, fetchConfig, data, onMessage, onError, signal }
       },
       onmessage: onMessage,
       onerror: (err) => {
-        onError?.()
         throw err ?? new Error('SSE connection failed')
       },
     })
