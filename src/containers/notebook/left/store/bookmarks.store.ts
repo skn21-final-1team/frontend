@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getDirectories } from '@/shared/api/directory.api'
-import type { directory, source } from '@/shared/api/directory.api'
+import { directory, source, updateSource } from '@/shared/api/directory.api'
 import type {
   BookmarkState,
   BookmarkStore,
@@ -18,6 +18,7 @@ const flattenDirectoryTree = (
   const flattenDirectory = (dir: directory, parentId: number | null) => {
     const childDirectoryIds = dir.children.map((child) => child.id)
     const childSourceIds = dir.sources.map((src) => toSourceNodeId(src.id))
+    const isChecked = dir.sources.every((src) => src.is_active)
 
     const node: FlatBookmarkNode = {
       id: dir.id,
@@ -25,7 +26,7 @@ const flattenDirectoryTree = (
       title: dir.title,
       url: null,
       isExpanded: false,
-      isChecked: false,
+      isChecked: isChecked,
       parentId,
       children: [...childDirectoryIds, ...childSourceIds],
     }
@@ -44,7 +45,7 @@ const flattenDirectoryTree = (
       title: src.title,
       url: src.url,
       isExpanded: false,
-      isChecked: false,
+      isChecked: src.is_active,
       parentId,
       children: [],
     }
@@ -103,30 +104,51 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
 
   toggleCheck: (id: number, isChecked: boolean) =>
     set((state) => {
-      const newBookmarks = { ...state.bookmarks }
-      const node = newBookmarks[id]
+      const nextBookmarks = { ...state.bookmarks }
+      const node = nextBookmarks[id]
       if (!node) return state
 
+      const sourceIdsToSync: number[] = []
+
       const updateChildren = (targetId: number, checked: boolean) => {
-        const target = newBookmarks[targetId]
-        newBookmarks[targetId] = { ...target, isChecked: checked }
+        const target = nextBookmarks[targetId]
+        if (!target) return
+
+        nextBookmarks[targetId] = { ...target, isChecked: checked }
+        if (target.type === 'source') {
+          sourceIdsToSync.push(-targetId)
+        }
+
         target.children.forEach((childId) => updateChildren(childId, checked))
       }
 
       const updateParents = (childId: number) => {
-        const child = newBookmarks[childId]
+        const child = nextBookmarks[childId]
+        if (!child) return
         if (child.parentId === null) return
 
-        const parent = newBookmarks[child.parentId]
-        const allChildrenChecked = parent.children.every((cId) => newBookmarks[cId].isChecked)
-        newBookmarks[child.parentId] = { ...parent, isChecked: allChildrenChecked }
+        const parent = nextBookmarks[child.parentId]
+        if (!parent) return
+
+        const allChildrenChecked = parent.children.every((cId) => {
+          const currentChild = nextBookmarks[cId]
+          return currentChild ? currentChild.isChecked : false
+        })
+
+        nextBookmarks[child.parentId] = { ...parent, isChecked: allChildrenChecked }
         updateParents(child.parentId)
       }
 
       updateChildren(id, isChecked)
       updateParents(id)
 
-      return { bookmarks: newBookmarks }
+      Promise.all(
+        sourceIdsToSync.map((sourceId) => updateSource(sourceId, undefined, isChecked)),
+      ).catch((error) => {
+        console.error('북마크 체크 상태 동기화 실패:', error)
+      })
+
+      return { bookmarks: nextBookmarks }
     }),
 
   getCheckedSources: (): CheckedSource[] => {

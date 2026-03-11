@@ -35,7 +35,16 @@ export const getDirectories = async (notebook_id: number): Promise<DirectoryResp
   return response.data
 }
 
-export const crawlUrls = async (urls: string[], notebook_id: number, directory_id: number | null = null) => {
+export const crawlUrls = async (
+  urls: string[],
+  notebook_id: number,
+  directory_id: number | null = null,
+) => {
   const response = await fetcher.post<boolean>('/crawl', { urls, notebook_id, directory_id })
+  return response.data
+}
+
+export const updateSource = async (sourceId: number, title?: string, is_active?: boolean) => {
+  const response = await fetcher.patch<source>(`/source/${sourceId}`, { title, is_active })
   return response.data
 }
