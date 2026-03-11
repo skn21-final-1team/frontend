@@ -5,6 +5,16 @@ import { BookOpen } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { Notebook } from '@/shared/api/notebook.api'
 import ItemMenu from '@/shared/components/item-menu/item-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shared/components'
 import * as S from './notebook-card.style'
 
 interface NotebookCardProps {
@@ -16,6 +26,7 @@ interface NotebookCardProps {
 export default function NotebookCard({ notebook, onRename, onDelete }: NotebookCardProps) {
   const router = useRouter()
   const [isRenaming, setIsRenaming] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [title, setTitle] = useState(notebook.title)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -63,7 +74,7 @@ export default function NotebookCard({ notebook, onRename, onDelete }: NotebookC
             align="end"
             size={16}
             onRename={() => setIsRenaming(true)}
-            onDelete={() => onDelete(notebook.id)}
+            onDelete={() => setDeleteOpen(true)}
           />
         </span>
       </div>
@@ -83,6 +94,23 @@ export default function NotebookCard({ notebook, onRename, onDelete }: NotebookC
           <p className={S.title()}>{notebook.title}</p>
         )}
       </div>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>노트북 삭제</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{notebook.title}&rdquo;을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction onClick={() => onDelete(notebook.id)}>
+              삭제
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -19,6 +19,7 @@ import {
   Button,
 } from '@/shared/components'
 import { useRouter } from 'next/navigation'
+import { isAxiosError } from 'axios'
 import { login } from '@/shared/api/auth.api'
 import { useUserStore } from '@/shared/store/user-store'
 import { loginFormSchema, type LoginFormValues } from './login.schema'
@@ -34,6 +35,7 @@ export function LoginContainer() {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
@@ -46,8 +48,18 @@ export function LoginContainer() {
       useUserStore.getState().setUser(loginResult.user, loginResult.access_token)
       router.push('/')
     } catch (error) {
-      setError('root', { message: '이메일 또는 비밀번호를 다시 확인해주세요.' })
-      console.error(error)
+      if (!isAxiosError(error) || !error.response) {
+        setError('root', { message: '네트워크 연결을 확인해주세요.' })
+        return
+      }
+      const status = error.response.status
+      const message =
+        status === 401
+          ? '비밀번호가 일치하지 않습니다.'
+          : status === 404
+            ? '존재하지 않는 이메일입니다.'
+            : '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      setError('root', { message })
     }
   }
 
@@ -68,7 +80,7 @@ export function LoginContainer() {
           </div>
         </CardHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} onChange={() => clearErrors('root')}>
           <CardContent>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
@@ -82,19 +94,13 @@ export function LoginContainer() {
                 {errors.email && <p className={s.errorText()}>{errors.email.message}</p>}
               </div>
               <div className={s.inputGroup()}>
-                <div className={s.passwordLabelWrapper()}>
-                  <Label htmlFor="password">Password</Label>
-                  <a href="#" className={s.forgotPasswordLink()}>
-                    Forgot password?
-                  </a>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <div className={s.passwordInputWrapper()}>
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     {...register('password')}
                   />
-                  {errors.password && <p className={s.errorText()}>{errors.password.message}</p>}
                   <Button
                     type="button"
                     variant="ghost"
@@ -110,6 +116,7 @@ export function LoginContainer() {
                     <span className="sr-only">Toggle password visibility</span>
                   </Button>
                 </div>
+                {errors.password && <p className={s.errorText()}>{errors.password.message}</p>}
               </div>
             </div>
           </CardContent>

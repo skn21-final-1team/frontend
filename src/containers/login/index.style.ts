@@ -51,19 +51,6 @@ export const inputGroup = cva(`
   gap-2
 `)
 
-export const passwordLabelWrapper = cva(`
-  flex
-  items-center
-`)
-
-export const forgotPasswordLink = cva(`
-  ml-auto
-  inline-block
-  text-sm
-  underline-offset-4
-  hover:underline
-`)
-
 export const passwordInputWrapper = cva(`
   relative
 `)

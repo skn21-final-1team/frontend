@@ -19,6 +19,7 @@ import {
   Button,
 } from '@/shared/components'
 import { useRouter } from 'next/navigation'
+import { isAxiosError } from 'axios'
 import { signup } from '@/shared/api/auth.api'
 import { signupFormSchema, type SignupFormValues } from './signup.schema'
 import { useGoogleAuth } from '@/shared/hooks/google-auth'
@@ -33,6 +34,7 @@ export function SignupContainer() {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormValues>({
     resolver: zodResolver(signupFormSchema),
@@ -44,8 +46,16 @@ export function SignupContainer() {
       await signup({ email: data.email, password: data.password, name: data.name })
       router.push('/login')
     } catch (error) {
-      setError('root', { message: '회원가입 실패: 이미 사용 중인 이메일이거나 서버 오류입니다.' })
-      console.error(error)
+      if (!isAxiosError(error) || !error.response) {
+        setError('root', { message: '네트워크 연결을 확인해주세요.' })
+        return
+      }
+      const status = error.response.status
+      const message =
+        status === 409
+          ? '이미 사용 중인 이메일입니다.'
+          : '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      setError('root', { message })
     }
   }
 
@@ -65,7 +75,7 @@ export function SignupContainer() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} onChange={() => clearErrors('root')}>
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="name">Name</Label>
