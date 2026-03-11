@@ -23,6 +23,7 @@ export type source = {
   directory_id: number
   is_active: boolean
   created_at: string
+  status: string
 }
 
 export type DirectoryResponse = {
@@ -44,7 +45,20 @@ export const crawlUrls = async (
   return response.data
 }
 
-export const updateSource = async (sourceId: number, title?: string, is_active?: boolean) => {
-  const response = await fetcher.patch<source>(`/source/${sourceId}`, { title, is_active })
+export const updateSource = async (
+  sourceId: number,
+  data: { title?: string; is_active?: boolean },
+) => {
+  const response = await fetcher.patch<source>(`/source/${sourceId}`, data)
+  return response.data
+}
+
+export const deleteSource = async (sourceId: number) => {
+  const response = await fetcher.delete(`/source/${sourceId}`)
+  return response.data
+}
+
+export const getSourcesByNotebook = async (notebookId: number): Promise<source[]> => {
+  const response = await fetcher.get<source[]>(`/source/${notebookId}`)
   return response.data
 }

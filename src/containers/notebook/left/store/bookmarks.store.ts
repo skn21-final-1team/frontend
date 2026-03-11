@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getDirectories } from '@/shared/api/directory.api'
-import { directory, source, updateSource } from '@/shared/api/directory.api'
+import { directory, source, updateSource, deleteSource } from '@/shared/api/directory.api'
 import type {
   BookmarkState,
   BookmarkStore,
@@ -63,18 +63,32 @@ const flattenDirectoryTree = (
     flattenSource(src, null)
   })
 
+  // 후처리: 폴더 isChecked를 하위 전체 기준으로 재계산
+  const recomputeChecked = (id: number): boolean => {
+    const node = bookmarks[id]
+    if (!node) return false
+    if (node.type === 'source') return node.isChecked
+    if (node.children.length === 0) return true
+    const allChecked = node.children.every((childId) => recomputeChecked(childId))
+    bookmarks[id] = { ...node, isChecked: allChecked }
+    return allChecked
+  }
+  rootIds.forEach((id) => recomputeChecked(id))
+
   return { bookmarks, rootIds }
 }
 
 const toSourceNodeId = (sourceId: number): number => -sourceId
 
-export const useBookmarkStore = create<BookmarkStore>((set) => ({
+export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
   bookmarks: {},
   rootIds: [],
   isLoading: false,
   searchQuery: '',
+  editingId: null,
 
   setSearchQuery: (query: string) => set({ searchQuery: query }),
+  setEditingId: (id: number | null) => set({ editingId: id }),
 
   fetchAndInitialize: async (notebookId: number) => {
     set({ isLoading: true })
@@ -104,6 +118,7 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
 
   toggleCheck: (id: number, isChecked: boolean) =>
     set((state) => {
+      const previousBookmarks = state.bookmarks
       const nextBookmarks = { ...state.bookmarks }
       const node = nextBookmarks[id]
       if (!node) return state
@@ -143,16 +158,17 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
       updateParents(id)
 
       Promise.all(
-        sourceIdsToSync.map((sourceId) => updateSource(sourceId, undefined, isChecked)),
+        sourceIdsToSync.map((sourceId) => updateSource(sourceId, { is_active: isChecked })),
       ).catch((error) => {
         console.error('북마크 체크 상태 동기화 실패:', error)
+        set({ bookmarks: previousBookmarks })
       })
 
       return { bookmarks: nextBookmarks }
     }),
 
   getCheckedSources: (): CheckedSource[] => {
-    const { bookmarks } = useBookmarkStore.getState()
+    const { bookmarks } = get()
     return Object.values(bookmarks)
       .filter(
         (node): node is FlatBookmarkNode & { url: string } =>
@@ -165,11 +181,46 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
       }))
   },
 
-  deleteBookmark: (id: number) =>
+  renameBookmark: async (id: number, title: string) => {
+    const node = get().bookmarks[id]
+    if (!node || !title.trim()) return
+
+    if (node.type === 'source') {
+      await updateSource(-id, { title })
+    }
+
+    set((state) => ({
+      bookmarks: {
+        ...state.bookmarks,
+        [id]: { ...state.bookmarks[id], title },
+      },
+      editingId: null,
+    }))
+  },
+
+  deleteBookmark: async (id: number) => {
+    const state = get()
+    const bookmarks = state.bookmarks
+    const node = bookmarks[id]
+    if (!node) return
+
+    const sourceIdsToDelete: number[] = []
+    const collectSourceIds = (targetId: number) => {
+      const target = bookmarks[targetId]
+      if (!target) return
+      if (target.type === 'source') {
+        sourceIdsToDelete.push(-targetId)
+      }
+      target.children.forEach((childId) => collectSourceIds(childId))
+    }
+    collectSourceIds(id)
+
+    if (sourceIdsToDelete.length > 0) {
+      await Promise.all(sourceIdsToDelete.map((sourceId) => deleteSource(sourceId)))
+    }
+
     set((state) => {
       const newBookmarks = { ...state.bookmarks }
-      const node = newBookmarks[id]
-      if (!node) return state
 
       if (node.parentId !== null) {
         const parent = newBookmarks[node.parentId]
@@ -193,5 +244,6 @@ export const useBookmarkStore = create<BookmarkStore>((set) => ({
       const newRootIds = state.rootIds.filter((rootId) => rootId !== id)
 
       return { bookmarks: newBookmarks, rootIds: newRootIds }
-    }),
+    })
+  },
 }))
