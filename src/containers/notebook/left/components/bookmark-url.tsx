@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Button, Checkbox } from '@/shared/components'
 import { Globe } from 'lucide-react'
@@ -35,34 +35,34 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
   const isChecked = useBookmarkStore((s) => s.bookmarks[data.id]?.isChecked ?? false)
   const toggleCheck = useBookmarkStore((s) => s.toggleCheck)
   const deleteBookmark = useBookmarkStore((s) => s.deleteBookmark)
-  const editingId = useBookmarkStore((s) => s.editingId)
-  const setEditingId = useBookmarkStore((s) => s.setEditingId)
   const renameBookmark = useBookmarkStore((s) => s.renameBookmark)
 
-  const isEditing = editingId === data.id
+  const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(data.title)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleStartEdit = () => {
-    setEditingId(data.id)
-    setEditValue(data.title)
-    requestAnimationFrame(() => {
+  useEffect(() => {
+    if (isEditing) {
       inputRef.current?.focus()
-      inputRef.current?.select()
-    })
-  }
+    }
+  }, [isEditing])
 
   const handleSubmit = () => {
     if (editValue.trim() && editValue !== data.title) {
       renameBookmark(data.id, editValue.trim())
     } else {
-      setEditingId(null)
+      setIsEditing(false)
     }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleSubmit()
-    if (e.key === 'Escape') setEditingId(null)
+    if (e.key === 'Escape') setIsEditing(false)
+  }
+
+  const changeEditMode = () => {
+    setIsEditing(true)
+    setEditValue(data.title)
   }
 
   return (
@@ -84,10 +84,7 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
             <span className={S.title()}>{data.title}</span>
           )}
         </Button>
-        <HoverActions
-          onClickDelete={() => deleteBookmark(data.id)}
-          onClickEdit={handleStartEdit}
-        />
+        <HoverActions onClickDelete={() => deleteBookmark(data.id)} onClickEdit={changeEditMode} />
       </div>
       <Checkbox
         checked={isChecked}

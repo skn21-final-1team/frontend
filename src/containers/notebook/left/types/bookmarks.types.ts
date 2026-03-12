@@ -26,13 +26,11 @@ export type BookmarkStore = {
   rootIds: number[]
   isLoading: boolean
   searchQuery: string
-  editingId: number | null
   fetchAndInitialize: (notebookId: number) => Promise<void>
   toggleExpand: (id: number) => void
   toggleCheck: (id: number, isChecked: boolean) => void
   getCheckedSources: () => CheckedSource[]
   deleteBookmark: (id: number) => Promise<void>
   setSearchQuery: (query: string) => void
-  setEditingId: (id: number | null) => void
   renameBookmark: (id: number, title: string) => Promise<void>
 }

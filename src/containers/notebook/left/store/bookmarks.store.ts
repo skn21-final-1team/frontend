@@ -85,10 +85,8 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
   rootIds: [],
   isLoading: false,
   searchQuery: '',
-  editingId: null,
 
   setSearchQuery: (query: string) => set({ searchQuery: query }),
-  setEditingId: (id: number | null) => set({ editingId: id }),
 
   fetchAndInitialize: async (notebookId: number) => {
     set({ isLoading: true })
