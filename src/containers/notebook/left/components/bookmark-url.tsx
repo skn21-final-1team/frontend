@@ -1,10 +1,31 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
+import Image from 'next/image'
 import { Button, Checkbox } from '@/shared/components'
-import { Bookmark as BookmarkIcon } from 'lucide-react'
+import { Globe } from 'lucide-react'
 import type { FlatBookmarkNode } from '../types/bookmarks.types'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import HoverActions from './hover-actions'
 import * as S from './bookmark-url.style'
+
+function Favicon({ url }: { url?: string | null }) {
+  const [failed, setFailed] = useState(false)
+
+  if (!url || failed) {
+    return <Globe size={16} style={{ flexShrink: 0 }} />
+  }
+
+  return (
+    <Image
+      src={`https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32`}
+      alt=""
+      width={16}
+      height={16}
+      style={{ flexShrink: 0 }}
+      unoptimized
+      onError={() => setFailed(true)}
+    />
+  )
+}
 
 type BookmarkUrlProps = {
   data: Pick<FlatBookmarkNode, 'id' | 'title' | 'url'>
@@ -22,13 +43,14 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
   const [editValue, setEditValue] = useState(data.title)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (isEditing) {
-      setEditValue(data.title)
+  const handleStartEdit = () => {
+    setEditingId(data.id)
+    setEditValue(data.title)
+    requestAnimationFrame(() => {
       inputRef.current?.focus()
       inputRef.current?.select()
-    }
-  }, [isEditing, data.title])
+    })
+  }
 
   const handleSubmit = () => {
     if (editValue.trim() && editValue !== data.title) {
@@ -47,7 +69,7 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
     <div className={S.fileRow()}>
       <div className={S.fileInfo()}>
         <Button variant="link" size="sm" className={S.file()}>
-          <BookmarkIcon />
+          <Favicon url={data.url} />
           {isEditing ? (
             <input
               ref={inputRef}
@@ -64,7 +86,7 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
         </Button>
         <HoverActions
           onClickDelete={() => deleteBookmark(data.id)}
-          onClickEdit={() => setEditingId(data.id)}
+          onClickEdit={handleStartEdit}
         />
       </div>
       <Checkbox
