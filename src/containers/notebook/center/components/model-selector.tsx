@@ -1,11 +1,15 @@
 import { ChevronDown } from 'lucide-react'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components'
+
 import { AI_MODELS, type AIModel } from '../../constants/models-mock'
+
+import * as S from './model-selector.style'
 
 interface ModelSelectorProps {
   selected: AIModel
@@ -13,28 +17,27 @@ interface ModelSelectorProps {
   disabled?: boolean
 }
 
-export default function ModelSelector({ selected, onSelect, disabled }: ModelSelectorProps) {
+function ModelSelector({ selected, onSelect, disabled }: ModelSelectorProps) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        className="flex items-center gap-1 rounded-md border px-2 py-1 text-xs text-muted-foreground hover:bg-accent disabled:opacity-50"
-        disabled={disabled}
-      >
+      <DropdownMenuTrigger className={S.trigger()} disabled={disabled}>
         {selected.name}
-        <ChevronDown className="size-3" />
+        <ChevronDown />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         {AI_MODELS.map((model) => (
           <DropdownMenuItem
             key={model.id}
             onClick={() => onSelect(model)}
-            className="flex flex-col items-start gap-0.5"
+            className={S.menuItem()}
           >
-            <span className="text-sm font-medium">{model.name}</span>
-            <span className="text-xs text-muted-foreground">{model.description}</span>
+            <span>{model.name}</span>
+            <span>{model.description}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
+
+export default ModelSelector

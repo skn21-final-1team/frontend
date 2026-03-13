@@ -79,7 +79,7 @@ function AddUrlButton({ notebookId }: AddUrlButtonProps) {
           <DialogDescription>크롤링할 웹 페이지 URL을 입력해주세요.</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2">
+        <div className={S.inputGroup()}>
           <Input
             placeholder="https://example.com"
             value={url}
@@ -87,7 +87,7 @@ function AddUrlButton({ notebookId }: AddUrlButtonProps) {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className={S.errorText()}>{error}</p>}
         </div>
 
         <DialogFooter>
@@ -97,7 +97,7 @@ function AddUrlButton({ notebookId }: AddUrlButtonProps) {
           <Button onClick={handleSubmit} disabled={!url.trim() || isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className={S.spinnerIcon()} />
                 크롤링 중...
               </>
             ) : (

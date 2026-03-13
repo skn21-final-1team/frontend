@@ -29,3 +29,18 @@ export const icon = cva(`
   duration-200
   group-hover:scale-110
 `)
+
+export const inputGroup = cva(`
+  flex
+  flex-col
+  gap-2
+`)
+
+export const errorText = cva(`
+  text-sm
+  text-destructive
+`)
+
+export const spinnerIcon = cva(`
+  animate-spin
+`)

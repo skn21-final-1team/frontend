@@ -11,7 +11,7 @@ function Favicon({ url }: { url?: string | null }) {
   const [failed, setFailed] = useState(false)
 
   if (!url || failed) {
-    return <Globe size={16} style={{ flexShrink: 0 }} />
+    return <Globe size={16} />
   }
 
   return (
@@ -20,7 +20,6 @@ function Favicon({ url }: { url?: string | null }) {
       alt=""
       width={16}
       height={16}
-      style={{ flexShrink: 0 }}
       unoptimized
       onError={() => setFailed(true)}
     />
@@ -78,7 +77,7 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
               onBlur={handleSubmit}
               onKeyDown={handleKeyDown}
               onClick={(e) => e.stopPropagation()}
-              style={{ all: 'unset', width: '100%' }}
+              className={S.editInput()}
             />
           ) : (
             <span className={S.title()}>{data.title}</span>

@@ -7,3 +7,14 @@ export const container = cva(`
   bg-background
   px-2
 `)
+
+export const loadingWrapper = cva(`
+  flex
+  items-center
+  justify-center
+  h-full
+`)
+
+export const spinner = cva(`
+  size-6
+`)

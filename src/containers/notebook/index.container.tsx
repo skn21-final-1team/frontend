@@ -20,8 +20,8 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
   if (is404) notFound()
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-full">
-        <Spinner className="size-6" />
+      <div className={s.loadingWrapper()}>
+        <Spinner className={s.spinner()} />
       </div>
     )
   if (isError)

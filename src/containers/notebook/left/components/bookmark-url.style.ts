@@ -19,6 +19,7 @@ export const fileRow = cva(`
 export const file = cva(`
   cursor-pointer
   truncate
+  [&_img]:shrink-0
 `)
 
 export const fileInfo = cva(`
@@ -29,5 +30,14 @@ export const fileInfo = cva(`
 export const title = cva(`
   truncate
   text-left
+  text-foreground
+`)
+
+export const editInput = cva(`
+  w-full
+  bg-transparent
+  border-none
+  outline-none
+  text-sm
   text-foreground
 `)
