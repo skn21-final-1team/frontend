@@ -29,7 +29,10 @@ export default function AuthCallbackPage() {
         useUserStore.getState().setUser(loginResult.user, loginResult.access_token)
         router.replace('/')
       } catch {
-        setError({ title: '로그인 실패', description: '구글 로그인에 실패했습니다. 다시 시도해주세요.' })
+        setError({
+          title: '로그인 실패',
+          description: '구글 로그인에 실패했습니다. 다시 시도해주세요.',
+        })
         isProcessing.current = false
       }
     }

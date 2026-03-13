@@ -24,7 +24,12 @@ interface NotebookCardProps {
   onTogglePin: (id: number, pinned: boolean) => Promise<void>
 }
 
-export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin }: NotebookCardProps) {
+export default function NotebookCard({
+  notebook,
+  onRename,
+  onDelete,
+  onTogglePin,
+}: NotebookCardProps) {
   const router = useRouter()
   const [isRenaming, setIsRenaming] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -77,10 +82,7 @@ export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin
           >
             <Pin size={16} className={notebook.pinned ? S.pinIconFilled() : undefined} />
           </button>
-          <span
-            onClick={(e) => e.stopPropagation()}
-            className={S.menuButton()}
-          >
+          <span onClick={(e) => e.stopPropagation()} className={S.menuButton()}>
             <ItemMenu
               align="end"
               size={16}
@@ -117,9 +119,7 @@ export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={() => onDelete(notebook.id)}>
-              삭제
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => onDelete(notebook.id)}>삭제</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

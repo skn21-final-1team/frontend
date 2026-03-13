@@ -13,7 +13,8 @@ interface ChatViewProps {
 }
 
 export default function ChatView({ notebookId }: ChatViewProps) {
-  const { messages, streamingMessage, isLoading, error, init, sendMessage, setError, abort } = useChatStore()
+  const { messages, streamingMessage, isLoading, error, init, sendMessage, setError, abort } =
+    useChatStore()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

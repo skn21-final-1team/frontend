@@ -83,7 +83,8 @@ export const actionGroup = cva(`
   gap-1
 `)
 
-export const pinButton = cva(`
+export const pinButton = cva(
+  `
   flex
   items-center
   justify-center
@@ -91,15 +92,17 @@ export const pinButton = cva(`
   h-7
   rounded-md
   transition-colors
-`, {
-  variants: {
-    pinned: {
-      true: `text-primary opacity-100`,
-      false: `text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground`,
+`,
+  {
+    variants: {
+      pinned: {
+        true: `text-primary opacity-100`,
+        false: `text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground`,
+      },
     },
+    defaultVariants: { pinned: false },
   },
-  defaultVariants: { pinned: false },
-})
+)
 
 export const pinIconFilled = cva(`
   fill-current

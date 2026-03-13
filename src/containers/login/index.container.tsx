@@ -85,12 +85,7 @@ export function LoginContainer() {
             <div className={s.formContent()}>
               <div className={s.inputGroup()}>
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  {...register('email')}
-                />
+                <Input id="email" type="email" placeholder="m@example.com" {...register('email')} />
                 {errors.email && <p className={s.errorText()}>{errors.email.message}</p>}
               </div>
               <div className={s.inputGroup()}>

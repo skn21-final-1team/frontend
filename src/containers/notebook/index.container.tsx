@@ -18,17 +18,22 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
   const { is404, isLoading, isError } = useNotebook(notebookId)
 
   if (is404) notFound()
-  if (isLoading) return (
-    <div className="flex items-center justify-center h-full">
-      <Spinner className="size-6" />
-    </div>
-  )
-  if (isError) return (
-    <ErrorAlert
-      error={{ title: '노트북 로딩 실패', description: '노트북을 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.' }}
-      onClose={() => router.push('/')}
-    />
-  )
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Spinner className="size-6" />
+      </div>
+    )
+  if (isError)
+    return (
+      <ErrorAlert
+        error={{
+          title: '노트북 로딩 실패',
+          description: '노트북을 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.',
+        }}
+        onClose={() => router.push('/')}
+      />
+    )
 
   return (
     <div className={s.container()}>
