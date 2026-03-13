@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import WorkingSection from '@/containers/notebook/right/working'
 import PendingSection from '@/containers/notebook/right/pending'
 import { useAgentStatusStore } from '@/shared/store/agent-status-store'
@@ -10,8 +9,7 @@ function AgentSection() {
   return (
     <section className={S.section()}>
       <div className={S.inner()}>
-        {/* {status === 'working' ? <WorkingSection /> : <PendingSection />} */}
-        <WorkingSection />
+        {status === 'working' ? <WorkingSection /> : <PendingSection />}
       </div>
     </section>
   )

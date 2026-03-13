@@ -1,13 +1,20 @@
 import AgentStep from '@/containers/notebook/right/components/agent-step'
+import { Button } from '@/shared/components'
+import { useAgentStatusStore } from '@/shared/store/agent-status-store'
 import * as S from './working.style'
 
 function WorkingSection() {
+  const { setStatus } = useAgentStatusStore()
+
   return (
     <section className={S.section()}>
       <AgentStep title="요구사항을 분석합니다." content="" status="completed" />
       <AgentStep title="구조화 작업을 진행합니다." content="" status="completed" />
       <AgentStep title="초안을 작성합니다." content={mookData} status="working" />
       <AgentStep title="최종 문서를 작성합니다." content="" status="pending" />
+      <Button variant="ghost" onClick={() => setStatus('sleep')} size="sm">
+        임의: cancel workflow
+      </Button>
     </section>
   )
 }
