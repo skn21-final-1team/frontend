@@ -10,7 +10,8 @@ function AgentSection() {
   return (
     <section className={S.section()}>
       <div className={S.inner()}>
-        {status === 'working' ? <WorkingSection /> : <PendingSection />}
+        {/* {status === 'working' ? <WorkingSection /> : <PendingSection />} */}
+        <WorkingSection />
       </div>
     </section>
   )

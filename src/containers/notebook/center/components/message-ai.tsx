@@ -1,5 +1,5 @@
-import ReactMarkdown from 'react-markdown'
 import * as S from './message-ai.style'
+import Markdown from '@/shared/components/ui/markdown/markdown'
 
 interface MessageAiProps {
   message: string
@@ -18,9 +18,7 @@ function MessageAi({ message, isLoading = false }: MessageAiProps) {
             <span>Thinking...</span>
           </div>
         ) : (
-          <div className={S.content()}>
-            <ReactMarkdown>{message}</ReactMarkdown>
-          </div>
+          <Markdown text={message} />
         )}
       </div>
     </div>
