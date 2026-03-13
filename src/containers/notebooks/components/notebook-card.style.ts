@@ -101,6 +101,10 @@ export const pinButton = cva(`
   defaultVariants: { pinned: false },
 })
 
+export const pinIconFilled = cva(`
+  fill-current
+`)
+
 export const deleteItem = cva(`
   text-destructive
   focus:text-destructive

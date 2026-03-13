@@ -75,7 +75,7 @@ export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin
             }}
             className={S.pinButton({ pinned: notebook.pinned })}
           >
-            <Pin size={16} className={notebook.pinned ? 'fill-current' : undefined} />
+            <Pin size={16} className={notebook.pinned ? S.pinIconFilled() : undefined} />
           </button>
           <span
             onClick={(e) => e.stopPropagation()}
