@@ -20,6 +20,25 @@ export const title = cva(`
   text-foreground
 `)
 
+export const section = cva(`
+  mb-8
+`)
+
+export const sectionHeader = cva(`
+  flex
+  items-center
+  justify-between
+  mb-4
+`)
+
+export const sectionTitle = cva(`
+  text-xs
+  font-semibold
+  uppercase
+  tracking-wider
+  text-muted-foreground
+`)
+
 export const grid = cva(`
   grid
   grid-cols-1
