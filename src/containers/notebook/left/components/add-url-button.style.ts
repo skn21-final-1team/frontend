@@ -13,14 +13,12 @@ export const wrapper = cva(`
   rounded-md
   border
   border-dashed
-  border-border/60
   text-sm
-  text-muted-foreground
   transition-all
   duration-200
-  hover:border-primary/50
+  border-primary/50
   hover:bg-primary/5
-  hover:text-primary
+  text-primary
   cursor-pointer
 `)
 
