@@ -18,7 +18,7 @@ interface ChatInputProps {
 function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: ChatInputProps) {
   const [value, setValue] = useState('')
   const [model, setModel] = useState<AIModel>(DEFAULT_MODEL)
-  const { isWorking } = useAgentStatusStore()
+  const { status } = useAgentStatusStore()
 
   const handleSend = () => {
     if (!value.trim() || disabled) return
@@ -35,7 +35,7 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
   }
 
   return (
-    <NeonGradientCard borderRadius={12} isOff={!isWorking} className={S.container()}>
+    <NeonGradientCard borderRadius={12} isOff={status === 'sleep'} className={S.container()}>
       <textarea
         rows={4}
         className={S.textarea()}

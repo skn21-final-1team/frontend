@@ -38,8 +38,7 @@ export const bottomBar = cva(`
   items-center
   justify-end
   gap-2
-  px-2
-  pb-2
+  p-2
 `)
 
 export const button = cva(`

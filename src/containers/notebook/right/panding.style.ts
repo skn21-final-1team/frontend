@@ -18,3 +18,9 @@ export const botIcon = cva(`
   text-gray-400
   -mt-20
 `)
+
+export const text = cva(`
+  flex
+  flex-col
+  gap-2
+`)

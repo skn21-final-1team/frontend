@@ -5,11 +5,13 @@ import { useAgentStatusStore } from '@/shared/store/agent-status-store'
 import * as S from './agent.style'
 
 function AgentSection() {
-  const { isWorking } = useAgentStatusStore()
+  const { status } = useAgentStatusStore()
 
   return (
     <section className={S.section()}>
-      <div className={S.inner()}>{isWorking ? <WorkingSection /> : <PendingSection />}</div>
+      <div className={S.inner()}>
+        {status === 'working' ? <WorkingSection /> : <PendingSection />}
+      </div>
     </section>
   )
 }

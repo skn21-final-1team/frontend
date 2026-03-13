@@ -1,19 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+type Status = 'working' | 'sleep' | 'ready'
 interface AgentStatusStore {
-  isWorking: boolean
-  setIsWorking: (status: boolean) => void
+  status: Status
+  setStatus: (status: Status) => void
 }
 
 export const useAgentStatusStore = create(
   persist<AgentStatusStore>(
     (set) => ({
-      isWorking: false,
-      setIsWorking: (status) => set({ isWorking: status }),
+      status: 'sleep',
+      setStatus: (status) => set({ status }),
     }),
     {
-      name: 'agent-status-storage',
+      name: 'agent-status',
     },
   ),
 )
