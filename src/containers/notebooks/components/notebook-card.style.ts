@@ -77,6 +77,30 @@ export const renameInput = cva(`
   focus:ring-primary
 `)
 
+export const actionGroup = cva(`
+  flex
+  items-center
+  gap-1
+`)
+
+export const pinButton = cva(`
+  flex
+  items-center
+  justify-center
+  w-7
+  h-7
+  rounded-md
+  transition-colors
+`, {
+  variants: {
+    pinned: {
+      true: `text-primary opacity-100`,
+      false: `text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground`,
+    },
+  },
+  defaultVariants: { pinned: false },
+})
+
 export const deleteItem = cva(`
   text-destructive
   focus:text-destructive

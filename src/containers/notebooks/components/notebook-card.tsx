@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, Pin } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { Notebook } from '@/shared/api/notebook.api'
 import ItemMenu from '@/shared/components/item-menu/item-menu'
@@ -21,9 +21,10 @@ interface NotebookCardProps {
   notebook: Notebook
   onRename: (id: number, newTitle: string) => Promise<void>
   onDelete: (id: number) => Promise<void>
+  onTogglePin: (id: number, pinned: boolean) => Promise<void>
 }
 
-export default function NotebookCard({ notebook, onRename, onDelete }: NotebookCardProps) {
+export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin }: NotebookCardProps) {
   const router = useRouter()
   const [isRenaming, setIsRenaming] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -66,17 +67,28 @@ export default function NotebookCard({ notebook, onRename, onDelete }: NotebookC
     <div className={S.card()} onClick={handleClick}>
       <div className={S.topRow()}>
         <BookOpen size={20} className={S.icon()} />
-        <span
-          onClick={(e) => e.stopPropagation()}
-          className={S.menuButton()}
-        >
-          <ItemMenu
-            align="end"
-            size={16}
-            onRename={() => setIsRenaming(true)}
-            onDelete={() => setDeleteOpen(true)}
-          />
-        </span>
+        <div className={S.actionGroup()}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onTogglePin(notebook.id, !notebook.pinned)
+            }}
+            className={S.pinButton({ pinned: notebook.pinned })}
+          >
+            <Pin size={16} className={notebook.pinned ? 'fill-current' : undefined} />
+          </button>
+          <span
+            onClick={(e) => e.stopPropagation()}
+            className={S.menuButton()}
+          >
+            <ItemMenu
+              align="end"
+              size={16}
+              onRename={() => setIsRenaming(true)}
+              onDelete={() => setDeleteOpen(true)}
+            />
+          </span>
+        </div>
       </div>
 
       <div className={S.titleArea()}>
