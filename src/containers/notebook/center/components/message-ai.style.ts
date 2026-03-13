@@ -12,7 +12,6 @@ export const bubble = cva(`
   text-foreground
   rounded-lg
   p-3
-  shadow-sm
 `)
 
 export const content = cva(`
@@ -44,6 +43,8 @@ export const loadingDots = cva(`
   flex
   gap-1
   items-center
+  [&>span]:ml-2 
+  [&>span]:text-sm
 `)
 
 export const dot = cva(`

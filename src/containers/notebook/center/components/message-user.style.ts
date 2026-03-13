@@ -13,13 +13,12 @@ export const bubble = cva(`
   rounded-lg
   px-4
   py-2
-  shadow-sm
 `)
 
 export const content = cva(`
   text-sm
   whitespace-pre-wrap
-  break-words
+  wrap-break-word
 `)
 
 export const timestamp = cva(`

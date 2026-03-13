@@ -49,7 +49,11 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
           size="icon"
           disabled={!isLoading && (disabled || !value.trim())}
         >
-          {isLoading ? <Square className="size-3" fill="currentColor" /> : <Send className="size-4" />}
+          {isLoading ? (
+            <Square className={S.buttonIcon({ size: 'sm' })} fill="currentColor" />
+          ) : (
+            <Send className={S.buttonIcon({ size: 'm' })} />
+          )}
         </Button>
       </div>
     </div>

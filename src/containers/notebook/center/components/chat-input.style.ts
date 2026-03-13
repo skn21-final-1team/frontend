@@ -39,3 +39,12 @@ export const bottomBar = cva(`
 export const button = cva(`
   size-8
 `)
+
+export const buttonIcon = cva(``, {
+  variants: {
+    size: {
+      sm: 'size-3',
+      m: 'size-4',
+    },
+  },
+})
