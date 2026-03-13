@@ -3,6 +3,9 @@ import { Button } from '@/shared/components'
 import { Send, Square } from 'lucide-react'
 import ModelSelector from './model-selector'
 import { DEFAULT_MODEL, type AIModel } from '../../constants/models-mock'
+import { useAgentStatusStore } from '@/shared/store/agent-status-store'
+import { NeonGradientCard } from '@/shared/components/ui/neon-gradient-card'
+
 import * as S from './chat-input.style'
 
 interface ChatInputProps {
@@ -15,6 +18,7 @@ interface ChatInputProps {
 function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: ChatInputProps) {
   const [value, setValue] = useState('')
   const [model, setModel] = useState<AIModel>(DEFAULT_MODEL)
+  const { isWorking } = useAgentStatusStore()
 
   const handleSend = () => {
     if (!value.trim() || disabled) return
@@ -31,7 +35,7 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
   }
 
   return (
-    <div className={S.container()}>
+    <NeonGradientCard borderRadius={12} isOff={!isWorking} className={S.container()}>
       <textarea
         rows={4}
         className={S.textarea()}
@@ -41,6 +45,7 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
         placeholder="메시지를 입력하세요."
         disabled={disabled}
       />
+
       <div className={S.bottomBar()}>
         <ModelSelector selected={model} onSelect={setModel} disabled={isLoading} />
         <Button
@@ -56,7 +61,7 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
           )}
         </Button>
       </div>
-    </div>
+    </NeonGradientCard>
   )
 }
 

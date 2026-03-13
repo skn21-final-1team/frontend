@@ -19,5 +19,7 @@
     "lib": "@/shared/style/lib",
     "hooks": "@/shared/style/hooks"
   },
-  "registries": {}
+  "registries": {
+    "@magicui": "https://magicui.design/r/{name}"
+  }
 }

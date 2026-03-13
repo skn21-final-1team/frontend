@@ -6,6 +6,7 @@ import { ErrorAlert } from '@/shared/components/error-alert'
 import ChatView from './center/chat-view'
 import SourceSection from './left/source-section'
 import { useNotebook } from './utils/use-notebook'
+import AgentSection from './right/agent'
 import * as s from './index.style'
 
 interface NotebookContainerProps {
@@ -19,8 +20,8 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
   if (is404) notFound()
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-full">
-        <Spinner className="size-6" />
+      <div className={s.spinnerWrapper()}>
+        <Spinner className={s.spinner()} />
       </div>
     )
   if (isError)
@@ -49,7 +50,9 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
 
         <ResizableHandle />
 
-        <ResizablePanel defaultSize={30} minSize={20}></ResizablePanel>
+        <ResizablePanel defaultSize={30} minSize={20}>
+          <AgentSection />
+        </ResizablePanel>
       </ResizablePanelGroup>
     </div>
   )

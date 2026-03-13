@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
-export const container = cva(`
+export const container = cva(
+  `
   flex
   flex-col
   w-full
@@ -11,11 +12,15 @@ export const container = cva(`
   shadow-sm
   focus-within:ring-1
   focus-within:ring-ring
-`)
+  relative
+  p-2
+`,
+)
 
-export const textarea = cva(`
+export const textarea = cva(
+  `
   w-full
-  min-h-[60px]
+  min-h-15
   resize-none
   bg-transparent
   px-3
@@ -25,7 +30,8 @@ export const textarea = cva(`
   placeholder:text-muted-foreground
   focus:outline-none
   border-none
-`)
+`,
+)
 
 export const bottomBar = cva(`
   flex
