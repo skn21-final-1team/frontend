@@ -8,6 +8,8 @@ export const inner = cva(`
   bg-card
   border
   border-border
+  p-4
+  gap-4
 `)
 
 export const messages = cva(`
@@ -15,15 +17,11 @@ export const messages = cva(`
   overflow-y-auto
   flex
   flex-col
-  px-4
-  pt-8
-  pb-4
+  py-2
 `)
 
 export const inputWrapper = cva(`
   shrink-0
-  px-4
-  pb-4
   bg-card
 `)
 
