@@ -3,10 +3,14 @@ import { fetcher } from '@/shared/utils/fetcher'
 export interface Notebook {
   id: number
   title: string
+  pinned: boolean
+  created_at: string
 }
 
-export const getNotebooks = async (): Promise<Notebook[]> => {
-  const response = await fetcher.get<Notebook[]>(`/notebook/list`)
+export type NotebookSortType = 'recent' | 'created_at' | 'name'
+
+export const getNotebooks = async (sort: NotebookSortType = 'recent'): Promise<Notebook[]> => {
+  const response = await fetcher.get<Notebook[]>(`/notebook/list?sort=${sort}`)
   return response.data
 }
 
@@ -20,8 +24,13 @@ export const createNotebook = async (title: string): Promise<Notebook> => {
   return response.data
 }
 
-export const updateNotebook = async (id: number, title: string): Promise<Notebook> => {
-  const response = await fetcher.patch<Notebook>(`/notebook/${id}`, { title })
+export interface NotebookUpdateBody {
+  title?: string
+  pinned?: boolean
+}
+
+export const updateNotebook = async (id: number, body: NotebookUpdateBody): Promise<Notebook> => {
+  const response = await fetcher.patch<Notebook>(`/notebook/${id}`, body)
   return response.data
 }
 
