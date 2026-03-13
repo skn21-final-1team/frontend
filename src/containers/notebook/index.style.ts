@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const container = cva(`
-  h-[calc(100vh-64px)]
+  h-full
   w-full
   overflow-hidden
   bg-background

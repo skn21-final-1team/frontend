@@ -3,16 +3,18 @@ import { cva } from 'class-variance-authority'
 export const wrapper = cva(`
   relative
   flex
-  min-h-screen
   items-center
   justify-center
   bg-background
   p-4
+  h-full
 `)
 
 export const card = cva(`
   w-full
   max-w-md
+  border
+  border-input
 `)
 
 export const cardHeader = cva(`

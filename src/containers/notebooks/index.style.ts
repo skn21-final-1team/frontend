@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const page = cva(`
-  min-h-screen
+  h-full
   bg-background
   px-8
   py-10

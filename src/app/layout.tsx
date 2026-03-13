@@ -28,7 +28,7 @@ export default function RootLayout({
           <AuthGuard>
             <div className="min-w-5xl mt-16">
               <Header />
-              {children}
+              <div className="h-[calc(100vh-64px)]">{children}</div>
             </div>
           </AuthGuard>
         </ThemeProvider>

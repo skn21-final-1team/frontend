@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority'
 export const wrapper = cva(`
   relative
   flex
-  min-h-screen
+  h-full
   items-center
   justify-center
   bg-background
