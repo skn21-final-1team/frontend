@@ -5,6 +5,7 @@ export type FlatBookmarkNode = {
   type: BookmarkNodeType
   title: string
   url: string | null
+  summary: string | null
   isExpanded: boolean
   isChecked: boolean
   parentId: number | null

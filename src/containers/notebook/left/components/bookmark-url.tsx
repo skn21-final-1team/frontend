@@ -1,17 +1,28 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { Button, Checkbox } from '@/shared/components'
+
 import { Globe } from 'lucide-react'
+
+import { Checkbox, Collapsible, CollapsibleContent } from '@/shared/components'
+
 import type { FlatBookmarkNode } from '../types/bookmarks.types'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import HoverActions from './hover-actions'
 import * as S from './bookmark-url.style'
 
+const isSafeUrl = (url: string) => {
+  try {
+    return ['http:', 'https:'].includes(new URL(url).protocol)
+  } catch {
+    return false
+  }
+}
+
 function Favicon({ url }: { url?: string | null }) {
   const [failed, setFailed] = useState(false)
 
-  if (!url || failed) {
-    return <Globe size={16} style={{ flexShrink: 0 }} />
+  if (!url || failed || !isSafeUrl(url)) {
+    return <Globe size={16} />
   }
 
   return (
@@ -20,15 +31,14 @@ function Favicon({ url }: { url?: string | null }) {
       alt=""
       width={16}
       height={16}
-      style={{ flexShrink: 0 }}
       unoptimized
       onError={() => setFailed(true)}
     />
   )
 }
 
-type BookmarkUrlProps = {
-  data: Pick<FlatBookmarkNode, 'id' | 'title' | 'url'>
+interface BookmarkUrlProps {
+  data: Pick<FlatBookmarkNode, 'id' | 'title' | 'url' | 'summary'>
 }
 
 function BookmarkUrl({ data }: BookmarkUrlProps) {
@@ -39,37 +49,60 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
 
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(data.title)
+  const [showSummary, setShowSummary] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const isEscaping = useRef(false)
 
   useEffect(() => {
-    if (isEditing) {
-      inputRef.current?.focus()
-    }
+    if (isEditing) inputRef.current?.focus()
   }, [isEditing])
 
   const handleSubmit = () => {
-    if (editValue.trim() && editValue !== data.title) {
-      renameBookmark(data.id, editValue.trim())
-    } else {
+    if (isEscaping.current) {
+      isEscaping.current = false
+      return
+    }
+    const trimmed = editValue.trim()
+    if (trimmed && trimmed !== data.title) {
+      renameBookmark(data.id, trimmed)
+    }
+    setIsEditing(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing) return
+    if (e.key === 'Enter') {
+      handleSubmit()
+    } else if (e.key === 'Escape') {
+      isEscaping.current = true
       setIsEditing(false)
+      setEditValue(data.title)
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSubmit()
-    if (e.key === 'Escape') setIsEditing(false)
+  const handleOpenUrl = () => {
+    if (!data.url || !isSafeUrl(data.url)) return
+    window.open(data.url, '_blank', 'noopener,noreferrer')
   }
 
-  const changeEditMode = () => {
+  const handleEditStart = () => {
     setIsEditing(true)
     setEditValue(data.title)
   }
 
+  const hasSummary = !!data.summary
+
   return (
-    <div className={S.fileRow()}>
-      <div className={S.fileInfo()}>
-        <Button variant="link" size="sm" className={S.file()}>
-          <Favicon url={data.url} />
+    <Collapsible open={showSummary}>
+      <div className={S.fileRow()}>
+        <div className={S.fileInfo()}>
+          <button
+            type="button"
+            className={S.faviconButton()}
+            onClick={handleOpenUrl}
+          >
+            <Favicon url={data.url} />
+          </button>
           {isEditing ? (
             <input
               ref={inputRef}
@@ -77,20 +110,34 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
               onChange={(e) => setEditValue(e.target.value)}
               onBlur={handleSubmit}
               onKeyDown={handleKeyDown}
-              onClick={(e) => e.stopPropagation()}
-              style={{ all: 'unset', width: '100%' }}
+              className={S.editInput()}
             />
           ) : (
-            <span className={S.title()}>{data.title}</span>
+            <button
+              type="button"
+              className={S.titleButton({ clickable: hasSummary })}
+              onClick={() => setShowSummary((prev) => !prev)}
+              disabled={!hasSummary}
+            >
+              {data.title}
+            </button>
           )}
-        </Button>
-        <HoverActions onClickDelete={() => deleteBookmark(data.id)} onClickEdit={changeEditMode} />
+          <HoverActions
+            onClickDelete={() => deleteBookmark(data.id)}
+            onClickEdit={handleEditStart}
+          />
+        </div>
+        <Checkbox
+          checked={isChecked}
+          onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
+        />
       </div>
-      <Checkbox
-        checked={isChecked}
-        onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
-      />
-    </div>
+      {hasSummary && (
+        <CollapsibleContent>
+          <p className={S.summary()}>{data.summary}</p>
+        </CollapsibleContent>
+      )}
+    </Collapsible>
   )
 }
 
