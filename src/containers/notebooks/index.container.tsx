@@ -57,18 +57,22 @@ function NotebooksContainer() {
         <h1 className={s.title()}>내 노트북</h1>
       </div>
 
-      {pinnedNotebooks.length > 0 && (
-        <section className={s.section()}>
-          <div className={s.sectionHeader()}>
-            <span className={s.sectionTitle()}>Pinned</span>
-          </div>
-          <div className={s.grid()}>
-            {pinnedNotebooks.map((notebook) => (
-              <NotebookCard key={notebook.id} notebook={notebook} {...cardProps} />
-            ))}
-          </div>
-        </section>
-      )}
+      <section className={s.section()}>
+        <div className={s.sectionHeader()}>
+          <span className={s.sectionTitle()}>Pinned</span>
+        </div>
+        <div className={s.pinnedContent()}>
+          {pinnedNotebooks.length === 0 ? (
+            <p className={s.emptyState()}>고정된 노트북이 없습니다.</p>
+          ) : (
+            <div className={s.grid()}>
+              {pinnedNotebooks.map((notebook) => (
+                <NotebookCard key={notebook.id} notebook={notebook} {...cardProps} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       <section className={s.section()}>
         <div className={s.sectionHeader()}>

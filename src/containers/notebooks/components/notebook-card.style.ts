@@ -3,17 +3,16 @@ import { cva } from 'class-variance-authority'
 export const card = cva(`
   flex
   flex-col
-  justify-between
+  gap-3
   w-full
-  h-40
-  p-4
+  p-5
   bg-card
   border
   border-border
-  rounded-xl
+  rounded-2xl
   shadow-sm
   hover:shadow-md
-  hover:border-primary/50
+  hover:border-primary/40
   transition-all
   duration-200
   cursor-pointer
@@ -25,42 +24,60 @@ export const topRow = cva(`
   flex
   w-full
   justify-between
-  items-start
+  items-center
 `)
 
-export const icon = cva(`
-  opacity-70
-  group-hover:opacity-100
-  transition-opacity
-  duration-200
+export const actionGroup = cva(`
+  flex
+  items-center
+  gap-0.5
 `)
 
 export const menuButton = cva(`
   flex
   items-center
   justify-center
-  w-7
-  h-7
+  w-6
+  h-6
   rounded-md
   text-muted-foreground
   hover:bg-muted
   hover:text-foreground
   transition-colors
-  opacity-0
-  group-hover:opacity-100
 `)
 
-export const titleArea = cva(`
-  w-full
-  mt-2
-`)
+export const pinButton = cva(
+  `
+  flex
+  items-center
+  justify-center
+  w-6
+  h-6
+  rounded-md
+  transition-colors
+`,
+  {
+    variants: {
+      pinned: {
+        true: `text-primary opacity-100`,
+        false: `text-muted-foreground hover:bg-muted hover:text-foreground`,
+      },
+    },
+    defaultVariants: { pinned: false },
+  },
+)
+
+export const pinIconFilled = cva(`fill-current`)
+
+export const titleArea = cva(`flex-1`)
 
 export const title = cva(`
   text-base
-  font-medium
+  font-semibold
   text-card-foreground
   line-clamp-2
   break-keep
+  leading-snug
 `)
 
 export const renameInput = cva(`
@@ -77,36 +94,26 @@ export const renameInput = cva(`
   focus:ring-primary
 `)
 
-export const actionGroup = cva(`
+export const footer = cva(`
   flex
   items-center
-  gap-1
+  justify-between
+  pt-3
+  border-t
+  border-border
 `)
 
-export const pinButton = cva(`
-  flex
-  items-center
-  justify-center
-  w-7
-  h-7
-  rounded-md
-  transition-colors
-`, {
-  variants: {
-    pinned: {
-      true: `text-primary opacity-100`,
-      false: `text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground`,
-    },
-  },
-  defaultVariants: { pinned: false },
-})
-
-export const pinIconFilled = cva(`
-  fill-current
+export const date = cva(`
+  text-xs
+  text-muted-foreground
 `)
 
-export const deleteItem = cva(`
-  text-destructive
-  focus:text-destructive
-  focus:bg-destructive/10
+export const pinnedBadge = cva(`
+  text-xs
+  font-medium
+  text-primary
+  bg-primary/10
+  px-2
+  py-0.5
+  rounded-full
 `)

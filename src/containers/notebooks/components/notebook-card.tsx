@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { BookOpen, Pin } from 'lucide-react'
+import { Pin } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { Notebook } from '@/shared/api/notebook.api'
 import ItemMenu from '@/shared/components/item-menu/item-menu'
@@ -24,7 +24,19 @@ interface NotebookCardProps {
   onTogglePin: (id: number, pinned: boolean) => Promise<void>
 }
 
-export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin }: NotebookCardProps) {
+const formatDate = (dateStr: string) =>
+  new Date(dateStr).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+
+export default function NotebookCard({
+  notebook,
+  onRename,
+  onDelete,
+  onTogglePin,
+}: NotebookCardProps) {
   const router = useRouter()
   const [isRenaming, setIsRenaming] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -39,9 +51,7 @@ export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin
   }, [isRenaming])
 
   const handleClick = () => {
-    if (!isRenaming) {
-      router.push(`/notebook/${notebook.id}`)
-    }
+    if (!isRenaming) router.push(`/notebook/${notebook.id}`)
   }
 
   const handleRenameSubmit = async () => {
@@ -66,29 +76,23 @@ export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin
   return (
     <div className={S.card()} onClick={handleClick}>
       <div className={S.topRow()}>
-        <BookOpen size={20} className={S.icon()} />
-        <div className={S.actionGroup()}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onTogglePin(notebook.id, !notebook.pinned)
-            }}
-            className={S.pinButton({ pinned: notebook.pinned })}
-          >
-            <Pin size={16} className={notebook.pinned ? S.pinIconFilled() : undefined} />
-          </button>
-          <span
-            onClick={(e) => e.stopPropagation()}
-            className={S.menuButton()}
-          >
-            <ItemMenu
-              align="end"
-              size={16}
-              onRename={() => setIsRenaming(true)}
-              onDelete={() => setDeleteOpen(true)}
-            />
-          </span>
-        </div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onTogglePin(notebook.id, !notebook.pinned)
+          }}
+          className={S.pinButton({ pinned: notebook.pinned })}
+        >
+          <Pin size={14} className={notebook.pinned ? S.pinIconFilled() : undefined} />
+        </button>
+        <span onClick={(e) => e.stopPropagation()} className={S.menuButton()}>
+          <ItemMenu
+            align="end"
+            size={14}
+            onRename={() => setIsRenaming(true)}
+            onDelete={() => setDeleteOpen(true)}
+          />
+        </span>
       </div>
 
       <div className={S.titleArea()}>
@@ -107,6 +111,11 @@ export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin
         )}
       </div>
 
+      <div className={S.footer()}>
+        <span className={S.date()}>{formatDate(notebook.created_at)}</span>
+        {notebook.pinned && <span className={S.pinnedBadge()}>고정됨</span>}
+      </div>
+
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent onClick={(e) => e.stopPropagation()}>
           <AlertDialogHeader>
@@ -117,9 +126,7 @@ export default function NotebookCard({ notebook, onRename, onDelete, onTogglePin
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={() => onDelete(notebook.id)}>
-              삭제
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => onDelete(notebook.id)}>삭제</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
