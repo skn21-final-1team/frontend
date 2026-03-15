@@ -48,6 +48,20 @@ export const grid = cva(`
   xl:grid-cols-4
 `)
 
+export const pinnedContent = cva(`
+  min-h-[11rem]
+`)
+
+export const emptyState = cva(`
+  h-[11rem]
+  flex
+  items-center
+  justify-center
+  text-base
+  font-medium
+  text-muted-foreground
+`)
+
 export const loadingState = cva(`
   col-span-full
   flex
