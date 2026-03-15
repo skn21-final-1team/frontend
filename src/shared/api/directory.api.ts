@@ -54,4 +54,3 @@ export const deleteSource = async (sourceId: number) => {
   const response = await fetcher.delete(`/source/${sourceId}`)
   return response.data
 }
-

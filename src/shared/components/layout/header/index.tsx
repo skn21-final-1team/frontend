@@ -56,45 +56,45 @@ export function Header() {
 
   return (
     <>
-    <ErrorAlert error={error} onClose={() => setError(null)} />
-    <header className={s.header()}>
-      <div className={s.container()}>
-        <div className={s.leftSection()}>
-          <Link href="/" className={s.logoLink()}>
-            <Image
-              src="/kalpi.png"
-              alt="Logo"
-              width={60}
-              height={60}
-              className="h-12 w-12 object-contain"
-            />
-            <span className={s.logoText()}>KALPIE</span>
-          </Link>
-          {notebookName && (
-            <>
-              <div className={s.titleDivider()} />
-              <span className={s.notebookTitle()}>{notebookName}</span>
-            </>
-          )}
-        </div>
+      <ErrorAlert error={error} onClose={() => setError(null)} />
+      <header className={s.header()}>
+        <div className={s.container()}>
+          <div className={s.leftSection()}>
+            <Link href="/" className={s.logoLink()}>
+              <Image
+                src="/kalpi.png"
+                alt="Logo"
+                width={60}
+                height={60}
+                className="h-12 w-12 object-contain"
+              />
+              <span className={s.logoText()}>KALPIE</span>
+            </Link>
+            {notebookName && (
+              <>
+                <div className={s.titleDivider()} />
+                <span className={s.notebookTitle()}>{notebookName}</span>
+              </>
+            )}
+          </div>
 
-        <div className={s.rightSection()}>
-          <ThemeToggle />
-          {user ? (
-            <div className={s.userInfo()}>
-              <span className={s.avatar()}>{user.name[0]}</span>
-              <Button variant="ghost" onClick={handleLogout}>
-                Logout
+          <div className={s.rightSection()}>
+            <ThemeToggle />
+            {user ? (
+              <div className={s.userInfo()}>
+                <span className={s.avatar()}>{user.name[0]}</span>
+                <Button variant="ghost" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Button asChild size="sm">
+                <Link href="/login">Login</Link>
               </Button>
-            </div>
-          ) : (
-            <Button asChild size="sm">
-              <Link href="/login">Login</Link>
-            </Button>
-          )}
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
     </>
   )
 }

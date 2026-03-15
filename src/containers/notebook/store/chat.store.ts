@@ -44,7 +44,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       const chats = await getChatsByNotebook(notebookId)
       set({ messages: chats })
     } catch {
-      set({ error: { title: '불러오기 실패', description: '채팅 내역을 불러오는데 실패했습니다.' } })
+      set({
+        error: { title: '불러오기 실패', description: '채팅 내역을 불러오는데 실패했습니다.' },
+      })
     }
   },
 
@@ -96,7 +98,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           streamingMessage: '',
           isLoading: false,
           abortController: null,
-          error: { title: '전송 실패', description: '메시지 전송에 실패했습니다. 다시 시도해주세요.' },
+          error: {
+            title: '전송 실패',
+            description: '메시지 전송에 실패했습니다. 다시 시도해주세요.',
+          },
         })
       },
     })
