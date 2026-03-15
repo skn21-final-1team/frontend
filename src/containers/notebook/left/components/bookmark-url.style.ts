@@ -34,17 +34,9 @@ export const titleButton = cva(`
   border-none
   p-0
   transition-colors
-`, {
-  variants: {
-    clickable: {
-      true: 'cursor-pointer hover:text-primary',
-      false: 'cursor-default',
-    },
-  },
-  defaultVariants: {
-    clickable: false,
-  },
-})
+  cursor-pointer
+  hover:text-primary
+`)
 
 export const editInput = cva(`
   w-full
@@ -55,11 +47,15 @@ export const editInput = cva(`
   text-foreground
 `)
 
-export const summary = cva(`
+export const popoverContent = cva(`
+  w-72
+  p-0
+  border-border
+`)
+
+export const summaryText = cva(`
   text-xs
   text-muted-foreground
   leading-relaxed
-  pl-6
-  pr-2
-  pb-2
+  p-3
 `)

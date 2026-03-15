@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 import { Globe } from 'lucide-react'
 
-import { Checkbox, Collapsible, CollapsibleContent } from '@/shared/components'
+import { Checkbox, Popover, PopoverContent, PopoverTrigger } from '@/shared/components'
 
 import type { FlatBookmarkNode } from '../types/bookmarks.types'
 import { useBookmarkStore } from '../store/bookmarks.store'
@@ -49,7 +49,6 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
 
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(data.title)
-  const [showSummary, setShowSummary] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isEscaping = useRef(false)
 
@@ -93,51 +92,48 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
   const hasSummary = !!data.summary
 
   return (
-    <Collapsible open={showSummary}>
-      <div className={S.fileRow()}>
-        <div className={S.fileInfo()}>
-          <button
-            type="button"
-            className={S.faviconButton()}
-            onClick={handleOpenUrl}
-          >
-            <Favicon url={data.url} />
-          </button>
-          {isEditing ? (
-            <input
-              ref={inputRef}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleSubmit}
-              onKeyDown={handleKeyDown}
-              className={S.editInput()}
-            />
-          ) : (
-            <button
-              type="button"
-              className={S.titleButton({ clickable: hasSummary })}
-              onClick={() => setShowSummary((prev) => !prev)}
-              disabled={!hasSummary}
-            >
-              {data.title}
-            </button>
-          )}
-          <HoverActions
-            onClickDelete={() => deleteBookmark(data.id)}
-            onClickEdit={handleEditStart}
+    <div className={S.fileRow()}>
+      <div className={S.fileInfo()}>
+        <button
+          type="button"
+          className={S.faviconButton()}
+          onClick={handleOpenUrl}
+        >
+          <Favicon url={data.url} />
+        </button>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleSubmit}
+            onKeyDown={handleKeyDown}
+            className={S.editInput()}
           />
-        </div>
-        <Checkbox
-          checked={isChecked}
-          onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
+        ) : (
+          <Popover>
+            <PopoverTrigger asChild>
+              <button type="button" className={S.titleButton()}>
+                {data.title}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className={S.popoverContent()} side="right" align="start">
+              <p className={S.summaryText()}>
+                {hasSummary ? data.summary : '요약 내용이 없습니다.'}
+              </p>
+            </PopoverContent>
+          </Popover>
+        )}
+        <HoverActions
+          onClickDelete={() => deleteBookmark(data.id)}
+          onClickEdit={handleEditStart}
         />
       </div>
-      {hasSummary && (
-        <CollapsibleContent>
-          <p className={S.summary()}>{data.summary}</p>
-        </CollapsibleContent>
-      )}
-    </Collapsible>
+      <Checkbox
+        checked={isChecked}
+        onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
+      />
+    </div>
   )
 }
 
