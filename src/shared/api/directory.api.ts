@@ -9,7 +9,7 @@ export type directory = {
   id: number
   title: string
   url: null
-  parent_id: number
+  parent_id: number | null
   notebook_id: number
   children: Array<directory>
   sources: Array<source>
@@ -18,12 +18,9 @@ export type directory = {
 export type source = {
   id: number
   url: string
-  title: string
-  summary: string
-  directory_id: number
+  title: string | null
+  summary: string | null
   is_active: boolean
-  created_at: string
-  status: string
 }
 
 export type DirectoryResponse = {
@@ -58,7 +55,3 @@ export const deleteSource = async (sourceId: number) => {
   return response.data
 }
 
-export const getSourcesByNotebook = async (notebookId: number): Promise<source[]> => {
-  const response = await fetcher.get<source[]>(`/source/${notebookId}`)
-  return response.data
-}

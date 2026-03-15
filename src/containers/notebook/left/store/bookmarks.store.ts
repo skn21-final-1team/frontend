@@ -25,6 +25,7 @@ const flattenDirectoryTree = (
       type: 'folder',
       title: dir.title,
       url: null,
+      summary: null,
       isExpanded: false,
       isChecked: isChecked,
       parentId,
@@ -42,8 +43,9 @@ const flattenDirectoryTree = (
     const node: FlatBookmarkNode = {
       id: nodeId,
       type: 'source',
-      title: src.title,
+      title: src.title ?? '',
       url: src.url,
+      summary: src.summary || null,
       isExpanded: false,
       isChecked: src.is_active,
       parentId,
