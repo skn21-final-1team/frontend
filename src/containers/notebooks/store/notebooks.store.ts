@@ -26,7 +26,11 @@ interface NotebooksStore {
   clearError: () => void
 }
 
-const showError = (set: (state: Partial<NotebooksStore>) => void, title: string, description: string) => {
+const showError = (
+  set: (state: Partial<NotebooksStore>) => void,
+  title: string,
+  description: string,
+) => {
   set({ error: { title, description } })
 }
 
@@ -42,7 +46,11 @@ export const useNotebooksStore = create<NotebooksStore>((set, get) => ({
       const data = await getNotebooks(get().sort)
       set({ notebooks: data })
     } catch {
-      showError(set, '목록 불러오기 실패', '노트북 목록을 불러오지 못했습니다. 네트워크 상태를 확인해주세요.')
+      showError(
+        set,
+        '목록 불러오기 실패',
+        '노트북 목록을 불러오지 못했습니다. 네트워크 상태를 확인해주세요.',
+      )
     } finally {
       set({ isLoading: false })
     }
@@ -64,7 +72,11 @@ export const useNotebooksStore = create<NotebooksStore>((set, get) => ({
       await updateNotebook(id, { title: newTitle })
       await get().fetchNotebooks()
     } catch {
-      showError(set, '이름 변경 실패', '노트북 이름을 변경하지 못했습니다. 잠시 후 다시 시도해주세요.')
+      showError(
+        set,
+        '이름 변경 실패',
+        '노트북 이름을 변경하지 못했습니다. 잠시 후 다시 시도해주세요.',
+      )
     }
   },
 

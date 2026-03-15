@@ -29,3 +29,4 @@ export const icon = cva(`
   duration-200
   group-hover:scale-110
 `)
+

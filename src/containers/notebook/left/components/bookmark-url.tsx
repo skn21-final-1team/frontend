@@ -94,11 +94,7 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
   return (
     <div className={S.fileRow()}>
       <div className={S.fileInfo()}>
-        <button
-          type="button"
-          className={S.faviconButton()}
-          onClick={handleOpenUrl}
-        >
+        <button type="button" className={S.faviconButton()} onClick={handleOpenUrl}>
           <Favicon url={data.url} />
         </button>
         {isEditing ? (
@@ -124,10 +120,7 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
             </PopoverContent>
           </Popover>
         )}
-        <HoverActions
-          onClickDelete={() => deleteBookmark(data.id)}
-          onClickEdit={handleEditStart}
-        />
+        <HoverActions onClickDelete={() => deleteBookmark(data.id)} onClickEdit={handleEditStart} />
       </div>
       <Checkbox
         checked={isChecked}

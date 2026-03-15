@@ -10,5 +10,5 @@ export function ExtensionInfo() {
         <li>북마크 자동 동기화</li>
       </ol>
     </div>
-  );
+  )
 }
