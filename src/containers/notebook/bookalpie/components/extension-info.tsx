@@ -5,9 +5,9 @@ export function ExtensionInfo() {
     <div className={S.container()}>
       <h4 className={S.title()}>사용 방법:</h4>
       <ol className={S.list()}>
-        <li>Chrome 스토어에서 Bookalpie 설치</li>
-        <li>Bookalpie 팝업 열고 상단에 키 입력</li>
-        <li>북마크 자동 동기화</li>
+        <li>Bookalpie 팝업 열고 cloud 클릭</li>
+        <li>전송할 북마크 체크하고 키 입력</li>
+        <li>전송이 완료되면 새로고침</li>
       </ol>
     </div>
   )
