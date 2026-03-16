@@ -1,14 +1,16 @@
-import React from 'react'
 import ReactMarkdown from 'react-markdown'
+import type { Components } from 'react-markdown'
 import * as S from './markdown.style'
 
-type Props = {
+type MarkdownProps = {
   text: string
+  components?: Components
 }
-function Markdown({ text }: Props) {
+
+function Markdown({ text, components }: MarkdownProps) {
   return (
     <div className={S.content()}>
-      <ReactMarkdown>{text}</ReactMarkdown>
+      <ReactMarkdown components={components}>{text}</ReactMarkdown>
     </div>
   )
 }

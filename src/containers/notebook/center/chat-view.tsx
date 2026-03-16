@@ -1,18 +1,18 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { ErrorAlert } from '@/shared/components/error-alert'
+import { useChatStore } from '../store/chat.store'
 import ChatInput from './components/chat-input'
 import MessageUser from './components/message-user'
 import MessageAi from './components/message-ai'
-import { ErrorAlert } from '@/shared/components/error-alert'
 import * as S from './chat-view.style'
-import { useChatStore } from '../store/chat.store'
 
 interface ChatViewProps {
   notebookId: number
 }
 
-export default function ChatView({ notebookId }: ChatViewProps) {
+function ChatView({ notebookId }: ChatViewProps) {
   const { messages, streamingMessage, isLoading, error, init, sendMessage, setError, abort } =
     useChatStore()
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -32,7 +32,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
         <div className={S.messages()}>
           {messages.map((chat) =>
             chat.role === 'assistant' ? (
-              <MessageAi key={chat.id} message={chat.message} />
+              <MessageAi key={chat.id} message={chat.message} sources={chat.sources} aborted={chat.aborted} />
             ) : (
               <MessageUser key={chat.id} message={chat.message} />
             ),
@@ -48,3 +48,5 @@ export default function ChatView({ notebookId }: ChatViewProps) {
     </section>
   )
 }
+
+export default ChatView

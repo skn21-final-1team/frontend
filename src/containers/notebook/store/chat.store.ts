@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Chat, getChatsByNotebook } from '@/shared/api/chat.api'
+import { Chat, ChatSource, getChatsByNotebook } from '@/shared/api/chat.api'
 import { SSE } from '@/shared/utils/fetcher'
 import { ErrorAlertState } from '@/shared/components/error-alert'
 
@@ -30,11 +30,27 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setError: (error) => set({ error }),
 
   abort: () => {
-    const { abortController } = get()
-    if (abortController) {
-      abortController.abort()
-      set({ abortController: null, isLoading: false, streamingMessage: '' })
-    }
+    const { abortController, notebookId } = get()
+    if (!abortController) return
+
+    abortController.abort()
+
+    set((state) => ({
+      abortController: null,
+      isLoading: false,
+      streamingMessage: '',
+      messages: [
+        ...state.messages,
+        {
+          id: nextTempId(),
+          role: 'assistant' as const,
+          message: '',
+          created_at: new Date().toISOString(),
+          notebook_id: notebookId!,
+          aborted: true,
+        },
+      ],
+    }))
   },
 
   init: async (notebookId) => {
@@ -72,6 +88,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }))
 
     let aiMessage = ''
+    let streamingSources: ChatSource[] = []
+
     await SSE({
       url: '/chat',
       data: {
@@ -89,6 +107,13 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         if (event.event === 'messages') {
           set((state) => ({ streamingMessage: state.streamingMessage + event.data }))
           aiMessage += event.data
+        }
+        if (event.event === 'sources') {
+          try {
+            streamingSources = JSON.parse(event.data)
+          } catch {
+            streamingSources = []
+          }
         }
       },
       onError: () => {
@@ -117,6 +142,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           message: aiMessage.trim(),
           created_at: new Date().toISOString(),
           notebook_id: notebookId,
+          sources: streamingSources.length > 0 ? streamingSources : undefined,
         },
       ],
       streamingMessage: '',
