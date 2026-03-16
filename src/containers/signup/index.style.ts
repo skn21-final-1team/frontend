@@ -13,6 +13,8 @@ export const wrapper = cva(`
 export const card = cva(`
   w-full
   max-w-md
+  border
+  border-input
 `)
 
 export const cardHeader = cva(`
