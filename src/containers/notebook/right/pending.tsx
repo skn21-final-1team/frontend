@@ -1,7 +1,7 @@
 import { Bot, BotMessageSquare } from 'lucide-react'
 import { Button } from '@/shared/components'
 import { useAgentStatusStore } from '@/shared/store/agent-status-store'
-import * as S from './panding.style'
+import * as S from './pending.style'
 
 function PendingSection() {
   const { status, setStatus } = useAgentStatusStore()
