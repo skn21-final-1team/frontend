@@ -51,7 +51,8 @@ export default function NotebookCard({
   }, [isRenaming])
 
   const handleClick = () => {
-    if (!isRenaming) router.push(`/notebook/${notebook.id}`)
+    if (isRenaming || deleteOpen) return
+    router.push(`/notebook/${notebook.id}`)
   }
 
   const handleRenameSubmit = async () => {
