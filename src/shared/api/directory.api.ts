@@ -33,12 +33,16 @@ export const getDirectories = async (notebook_id: number): Promise<DirectoryResp
   return response.data
 }
 
-export const crawlUrls = async (
-  urls: string[],
-  notebook_id: number,
-  directory_id: number | null = null,
-) => {
-  const response = await fetcher.post<boolean>('/crawl', { urls, notebook_id, directory_id })
+export interface AddSourceRequest {
+  url: string
+  notebook_id: number
+  directory_id?: number
+  title?: string
+  is_active?: boolean
+}
+
+export const addSource = async (params: AddSourceRequest): Promise<source> => {
+  const response = await fetcher.post<source>('/source/add', params)
   return response.data
 }
 
