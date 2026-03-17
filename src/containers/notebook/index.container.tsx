@@ -51,7 +51,7 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
         <ResizableHandle />
 
         <ResizablePanel defaultSize={30} minSize={20}>
-          <AgentSection />
+          <AgentSection notebookId={notebookId} />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
