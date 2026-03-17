@@ -8,7 +8,10 @@ import { ErrorAlert } from '@/shared/components/error-alert'
 import * as S from './chat-view.style'
 import { useChatStore } from '../store/chat.store'
 import { useReportWorkflowStore } from '../store/report-workflow.store'
-import { useAgentStatusStore } from '@/shared/store/agent-status-store'
+import {
+  AGENT_MODE_CHAT_GUIDE_MESSAGE,
+  useAgentStatusStore,
+} from '@/shared/store/agent-status-store'
 
 interface ChatViewProps {
   notebookId: number
@@ -30,6 +33,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
   const { status: agentStatus } = useAgentStatusStore()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const isAgentMode = agentStatus === 'ready' || agentStatus === 'working'
+  const shouldShowAgentGuide = agentStatus === 'ready' && agentMessages.length === 0 && !isLoading
   const visibleMessages = isAgentMode ? agentMessages : chatMessages
   const workflowInitializedNotebook = useRef<number | null>(null)
 
@@ -57,6 +61,7 @@ export default function ChatView({ notebookId }: ChatViewProps) {
       <ErrorAlert error={error} onClose={() => setError(null)} />
       <div className={S.inner()}>
         <div className={S.messages()}>
+          {shouldShowAgentGuide && <MessageAi message={AGENT_MODE_CHAT_GUIDE_MESSAGE} />}
           {visibleMessages.map((chat) =>
             chat.role === 'assistant' ? (
               <MessageAi key={chat.id} message={chat.message} />
