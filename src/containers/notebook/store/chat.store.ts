@@ -46,8 +46,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       abortController: null,
       isLoading: false,
       streamingMessage: '',
-      messages: [
-        ...state.messages,
+      chatMessages: [
+        ...state.chatMessages,
         {
           id: nextTempId(),
           role: 'assistant' as const,
