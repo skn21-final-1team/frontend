@@ -8,7 +8,14 @@ type Props = {
 function Markdown({ text }: Props) {
   return (
     <div className={S.content()}>
-      <ReactMarkdown>{text}</ReactMarkdown>
+      <ReactMarkdown
+        skipHtml
+        components={{
+          a: (props) => <a {...props} target="_blank" rel="noreferrer" />,
+        }}
+      >
+        {text}
+      </ReactMarkdown>
     </div>
   )
 }

@@ -8,5 +8,9 @@ export const container = cva(`
   px-2
 `)
 
+export const resizablePanel = cva(`
+  min-h-0
+`)
+
 export const spinnerWrapper = cva(`flex items-center justify-center h-full`)
 export const spinner = cva(`size-6`)

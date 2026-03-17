@@ -10,7 +10,7 @@ export const container = cva(
   {
     variants: {
       status: {
-        working: 'bg-blue-50/60 dark:bg-blue-950/60',
+        working: 'flex flex-1 min-h-0 flex-col overflow-hidden bg-blue-50/60 dark:bg-blue-950/60',
         pending: 'bg-muted',
         completed: 'bg-green-50/60 dark:bg-green-950/60',
       },
@@ -37,7 +37,7 @@ export const titleDot = cva(`w-2 h-2 rounded-full shrink-0`, {
   },
 })
 
-export const statusBadge = cva(`gap-1 text-xs font-medium rounded-full`, {
+export const statusBadge = cva(`flex gap-1 text-xs font-medium rounded-full`, {
   variants: {
     status: {
       working: 'border-blue-400/60  text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
@@ -58,13 +58,17 @@ export const title = cva(`flex-1 text-xs font-medium`, {
   },
 })
 
-export const content = cva(`px-3
-  max-h-[70vh]
-  overflow-y-auto
+export const content = cva(`
+  flex-1
+  min-h-0
+  px-3
+  overflow-hidden
   leading-relaxed
 `)
 
 export const contentInner = cva(`
+  h-full
+  overflow-y-auto
   px-3
   pt-2
   pb-3

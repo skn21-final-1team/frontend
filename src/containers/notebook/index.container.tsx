@@ -38,19 +38,19 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
   return (
     <div className={s.container()}>
       <ResizablePanelGroup orientation="horizontal">
-        <ResizablePanel defaultSize={20} minSize={15}>
+        <ResizablePanel defaultSize={20} minSize={15} className={s.resizablePanel()}>
           <SourceSection notebookId={notebookId} />
         </ResizablePanel>
 
         <ResizableHandle />
 
-        <ResizablePanel defaultSize={50} minSize={30}>
+        <ResizablePanel defaultSize={50} minSize={30} className={s.resizablePanel()}>
           <ChatView notebookId={notebookId} />
         </ResizablePanel>
 
         <ResizableHandle />
 
-        <ResizablePanel defaultSize={30} minSize={20}>
+        <ResizablePanel defaultSize={30} minSize={20} className={s.resizablePanel()}>
           <AgentSection notebookId={notebookId} />
         </ResizablePanel>
       </ResizablePanelGroup>

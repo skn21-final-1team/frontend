@@ -20,9 +20,8 @@ function PendingSection() {
         <>
           <BotMessageSquare className={S.botIcon()} />
           <div className={S.text()}>
-            <p>문서 작성을 바로 시작할게요.</p>
-            <p>채팅을 통해 작성을 원하는 문서를 알려주세요.</p>
-            <p>{'예시) "에이전트 사용설명서 만들어줘"'}</p>
+            <p>에이전트 모드가 활성화되었습니다.</p>
+            <p>채팅 영역에서 작성할 문서 예시와 사용 방법을 확인할 수 있어요.</p>
           </div>
           <Button variant="ghost" onClick={changeChatMode} size="sm">
             채팅모드로 돌아가기
