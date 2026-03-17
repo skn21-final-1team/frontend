@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import axios from 'axios'
 import { Loader2, Plus } from 'lucide-react'
 import {
   Dialog,
@@ -10,7 +11,7 @@ import {
   Button,
   Input,
 } from '@/shared/components'
-import { crawlUrls } from '@/shared/api/directory.api'
+import { addSource } from '@/shared/api/directory.api'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import * as S from './add-url-button.style'
 
@@ -52,11 +53,21 @@ function AddUrlButton({ notebookId }: AddUrlButtonProps) {
     setIsLoading(true)
 
     try {
-      await crawlUrls([trimmed], notebookId)
+      await addSource({ url: trimmed, notebook_id: notebookId })
       await fetchAndInitialize(notebookId)
       handleClose()
-    } catch {
-      setError('URL 크롤링에 실패했습니다. URL을 확인해주세요.')
+    } catch (error) {
+      console.error('소스 추가 실패:', error)
+
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status
+        if (status === 400 || status === 422) setError('유효하지 않은 URL입니다. 형식을 확인해주세요.')
+        else if (status === 404) setError('노트북을 찾을 수 없습니다.')
+        else if (status && status >= 500) setError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+        else setError('네트워크 오류가 발생했습니다. 연결 상태를 확인해주세요.')
+      } else {
+        setError('알 수 없는 오류가 발생했습니다.')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -79,7 +90,7 @@ function AddUrlButton({ notebookId }: AddUrlButtonProps) {
           <DialogDescription>크롤링할 웹 페이지 URL을 입력해주세요.</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-2">
+        <div className={S.inputWrapper()}>
           <Input
             placeholder="https://example.com"
             value={url}
@@ -87,7 +98,7 @@ function AddUrlButton({ notebookId }: AddUrlButtonProps) {
             onKeyDown={handleKeyDown}
             disabled={isLoading}
           />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className={S.errorText()}>{error}</p>}
         </div>
 
         <DialogFooter>
@@ -97,7 +108,7 @@ function AddUrlButton({ notebookId }: AddUrlButtonProps) {
           <Button onClick={handleSubmit} disabled={!url.trim() || isLoading}>
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className={S.spinner()} />
                 크롤링 중...
               </>
             ) : (
