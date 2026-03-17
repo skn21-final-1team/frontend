@@ -1,53 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/shared/components/ui/button'
 import { ThemeToggle } from '@/shared/components/theme-toggle'
-import { ErrorAlert, type ErrorAlertState } from '@/shared/components'
 import * as s from './index.style'
 import { useUserStore } from '@/shared/store/user-store'
-import { useRouter, useParams } from 'next/navigation'
-import { getNotebook } from '@/shared/api/notebook.api'
+import { useRouter } from 'next/navigation'
+import { useNotebookMetaStore } from '@/shared/store/notebook-meta-store'
 
 export function Header() {
   const router = useRouter()
-  const params = useParams()
   const user = useUserStore((state) => state.user)
-  const [notebookName, setNotebookName] = useState<string | null>(null)
-  const [error, setError] = useState<ErrorAlertState | null>(null)
-
-  const notebookId = params && typeof params.id === 'string' ? Number(params.id) : null
-
-  useEffect(() => {
-    let isMounted = true
-
-    const fetchNotebookName = async () => {
-      if (!notebookId) {
-        if (isMounted) setNotebookName(null)
-        return
-      }
-
-      try {
-        const notebook = await getNotebook(notebookId)
-        if (isMounted) {
-          setNotebookName(notebook.title)
-        }
-      } catch {
-        if (isMounted) {
-          setNotebookName(null)
-          setError({ title: '노트북 정보 실패', description: '노트북 이름을 불러오지 못했습니다.' })
-        }
-      }
-    }
-
-    fetchNotebookName()
-
-    return () => {
-      isMounted = false
-    }
-  }, [notebookId])
+  const notebookName = useNotebookMetaStore((s) => s.title)
 
   const handleLogout = () => {
     useUserStore.getState().clearUser()
@@ -56,7 +21,6 @@ export function Header() {
 
   return (
     <>
-      <ErrorAlert error={error} onClose={() => setError(null)} />
       <header className={s.header()}>
         <div className={s.container()}>
           <div className={s.leftSection()}>
