@@ -16,8 +16,10 @@ const flattenDirectoryTree = (
   const rootIds: number[] = []
 
   const flattenDirectory = (dir: directory, parentId: number | null) => {
-    const childDirectoryIds = dir.children.map((child) => child.id)
-    const childSourceIds = dir.sources.map((src) => toSourceNodeId(src.id))
+    const sortedChildren = [...dir.children].sort((a, b) => a.id - b.id)
+    const sortedSources = [...dir.sources].sort((a, b) => a.id - b.id)
+    const childDirectoryIds = sortedChildren.map((child) => child.id)
+    const childSourceIds = sortedSources.map((src) => toSourceNodeId(src.id))
     const isChecked = dir.sources.every((src) => src.is_active)
 
     const node: FlatBookmarkNode = {
@@ -34,8 +36,8 @@ const flattenDirectoryTree = (
 
     bookmarks[dir.id] = node
 
-    dir.sources.forEach((src) => flattenSource(src, dir.id))
-    dir.children.forEach((child) => flattenDirectory(child, dir.id))
+    sortedSources.forEach((src) => flattenSource(src, dir.id))
+    sortedChildren.forEach((child) => flattenDirectory(child, dir.id))
   }
 
   const flattenSource = (src: source, parentId: number | null) => {
@@ -54,12 +56,15 @@ const flattenDirectoryTree = (
     bookmarks[nodeId] = node
   }
 
-  directories.forEach((dir) => {
+  const sortedDirectories = [...directories].sort((a, b) => a.id - b.id)
+  const sortedRootSources = [...rootSources].sort((a, b) => a.id - b.id)
+
+  sortedDirectories.forEach((dir) => {
     rootIds.push(dir.id)
     flattenDirectory(dir, null)
   })
 
-  rootSources.forEach((src) => {
+  sortedRootSources.forEach((src) => {
     const nodeId = toSourceNodeId(src.id)
     rootIds.push(nodeId)
     flattenSource(src, null)
