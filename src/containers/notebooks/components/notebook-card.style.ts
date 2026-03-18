@@ -115,27 +115,6 @@ export const dateBadge = cva(`
   backdrop-blur-sm
 `)
 
-export const titleArea = cva(`
-  flex
-  min-h-[4.5rem]
-  w-full
-  items-center
-`)
-
-export const menuButton = cva(`
-  flex
-  items-center
-  justify-center
-  w-6
-  h-6
-  rounded-md
-  text-white/85
-  bg-black/20
-  hover:bg-black/35
-  hover:text-white
-  transition-colors
-`)
-
 export const pinButton = cva(
   `
   flex

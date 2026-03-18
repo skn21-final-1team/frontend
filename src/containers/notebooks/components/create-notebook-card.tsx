@@ -50,39 +50,27 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
     }
   }
 
-  if (isEditing) {
-    return (
-      <div className={S.card()}>
-        <div className={S.media()}>
-          <div className={S.mediaOverlay()} />
-          <div className={S.mediaInner()}>
-            <Plus size={28} className={S.plusIcon()} />
-          </div>
-        </div>
-
-        <div className={S.inputWrapper()}>
-          <input
-            ref={inputRef}
-            className={S.input()}
-            placeholder="노트북 제목"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleSubmit}
-            disabled={isLoading}
-          />
-          <span className={S.hint()}>Enter로 생성 · Esc로 취소</span>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className={S.card()} onClick={handleOpen}>
       <div className={S.media()}>
         <div className={S.mediaOverlay()} />
         <div className={S.mediaInner()}>
-          <Plus size={28} className={S.plusIcon()} />
+          {isEditing ? (
+            <div className={S.inputWrapper()}>
+              <input
+                className={S.input()}
+                placeholder="노트북 제목"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onBlur={handleSubmit}
+                disabled={isLoading}
+              />
+              <span className={S.hint()}>Enter로 생성 · Esc로 취소</span>
+            </div>
+          ) : (
+            <Plus size={28} className={S.plusIcon()} />
+          )}
         </div>
       </div>
     </div>

@@ -47,27 +47,30 @@ export const inputWrapper = cva(`
   justify-center
   gap-2
   w-full
+  px-4
 `)
 
 export const input = cva(`
   w-full
-  rounded-md
-  border
-  border-primary
-  bg-background
-  px-3
-  py-1.5
-  text-sm
-  text-foreground
-  placeholder:text-muted-foreground
+  bg-transparent
+  border-none
+  border-b-2
+  text-xl
+  font-semibold
+  text-white
+  placeholder:text-white/50
+  overflow-hidden
+  whitespace-pre-wrap
+  break-keep
+  leading-snug
   focus:outline-none
-  focus:ring-1
-  focus:ring-primary
+  focus:border-b-white/60
+  focus:ring-0
 `)
 
 export const hint = cva(`
   text-xs
-  text-muted-foreground
+  text-black/80
 `)
 
 export const plusIcon = cva(`
