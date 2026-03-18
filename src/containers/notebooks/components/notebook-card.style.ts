@@ -74,12 +74,52 @@ export const mediaFallbackLabel = cva(`
   text-white/90
 `)
 
-export const content = cva(`
+export const badgeStack = cva(`
+  absolute
+  bottom-3
+  left-3
+  right-3
+  z-20
   flex
-  flex-1
-  flex-col
-  gap-3
-  p-4
+  items-center
+  justify-between
+`)
+
+export const overlayTitleArea = cva(`
+  absolute
+  inset-x-0
+  bottom-0
+  z-10
+  flex
+  items-end
+  bg-linear-to-t
+  from-black/70
+  via-black/30
+  to-transparent
+  px-4
+  pb-14
+  pt-10
+`)
+
+export const dateBadge = cva(`
+  inline-flex
+  items-center
+  ml-auto
+  rounded-full
+  bg-black/45
+  px-3
+  py-1
+  text-xs
+  font-medium
+  text-white
+  backdrop-blur-sm
+`)
+
+export const titleArea = cva(`
+  flex
+  min-h-[4.5rem]
+  w-full
+  items-center
 `)
 
 export const menuButton = cva(`
@@ -105,12 +145,13 @@ export const pinButton = cva(
   h-6
   rounded-md
   transition-colors
+  cursor-pointer
 `,
   {
     variants: {
       pinned: {
         true: `text-white opacity-100 bg-black/35`,
-        false: `text-white/85 bg-black/20 hover:bg-black/35 hover:text-white`,
+        false: `text-white/85 bg-black/40 hover:bg-black/50 hover:text-white`,
       },
     },
     defaultVariants: { pinned: false },
@@ -120,9 +161,11 @@ export const pinButton = cva(
 export const pinIconFilled = cva(`fill-current`)
 
 export const title = cva(`
-  text-base
+  w-full
+  overflow-hidden
+  text-xl
   font-semibold
-  text-card-foreground
+  text-white
   line-clamp-2
   break-keep
   leading-snug
@@ -130,25 +173,27 @@ export const title = cva(`
 
 export const renameInput = cva(`
   w-full
-  px-2
-  py-1
-  text-sm
-  rounded-md
-  border
-  border-primary
-  bg-background
+  bg-transparent
+  border-none
+  border-b-2
+  border-b-white/20
+  text-xl
+  font-semibold
+  text-white
+  placeholder:text-white/50
+  overflow-hidden
+  whitespace-pre-wrap
+  break-keep
+  leading-snug
   focus:outline-none
-  focus:ring-1
-  focus:ring-primary
+  focus:border-b-white/60
+  focus:ring-0
 `)
 
 export const footer = cva(`
   flex
   items-center
-  justify-between
-  pt-2
-  border-t
-  border-border
+  justify-end
 `)
 
 export const date = cva(`
@@ -159,9 +204,9 @@ export const date = cva(`
 export const pinnedBadge = cva(`
   text-xs
   font-medium
-  text-primary
-  bg-primary/10
-  px-2
-  py-0.5
+  text-white
+  bg-primary/80
+  px-3
+  py-1
   rounded-full
 `)

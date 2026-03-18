@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Pin } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
@@ -46,14 +46,19 @@ export default function NotebookCard({
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [isImageFailed, setIsImageFailed] = useState(false)
   const [title, setTitle] = useState(notebook.title)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const cardImageSrc = getNotebookCardImageByIndex(cardIndex)
 
+  const changeRenameMode = (editing: boolean) => {
+    setIsRenaming(editing)
+  }
+
   useEffect(() => {
-    if (isRenaming) {
-      inputRef.current?.focus()
-      inputRef.current?.select()
-    }
+    if (!isRenaming) return
+
+    if (!inputRef.current) return
+    inputRef.current.focus()
+    inputRef.current.select()
   }, [isRenaming])
 
   const handleClick = () => {
@@ -72,8 +77,11 @@ export default function NotebookCard({
     setIsRenaming(false)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleRenameSubmit()
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleRenameSubmit()
+    }
     if (e.key === 'Escape') {
       setTitle(notebook.title)
       setIsRenaming(false)
@@ -105,14 +113,33 @@ export default function NotebookCard({
           >
             <Pin size={14} className={notebook.pinned ? S.pinIconFilled() : undefined} />
           </button>
-          <span onClick={(e) => e.stopPropagation()} className={S.menuButton()}>
-            <ItemMenu
-              align="end"
-              size={14}
-              onRename={() => setIsRenaming(true)}
-              onDelete={() => setDeleteOpen(true)}
+          <ItemMenu
+            align="end"
+            size={14}
+            onRename={() => changeRenameMode(true)}
+            onDelete={() => setDeleteOpen(true)}
+          />
+        </div>
+
+        <div className={S.badgeStack()}>
+          {notebook.pinned && <span className={S.pinnedBadge()}>고정됨</span>}
+          <span className={S.dateBadge()}>{formatDate(notebook.created_at)}</span>
+        </div>
+
+        <div className={S.overlayTitleArea()}>
+          {isRenaming ? (
+            <textarea
+              ref={inputRef}
+              autoFocus
+              className={S.renameInput()}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onClick={(e) => e.stopPropagation()}
             />
-          </span>
+          ) : (
+            <p className={S.title()}>{notebook.title}</p>
+          )}
         </div>
 
         {isImageFailed && (
@@ -120,27 +147,6 @@ export default function NotebookCard({
             <span className={S.mediaFallbackLabel()}>Notebook</span>
           </div>
         )}
-      </div>
-
-      <div className={S.content()}>
-        {isRenaming ? (
-          <input
-            ref={inputRef}
-            className={S.renameInput()}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleRenameSubmit}
-            onClick={(e) => e.stopPropagation()}
-          />
-        ) : (
-          <p className={S.title()}>{notebook.title}</p>
-        )}
-
-        <div className={S.footer()}>
-          <span className={S.date()}>{formatDate(notebook.created_at)}</span>
-          {notebook.pinned && <span className={S.pinnedBadge()}>고정됨</span>}
-        </div>
       </div>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>

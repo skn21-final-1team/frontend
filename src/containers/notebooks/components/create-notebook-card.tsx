@@ -60,20 +60,18 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
           </div>
         </div>
 
-        <div className={S.content()}>
-          <div className={S.inputWrapper()}>
-            <input
-              ref={inputRef}
-              className={S.input()}
-              placeholder="노트북 제목"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onBlur={handleSubmit}
-              disabled={isLoading}
-            />
-            <span className={S.hint()}>Enter로 생성 · Esc로 취소</span>
-          </div>
+        <div className={S.inputWrapper()}>
+          <input
+            ref={inputRef}
+            className={S.input()}
+            placeholder="노트북 제목"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSubmit}
+            disabled={isLoading}
+          />
+          <span className={S.hint()}>Enter로 생성 · Esc로 취소</span>
         </div>
       </div>
     )
@@ -86,10 +84,6 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
         <div className={S.mediaInner()}>
           <Plus size={28} className={S.plusIcon()} />
         </div>
-      </div>
-
-      <div className={S.content()}>
-        <span className={S.label()}>새 노트북 만들기</span>
       </div>
     </div>
   )

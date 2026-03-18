@@ -40,15 +40,6 @@ export const mediaInner = cva(`
   justify-center
 `)
 
-export const content = cva(`
-  flex
-  min-h-[96px]
-  flex-col
-  justify-center
-  gap-2
-  p-4
-`)
-
 export const inputWrapper = cva(`
   flex
   flex-col
@@ -86,10 +77,26 @@ export const plusIcon = cva(`
   duration-150
 `)
 
+export const overlayLabelArea = cva(`
+  absolute
+  inset-x-0
+  bottom-0
+  z-10
+  flex
+  items-end
+  bg-linear-to-t
+  from-black/70
+  via-black/30
+  to-transparent
+  px-4
+  pb-14
+  pt-10
+`)
+
 export const label = cva(`
   text-xl
   font-bold
-  text-card-foreground
+  text-white
   transition-colors
   duration-150
 `)
