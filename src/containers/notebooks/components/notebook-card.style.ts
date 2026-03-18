@@ -33,6 +33,7 @@ export const topRow = cva(`
 export const media = cva(`
   relative
   w-full
+  overflow-hidden
   aspect-16/10
   bg-muted
 `)
@@ -41,6 +42,7 @@ export const cardImage = cva(`
   h-full
   w-full
   object-cover
+  object-center
   transition-transform
   duration-300
   group-hover:scale-[1.03]
