@@ -3,32 +3,59 @@ import { cva } from 'class-variance-authority'
 export const card = cva(`
   flex
   flex-col
-  items-center
-  justify-center
-  gap-2
-  rounded-xl
-  border-2
-  border-dashed
+  w-full
+  overflow-hidden
+  rounded-2xl
+  border
   border-border
   bg-card
-  h-40
-  hover:border-primary/60
-  hover:bg-muted/30
+  shadow-sm
+  hover:shadow-md
+  hover:border-primary/50
   transition-all
   duration-200
   cursor-pointer
   group
 `)
 
+export const media = cva(`
+  relative
+  w-full
+  overflow-hidden
+  aspect-16/10
+  bg-[linear-gradient(135deg,hsl(var(--primary)/0.22),hsl(var(--muted)))]
+`)
+
+export const mediaOverlay = cva(`
+  absolute
+  inset-0
+  bg-foreground/40
+`)
+
+export const mediaInner = cva(`
+  absolute
+  inset-0
+  flex
+  items-center
+  justify-center
+`)
+
+export const content = cva(`
+  flex
+  min-h-[96px]
+  flex-col
+  justify-center
+  gap-2
+  p-4
+`)
+
 export const inputWrapper = cva(`
   flex
   flex-col
-  items-center
+  items-start
   justify-center
   gap-2
   w-full
-  h-full
-  px-4
 `)
 
 export const input = cva(`
@@ -53,16 +80,16 @@ export const hint = cva(`
 `)
 
 export const plusIcon = cva(`
-  text-muted-foreground
-  group-hover:text-primary
+  text-white/85
+  group-hover:text-white
   transition-colors
   duration-150
 `)
 
 export const label = cva(`
-  text-sm
-  text-muted-foreground
-  group-hover:text-primary
+  text-xl
+  font-bold
+  text-card-foreground
   transition-colors
   duration-150
 `)
