@@ -3,8 +3,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { Pin } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import type { Notebook } from '@/shared/api/notebook.api'
 import ItemMenu from '@/shared/components/item-menu/item-menu'
+import { getNotebookCardImageByIndex } from '../constants/card-images'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +21,7 @@ import * as S from './notebook-card.style'
 
 interface NotebookCardProps {
   notebook: Notebook
+  cardIndex: number
   onRename: (id: number, newTitle: string) => Promise<void>
   onDelete: (id: number) => Promise<void>
   onTogglePin: (id: number, pinned: boolean) => Promise<void>
@@ -33,6 +36,7 @@ const formatDate = (dateStr: string) =>
 
 export default function NotebookCard({
   notebook,
+  cardIndex,
   onRename,
   onDelete,
   onTogglePin,
@@ -40,8 +44,10 @@ export default function NotebookCard({
   const router = useRouter()
   const [isRenaming, setIsRenaming] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isImageFailed, setIsImageFailed] = useState(false)
   const [title, setTitle] = useState(notebook.title)
   const inputRef = useRef<HTMLInputElement>(null)
+  const cardImageSrc = getNotebookCardImageByIndex(cardIndex)
 
   useEffect(() => {
     if (isRenaming) {
@@ -76,27 +82,47 @@ export default function NotebookCard({
 
   return (
     <div className={S.card()} onClick={handleClick}>
-      <div className={S.topRow()}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onTogglePin(notebook.id, !notebook.pinned)
-          }}
-          className={S.pinButton({ pinned: notebook.pinned })}
-        >
-          <Pin size={14} className={notebook.pinned ? S.pinIconFilled() : undefined} />
-        </button>
-        <span onClick={(e) => e.stopPropagation()} className={S.menuButton()}>
-          <ItemMenu
-            align="end"
-            size={14}
-            onRename={() => setIsRenaming(true)}
-            onDelete={() => setDeleteOpen(true)}
+      <div className={S.media()}>
+        {!isImageFailed && (
+          <Image
+            src={cardImageSrc}
+            alt={`${notebook.title} 배경 이미지`}
+            className={S.cardImage()}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+            onError={() => setIsImageFailed(true)}
           />
-        </span>
+        )}
+        <div className={S.mediaOverlay()} />
+
+        <div className={S.topRow()}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onTogglePin(notebook.id, !notebook.pinned)
+            }}
+            className={S.pinButton({ pinned: notebook.pinned })}
+          >
+            <Pin size={14} className={notebook.pinned ? S.pinIconFilled() : undefined} />
+          </button>
+          <span onClick={(e) => e.stopPropagation()} className={S.menuButton()}>
+            <ItemMenu
+              align="end"
+              size={14}
+              onRename={() => setIsRenaming(true)}
+              onDelete={() => setDeleteOpen(true)}
+            />
+          </span>
+        </div>
+
+        {isImageFailed && (
+          <div className={S.mediaFallback()}>
+            <span className={S.mediaFallbackLabel()}>Notebook</span>
+          </div>
+        )}
       </div>
 
-      <div className={S.titleArea()}>
+      <div className={S.content()}>
         {isRenaming ? (
           <input
             ref={inputRef}
@@ -110,11 +136,11 @@ export default function NotebookCard({
         ) : (
           <p className={S.title()}>{notebook.title}</p>
         )}
-      </div>
 
-      <div className={S.footer()}>
-        <span className={S.date()}>{formatDate(notebook.created_at)}</span>
-        {notebook.pinned && <span className={S.pinnedBadge()}>고정됨</span>}
+        <div className={S.footer()}>
+          <span className={S.date()}>{formatDate(notebook.created_at)}</span>
+          {notebook.pinned && <span className={S.pinnedBadge()}>고정됨</span>}
+        </div>
       </div>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>

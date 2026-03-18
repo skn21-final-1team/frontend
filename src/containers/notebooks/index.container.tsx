@@ -66,8 +66,13 @@ function NotebooksContainer() {
             <p className={s.emptyState()}>고정된 노트북이 없습니다.</p>
           ) : (
             <div className={s.grid()}>
-              {pinnedNotebooks.map((notebook) => (
-                <NotebookCard key={notebook.id} notebook={notebook} {...cardProps} />
+              {pinnedNotebooks.map((notebook, cardIndex) => (
+                <NotebookCard
+                  key={notebook.id}
+                  notebook={notebook}
+                  cardIndex={cardIndex}
+                  {...cardProps}
+                />
               ))}
             </div>
           )}
@@ -81,8 +86,13 @@ function NotebooksContainer() {
         </div>
         <div className={s.grid()}>
           <CreateCard onCreate={createNotebook} />
-          {unpinnedNotebooks.map((notebook) => (
-            <NotebookCard key={notebook.id} notebook={notebook} {...cardProps} />
+          {unpinnedNotebooks.map((notebook, cardIndex) => (
+            <NotebookCard
+              key={notebook.id}
+              notebook={notebook}
+              cardIndex={cardIndex}
+              {...cardProps}
+            />
           ))}
         </div>
       </section>

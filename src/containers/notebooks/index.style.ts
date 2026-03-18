@@ -45,15 +45,15 @@ export const grid = cva(`
   gap-4
   sm:grid-cols-2
   lg:grid-cols-3
-  xl:grid-cols-4
+  xl:grid-cols-5
 `)
 
 export const pinnedContent = cva(`
-  min-h-[11rem]
+  min-h-44
 `)
 
 export const emptyState = cva(`
-  h-[11rem]
+  h-44
   flex
   items-center
   justify-center
