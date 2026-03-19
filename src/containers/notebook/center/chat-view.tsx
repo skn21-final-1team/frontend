@@ -69,7 +69,7 @@ function ChatView({ notebookId }: ChatViewProps) {
 
   useEffect(() => {
     void initChat(notebookId)
-    initReportWorkflowSession(notebookId)
+    void initReportWorkflowSession(notebookId)
   }, [initChat, initReportWorkflowSession, notebookId])
 
   useEffect(() => {

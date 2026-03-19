@@ -1,4 +1,8 @@
 import { create } from 'zustand'
+import {
+  getReportWorkflowState,
+  type ReportWorkflowState,
+} from '@/shared/api/report-workflow.api'
 import { type Chat } from '@/shared/api/chat.api'
 import { type ErrorAlertState } from '@/shared/components/error-alert'
 import { useAgentStatusStore } from '@/shared/store/agent-status-store'
@@ -22,6 +26,13 @@ import {
 
 let tempId = 0
 const nextTempId = () => --tempId
+let hydrationRequestSeq = 0
+let workflowMutationRevision = 0
+
+const bumpWorkflowMutationRevision = (): number => {
+  workflowMutationRevision += 1
+  return workflowMutationRevision
+}
 
 const isReportMode = (): boolean => {
   const status = useAgentStatusStore.getState().status
@@ -41,13 +52,34 @@ interface ReportWorkflowStore {
   setStepContent: (step: number, content: string) => void
   appendAgentMessage: (message: Chat) => void
   clearAgentMessages: () => void
-  initSession: (notebookId: number) => void
+  initSession: (notebookId: number) => Promise<void>
   sendAgentMessage: (message: string, notebookId: number) => Promise<boolean>
   abortAgentSession: () => boolean
   resetWorkflow: () => void
   clear: () => void
   setError: (error: ErrorAlertState | null) => void
 }
+
+const createInitReportWorkflowState = (
+  notebookId: number,
+): Pick<
+  ReportWorkflowStore,
+  | 'status'
+  | 'currentStepNumber'
+  | 'stepContents'
+  | 'agentMessages'
+  | 'notebookId'
+  | 'isLoading'
+  | 'abortController'
+  | 'error'
+> => ({
+  ...createResetReportWorkflowStateSnapshot(),
+  agentMessages: [],
+  notebookId,
+  isLoading: true,
+  abortController: null,
+  error: null,
+})
 
 export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => ({
   status: 'idle',
@@ -59,44 +91,100 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
   abortController: null,
   error: null,
   setWorkflowState: ({ status, currentStepNumber }) =>
-    set((state) => ({
-      ...state,
-      status,
-      currentStepNumber: resolveReportWorkflowStepDefinition(currentStepNumber).stepNumber,
-    })),
+    set((state) => {
+      bumpWorkflowMutationRevision()
+      return {
+        ...state,
+        status,
+        currentStepNumber: resolveReportWorkflowStepDefinition(currentStepNumber).stepNumber,
+      }
+    }),
   setStepContent: (step, content) =>
-    set((state) => ({
-      stepContents: updateReportWorkflowStepContent(state.stepContents, step, content),
-    })),
+    set((state) => {
+      bumpWorkflowMutationRevision()
+      return {
+        stepContents: updateReportWorkflowStepContent(state.stepContents, step, content),
+      }
+    }),
   appendAgentMessage: (message) =>
-    set((state) => ({
-      agentMessages: [...state.agentMessages, message],
-    })),
-  clearAgentMessages: () => set({ agentMessages: [] }),
-  initSession: (notebookId) => {
-    const state = get()
-    const shouldClearSession = state.notebookId !== null && state.notebookId !== notebookId
+    set((state) => {
+      bumpWorkflowMutationRevision()
+      return {
+        agentMessages: [...state.agentMessages, message],
+      }
+    }),
+  clearAgentMessages: () =>
+    set(() => {
+      bumpWorkflowMutationRevision()
+      return { agentMessages: [] }
+    }),
+  initSession: async (notebookId) => {
+    get().abortAgentSession()
 
-    state.abortAgentSession()
+    const requestedRevision = bumpWorkflowMutationRevision()
+    set(createInitReportWorkflowState(notebookId))
 
-    if (shouldClearSession) {
+    const requestSeq = ++hydrationRequestSeq
+
+    let hydratedState: ReportWorkflowState
+    try {
+      hydratedState = await getReportWorkflowState(notebookId)
+    } catch {
+      if (hydrationRequestSeq !== requestSeq) return
+      if (get().notebookId !== notebookId) return
+      if (workflowMutationRevision !== requestedRevision) return
+
+      bumpWorkflowMutationRevision()
       set({
-        ...createResetReportWorkflowStateSnapshot(),
-        agentMessages: [],
-        notebookId,
         isLoading: false,
-        abortController: null,
-        error: null,
       })
+
+      if (isReportMode()) {
+        const { status: agentModeStatus, setStatus: setAgentModeStatus } =
+          useAgentStatusStore.getState()
+        if (agentModeStatus === 'working') {
+          setAgentModeStatus('ready')
+        }
+
+        set({
+          error: {
+            title: '복원 실패',
+            description: '진행 중인 보고서 워크플로우 상태를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
+          },
+        })
+      }
       return
     }
 
+    if (hydrationRequestSeq !== requestSeq) return
+    if (get().notebookId !== notebookId) return
+    if (workflowMutationRevision !== requestedRevision) return
+
+    const { workflowStatus, currentStep, stepOutputs } = hydratedState
+    const nextStepNumber = resolveReportWorkflowStepDefinition(currentStep ?? undefined).stepNumber
+    bumpWorkflowMutationRevision()
     set({
-      notebookId,
+      status: workflowStatus,
+      currentStepNumber: nextStepNumber,
+      stepContents: {
+        requirementsAnalysis: stepOutputs.requirementsText,
+        outlineComposition: stepOutputs.outlineText,
+        draftWriting: stepOutputs.draftText,
+        finalDocumentWriting: stepOutputs.finalText,
+      },
       isLoading: false,
-      abortController: null,
       error: null,
     })
+
+    const { status: agentModeStatus, setStatus: setAgentModeStatus } = useAgentStatusStore.getState()
+    if (workflowStatus === 'idle') {
+      if (agentModeStatus === 'working') {
+        setAgentModeStatus('ready')
+      }
+      return
+    }
+
+    setAgentModeStatus('working')
   },
   sendAgentMessage: async (message, notebookId) => {
     if (!isReportMode()) return false
@@ -108,6 +196,7 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
     if (state.isLoading) return true
 
     const abortController = new AbortController()
+    bumpWorkflowMutationRevision()
     const { status, setStatus } = useAgentStatusStore.getState()
     if (status === 'ready') {
       setStatus('working')
@@ -231,12 +320,11 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
     return true
   },
   abortAgentSession: () => {
-    if (!isReportMode()) return false
-
     const { abortController, notebookId } = get()
-    if (!abortController) return true
+    if (!abortController) return false
 
     abortController.abort()
+    bumpWorkflowMutationRevision()
     if (notebookId !== null) {
       get().appendAgentMessage({
         id: nextTempId(),
@@ -255,22 +343,28 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
     return true
   },
   resetWorkflow: () =>
-    set((state) => ({
-      ...createResetReportWorkflowStateSnapshot(),
-      agentMessages: state.agentMessages,
-      notebookId: state.notebookId,
-      isLoading: state.isLoading,
-      abortController: state.abortController,
-      error: null,
-    })),
+    set((state) => {
+      bumpWorkflowMutationRevision()
+      return {
+        ...createResetReportWorkflowStateSnapshot(),
+        agentMessages: state.agentMessages,
+        notebookId: state.notebookId,
+        isLoading: state.isLoading,
+        abortController: state.abortController,
+        error: null,
+      }
+    }),
   clear: () =>
-    set({
-      ...createResetReportWorkflowStateSnapshot(),
-      agentMessages: [],
-      notebookId: null,
-      isLoading: false,
-      abortController: null,
-      error: null,
+    set(() => {
+      bumpWorkflowMutationRevision()
+      return {
+        ...createResetReportWorkflowStateSnapshot(),
+        agentMessages: [],
+        notebookId: null,
+        isLoading: false,
+        abortController: null,
+        error: null,
+      }
     }),
   setError: (error) => set({ error }),
 }))

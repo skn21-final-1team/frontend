@@ -3,17 +3,13 @@ import PendingSection from '@/containers/notebook/right/pending'
 import { useAgentStatusStore } from '@/shared/store/agent-status-store'
 import * as S from './agent.style'
 
-interface AgentSectionProps {
-  notebookId: number
-}
-
-function AgentSection({ notebookId }: AgentSectionProps) {
+function AgentSection() {
   const { status } = useAgentStatusStore()
 
   return (
     <section className={S.section()}>
       <div className={S.inner()}>
-        {status === 'working' ? <WorkingSection notebookId={notebookId} /> : <PendingSection />}
+        {status === 'working' ? <WorkingSection /> : <PendingSection />}
       </div>
     </section>
   )
