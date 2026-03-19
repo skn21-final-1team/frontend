@@ -37,3 +37,14 @@ export const folder = cva(`
   justify-start
   transition-none
 `)
+
+export const editInput = cva(`
+  w-full
+  bg-transparent
+  border-none
+  outline-none
+  text-sm
+  text-foreground
+  px-1
+  h-6
+`)
