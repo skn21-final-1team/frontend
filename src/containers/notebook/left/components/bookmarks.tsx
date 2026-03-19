@@ -9,7 +9,8 @@ type BookmarksProps = {
 }
 
 function Bookmarks({ notebookId }: BookmarksProps) {
-  const { rootIds, bookmarks, searchQuery, fetchAndInitialize, isLoading } = useBookmarkStore()
+  const { rootIds, bookmarks, searchQuery, isLoading } = useBookmarkStore()
+  const fetchAndInitialize = useBookmarkStore((s) => s.fetchAndInitialize)
 
   useEffect(() => {
     fetchAndInitialize(notebookId)
