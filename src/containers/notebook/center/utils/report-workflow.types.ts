@@ -10,8 +10,6 @@ export enum ReportWorkflowPurpose {
 export interface ReportWorkflowStepDefinition {
   stepNumber: number
   purpose: ReportWorkflowPurpose
-  title: string
-  contentField: 'requirements_text' | 'outline_text' | 'draft_text' | 'final_text'
 }
 
 export type ReportWorkflowStepContents = Record<ReportWorkflowPurpose, string>

@@ -2,32 +2,23 @@ import AgentStep from '@/containers/notebook/right/components/agent-step'
 import { ConfirmationDialog } from '@/shared/components'
 import { ErrorAlert } from '@/shared/components/error-alert'
 import { useAgentStatusStore } from '@/shared/store/agent-status-store'
-import { useChatStore } from '@/containers/notebook/store/chat.store'
-import {
-  REPORT_WORKFLOW_STEP_DEFINITIONS,
-  resolveReportWorkflowStepUiState,
-} from '@/containers/notebook/store/report-workflow.domain'
 import { useReportWorkflowStore } from '@/containers/notebook/store/report-workflow.store'
 import { useState } from 'react'
 import * as S from './working.style'
 
-interface WorkingSectionProps {
-  notebookId: number
-}
-
-function WorkingSection({ notebookId }: WorkingSectionProps) {
+function WorkingSection() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const { setStatus } = useAgentStatusStore()
-  const { abort, clearAgentMessages, setError: setChatError } = useChatStore()
-  const { stepContents, currentStepNumber, status, error, setError, clear } =
-    useReportWorkflowStore()
-  void notebookId
-
+  const stepContents = useReportWorkflowStore((state) => state.stepContents)
+  const currentStepNumber = useReportWorkflowStore((state) => state.currentStepNumber)
+  const workflowStatus = useReportWorkflowStore((state) => state.status)
+  const error = useReportWorkflowStore((state) => state.error)
+  const setError = useReportWorkflowStore((state) => state.setError)
+  const clear = useReportWorkflowStore((state) => state.clear)
+  const abortAgentSession = useReportWorkflowStore((state) => state.abortAgentSession)
   const handleConfirmExit = () => {
-    abort()
+    abortAgentSession()
     clear()
-    clearAgentMessages()
-    setChatError(null)
     setConfirmOpen(false)
     setStatus('sleep')
   }
@@ -44,23 +35,34 @@ function WorkingSection({ notebookId }: WorkingSectionProps) {
         onConfirm={handleConfirmExit}
       />
       <div className={S.content()}>
-        {REPORT_WORKFLOW_STEP_DEFINITIONS.map((stepDefinition) => {
-          const stepUiState = resolveReportWorkflowStepUiState(
-            status,
-            currentStepNumber,
-            stepDefinition,
-          )
-
-          return (
-            <AgentStep
-              key={stepDefinition.purpose}
-              title={stepDefinition.title}
-              content={stepContents[stepDefinition.purpose]}
-              status={stepUiState.status}
-              badgeLabel={stepUiState.badgeLabel}
-            />
-          )
-        })}
+        <AgentStep
+          title="요구사항을 분석합니다."
+          content={stepContents.requirementsAnalysis}
+          workflowStatus={workflowStatus}
+          currentStepNumber={currentStepNumber}
+          stepNumber={1}
+        />
+        <AgentStep
+          title="목차 및 문서 구성을 작성합니다."
+          content={stepContents.outlineComposition}
+          workflowStatus={workflowStatus}
+          currentStepNumber={currentStepNumber}
+          stepNumber={2}
+        />
+        <AgentStep
+          title="초안을 작성합니다."
+          content={stepContents.draftWriting}
+          workflowStatus={workflowStatus}
+          currentStepNumber={currentStepNumber}
+          stepNumber={3}
+        />
+        <AgentStep
+          title="최종 문서를 작성합니다."
+          content={stepContents.finalDocumentWriting}
+          workflowStatus={workflowStatus}
+          currentStepNumber={currentStepNumber}
+          stepNumber={4}
+        />
       </div>
       <div className={S.actionArea()}>
         <button className={S.exitButton()} onClick={() => setConfirmOpen(true)} type="button">
