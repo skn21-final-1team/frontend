@@ -1,4 +1,5 @@
-import { fetcher } from '@/shared/utils/fetcher'
+import { plainApi, apiUrl } from '@/shared/utils/fetcher'
+import { BaseResponse } from '@/shared/types/response'
 
 export type User = {
   id: number
@@ -13,16 +14,16 @@ export type LoginResponse = {
 }
 
 export const login = async (email: string, password: string) => {
-  const res = await fetcher.post<LoginResponse>('/login', { email, password })
-  return res.data
+  const res = await plainApi.post<BaseResponse<LoginResponse>>(apiUrl('/login'), { email, password })
+  return res.data.data
 }
 
 export const signup = async (data: { email: string; password: string; name: string }) => {
-  const res = await fetcher.post<{ message: string }>('/signup', data)
-  return res.data
+  const res = await plainApi.post<BaseResponse<{ message: string }>>(apiUrl('/signup'), data)
+  return res.data.data
 }
 
 export const exchangeGoogleCallback = async (code: string) => {
-  const res = await fetcher.post<LoginResponse>('/auth/google', { code })
-  return res.data
+  const res = await plainApi.post<BaseResponse<LoginResponse>>(apiUrl('/auth/google'), { code })
+  return res.data.data
 }

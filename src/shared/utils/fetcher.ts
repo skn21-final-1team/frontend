@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useUserStore } from '@/shared/store/user-store'
 import { BaseResponse } from '@/shared/types/response'
-import { User } from '@/shared/api/auth.api'
+import type { User } from '@/shared/api/auth.api'
 import { EventSourceMessage, fetchEventSource } from '@microsoft/fetch-event-source'
 
 export const config = {
@@ -14,7 +14,7 @@ export const config = {
 
 export const api = axios.create(config)
 
-const plainApi = axios.create(config)
+export const plainApi = axios.create(config)
 
 api.interceptors.request.use((config) => {
   const token = useUserStore.getState().accessToken
@@ -66,7 +66,8 @@ const refreshAccessToken = (): Promise<string> => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401 && !error.config._retry) {
+    const hasToken = useUserStore.getState().accessToken
+    if (error.response?.status === 401 && !error.config._retry && hasToken) {
       error.config._retry = true
       try {
         const token = await refreshAccessToken()
