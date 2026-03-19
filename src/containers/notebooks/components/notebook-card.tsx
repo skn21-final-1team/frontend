@@ -7,16 +7,7 @@ import Image from 'next/image'
 import type { Notebook } from '@/shared/api/notebook.api'
 import ItemMenu from '@/shared/components/item-menu/item-menu'
 import { getNotebookCardImageByIndex } from '../constants/card-images'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/components'
+import { ConfirmationDialog } from '@/shared/components/confirmation-dialog'
 import * as S from './notebook-card.style'
 
 interface NotebookCardProps {
@@ -47,9 +38,10 @@ export default function NotebookCard({
   const [isImageFailed, setIsImageFailed] = useState(false)
   const [title, setTitle] = useState(notebook.title)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const isEscaping = useRef(false)
   const cardImageSrc = getNotebookCardImageByIndex(cardIndex)
 
-  const changeRenameMode = (editing: boolean) => {
+  const handleSetRenaming = (editing: boolean) => {
     setIsRenaming(editing)
   }
 
@@ -59,6 +51,8 @@ export default function NotebookCard({
     if (!inputRef.current) return
     inputRef.current.focus()
     inputRef.current.select()
+    inputRef.current.style.height = 'auto'
+    inputRef.current.style.height = `${inputRef.current.scrollHeight}px`
   }, [isRenaming])
 
   const handleClick = () => {
@@ -67,6 +61,10 @@ export default function NotebookCard({
   }
 
   const handleRenameSubmit = async () => {
+    if (isEscaping.current) {
+      isEscaping.current = false
+      return
+    }
     const trimmed = title.trim()
     if (!trimmed || trimmed === notebook.title) {
       setTitle(notebook.title)
@@ -78,11 +76,12 @@ export default function NotebookCard({
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.nativeEvent.isComposing) return
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleRenameSubmit()
-    }
-    if (e.key === 'Escape') {
+    } else if (e.key === 'Escape') {
+      isEscaping.current = true
       setTitle(notebook.title)
       setIsRenaming(false)
     }
@@ -111,14 +110,16 @@ export default function NotebookCard({
             }}
             className={S.pinButton({ pinned: notebook.pinned })}
           >
-            <Pin size={14} className={notebook.pinned ? S.pinIconFilled() : undefined} />
+            <Pin size={14} />
           </button>
-          <ItemMenu
-            align="end"
-            size={14}
-            onRename={() => changeRenameMode(true)}
-            onDelete={() => setDeleteOpen(true)}
-          />
+          <div className={S.menuWrapper()}>
+            <ItemMenu
+              align="end"
+              size={14}
+              onRename={() => handleSetRenaming(true)}
+              onDelete={() => setDeleteOpen(true)}
+            />
+          </div>
         </div>
 
         <div className={S.badgeStack()}>
@@ -130,11 +131,17 @@ export default function NotebookCard({
           {isRenaming ? (
             <textarea
               ref={inputRef}
+              rows={1}
               autoFocus
               className={S.renameInput()}
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value)
+                e.target.style.height = 'auto'
+                e.target.style.height = `${e.target.scrollHeight}px`
+              }}
               onKeyDown={handleKeyDown}
+              onBlur={handleRenameSubmit}
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
@@ -149,20 +156,14 @@ export default function NotebookCard({
         )}
       </div>
 
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-          <AlertDialogHeader>
-            <AlertDialogTitle>노트북 삭제</AlertDialogTitle>
-            <AlertDialogDescription>
-              &ldquo;{notebook.title}&rdquo;을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={() => onDelete(notebook.id)}>삭제</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmationDialog
+        open={deleteOpen}
+        title="노트북 삭제"
+        description={`\u201C${notebook.title}\u201D을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
+        confirmLabel="삭제"
+        onOpenChange={setDeleteOpen}
+        onConfirm={() => onDelete(notebook.id)}
+      />
     </div>
   )
 }
