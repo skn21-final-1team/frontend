@@ -130,14 +130,12 @@ export const pinButton = cva(
     variants: {
       pinned: {
         true: `text-white opacity-100 bg-black/35`,
-        false: `text-white/85 bg-black/40 hover:bg-black/50 hover:text-white`,
+        false: `text-white/85 bg-black/40 hover:bg-black/50 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200`,
       },
     },
     defaultVariants: { pinned: false },
   },
 )
-
-export const pinIconFilled = cva(`fill-current`)
 
 export const title = cva(`
   w-full
@@ -148,6 +146,13 @@ export const title = cva(`
   line-clamp-2
   break-keep
   leading-snug
+`)
+
+export const menuWrapper = cva(`
+  opacity-0
+  group-hover:opacity-100
+  transition-opacity
+  duration-200
 `)
 
 export const renameInput = cva(`
@@ -164,27 +169,20 @@ export const renameInput = cva(`
   whitespace-pre-wrap
   break-keep
   leading-snug
+  resize-none
+  p-0
+  m-0
   focus:outline-none
   focus:border-b-white/60
   focus:ring-0
-`)
-
-export const footer = cva(`
-  flex
-  items-center
-  justify-end
-`)
-
-export const date = cva(`
-  text-xs
-  text-muted-foreground
 `)
 
 export const pinnedBadge = cva(`
   text-xs
   font-medium
   text-white
-  bg-primary/80
+  bg-black/45
+  backdrop-blur-sm
   px-3
   py-1
   rounded-full
