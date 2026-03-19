@@ -13,6 +13,7 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
   const [title, setTitle] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const isEscaping = useRef(false)
 
   useEffect(() => {
     if (isEditing) {
@@ -26,6 +27,10 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
   }
 
   const handleSubmit = async () => {
+    if (isEscaping.current) {
+      isEscaping.current = false
+      return
+    }
     if (isLoading) return
     const trimmed = title.trim()
     if (!trimmed) {
@@ -43,8 +48,11 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleSubmit()
-    if (e.key === 'Escape') {
+    if (e.nativeEvent.isComposing) return
+    if (e.key === 'Enter') {
+      handleSubmit()
+    } else if (e.key === 'Escape') {
+      isEscaping.current = true
       setIsEditing(false)
       setTitle('')
     }
@@ -53,17 +61,18 @@ export default function CreateNotebookCard({ onCreate }: CreateNotebookCardProps
   return (
     <div className={S.card()} onClick={handleOpen}>
       <div className={S.media()}>
-        <div className={S.mediaOverlay()} />
         <div className={S.mediaInner()}>
           {isEditing ? (
             <div className={S.inputWrapper()}>
               <input
+                ref={inputRef}
                 className={S.input()}
                 placeholder="노트북 제목"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onBlur={handleSubmit}
+                onClick={(e) => e.stopPropagation()}
                 disabled={isLoading}
               />
               <span className={S.hint()}>Enter로 생성 · Esc로 취소</span>

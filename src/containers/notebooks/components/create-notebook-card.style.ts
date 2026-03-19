@@ -7,11 +7,10 @@ export const card = cva(`
   overflow-hidden
   rounded-2xl
   border
-  border-border
-  bg-card
-  shadow-sm
-  hover:shadow-md
+  border-dashed
+  border-muted-foreground/30
   hover:border-primary/50
+  bg-transparent
   transition-all
   duration-200
   cursor-pointer
@@ -23,13 +22,6 @@ export const media = cva(`
   w-full
   overflow-hidden
   aspect-16/10
-  bg-[linear-gradient(135deg,hsl(var(--primary)/0.22),hsl(var(--muted)))]
-`)
-
-export const mediaOverlay = cva(`
-  absolute
-  inset-0
-  bg-foreground/40
 `)
 
 export const mediaInner = cva(`
@@ -55,51 +47,28 @@ export const input = cva(`
   bg-transparent
   border-none
   border-b-2
+  border-b-border
   text-xl
   font-semibold
-  text-white
-  placeholder:text-white/50
+  text-foreground
+  placeholder:text-muted-foreground
   overflow-hidden
   whitespace-pre-wrap
   break-keep
   leading-snug
   focus:outline-none
-  focus:border-b-white/60
+  focus:border-b-primary/60
   focus:ring-0
 `)
 
 export const hint = cva(`
   text-xs
-  text-black/80
+  text-muted-foreground
 `)
 
 export const plusIcon = cva(`
-  text-white/85
-  group-hover:text-white
-  transition-colors
-  duration-150
-`)
-
-export const overlayLabelArea = cva(`
-  absolute
-  inset-x-0
-  bottom-0
-  z-10
-  flex
-  items-end
-  bg-linear-to-t
-  from-black/70
-  via-black/30
-  to-transparent
-  px-4
-  pb-14
-  pt-10
-`)
-
-export const label = cva(`
-  text-xl
-  font-bold
-  text-white
+  text-muted-foreground
+  group-hover:text-primary
   transition-colors
   duration-150
 `)
