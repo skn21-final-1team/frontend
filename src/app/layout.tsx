@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${notoSansKR.className} antialiased`}>
+      <body className={`${notoSansKR.className} antialiased bg-background`}>
         <ThemeProvider>
           <AuthGuard>
             <div className="min-w-5xl mt-16">
