@@ -14,6 +14,9 @@ const notoSansKR = Noto_Sans_KR({
 export const metadata: Metadata = {
   title: 'Kalpie',
   description: '북마크 기반 개인화된 노트 정리 및 리서치 도구',
+  icons: {
+    icon: '/icon.png',
+  },
 }
 
 export default function RootLayout({
