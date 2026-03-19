@@ -7,7 +7,6 @@ import ChatInput from './components/chat-input'
 import MessageUser from './components/message-user'
 import MessageAi from './components/message-ai'
 import * as S from './chat-view.style'
-import { useReportWorkflowStore } from '../store/report-workflow.store'
 import {
   AGENT_MODE_CHAT_GUIDE_MESSAGE,
   useAgentStatusStore,
@@ -29,28 +28,14 @@ function ChatView({ notebookId }: ChatViewProps) {
     setError,
     abort,
   } = useChatStore()
-  const { init: initWorkflow } = useReportWorkflowStore()
   const { status: agentStatus } = useAgentStatusStore()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const isAgentMode = agentStatus === 'ready' || agentStatus === 'working'
-  const shouldShowAgentGuide = agentStatus === 'ready' && agentMessages.length === 0 && !isLoading
   const visibleMessages = isAgentMode ? agentMessages : chatMessages
-  const workflowInitializedNotebook = useRef<number | null>(null)
 
   useEffect(() => {
     init(notebookId)
   }, [notebookId, init])
-
-  useEffect(() => {
-    if (!isAgentMode) {
-      workflowInitializedNotebook.current = null
-      return
-    }
-
-    if (workflowInitializedNotebook.current === notebookId) return
-    workflowInitializedNotebook.current = notebookId
-    initWorkflow(notebookId)
-  }, [isAgentMode, notebookId, initWorkflow])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -61,7 +46,7 @@ function ChatView({ notebookId }: ChatViewProps) {
       <ErrorAlert error={error} onClose={() => setError(null)} />
       <div className={S.inner()}>
         <div className={S.messages()}>
-          {shouldShowAgentGuide && <MessageAi message={AGENT_MODE_CHAT_GUIDE_MESSAGE} />}
+          {isAgentMode && <MessageAi message={AGENT_MODE_CHAT_GUIDE_MESSAGE} />}
           {visibleMessages.map((chat) =>
             chat.role === 'assistant' ? (
               <MessageAi

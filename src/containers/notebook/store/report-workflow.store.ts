@@ -1,16 +1,8 @@
 import { create } from 'zustand'
 import { type ErrorAlertState } from '@/shared/components/error-alert'
-import {
-  type ReportWorkflowFetchResult,
-  type ResetReportWorkflowResult,
-  type WorkflowApiError,
-  type WorkflowStatus,
-  getReportWorkflow,
-  resetReportWorkflow,
-} from '@/shared/api/report-workflow.api'
+import { type WorkflowStatus } from './report-workflow.contract'
 import {
   createDefaultReportWorkflowStepContents,
-  createReportWorkflowStateSnapshot,
   createResetReportWorkflowStateSnapshot,
   resolveReportWorkflowStepDefinition,
   updateReportWorkflowStepContent,
@@ -22,57 +14,20 @@ interface ReportWorkflowStore {
   currentStepNumber: number
   stepContents: ReportWorkflowStepContents
   error: ErrorAlertState | null
-  init: (notebookId: number) => Promise<boolean>
-  reset: (notebookId: number) => Promise<boolean>
   setWorkflowState: (payload: {
     status: WorkflowStatus
     currentStepNumber: number
   }) => void
   setStepContent: (step: number, content: string) => void
+  clear: () => void
   setError: (error: ErrorAlertState | null) => void
 }
-
-const mapWorkflowApiErrorToAlert = (error: WorkflowApiError): ErrorAlertState => ({
-  title: error.title,
-  description: error.description,
-})
-
-let initRequestSequence = 0
 
 export const useReportWorkflowStore = create<ReportWorkflowStore>((set) => ({
   status: 'idle',
   currentStepNumber: resolveReportWorkflowStepDefinition(undefined).stepNumber,
   stepContents: createDefaultReportWorkflowStepContents(),
   error: null,
-  init: async (notebookId) => {
-    const requestSequence: number = ++initRequestSequence
-    const result: ReportWorkflowFetchResult = await getReportWorkflow(notebookId)
-    if (requestSequence !== initRequestSequence) return false
-
-    if (!result.success) {
-      set({ error: mapWorkflowApiErrorToAlert(result.error) })
-      return false
-    }
-
-    set({
-      ...createReportWorkflowStateSnapshot(result.data),
-      error: null,
-    })
-    return true
-  },
-  reset: async (notebookId) => {
-    const result: ResetReportWorkflowResult = await resetReportWorkflow(notebookId)
-    if (!result.success) {
-      set({ error: mapWorkflowApiErrorToAlert(result.error) })
-      return false
-    }
-
-    set({
-      ...createResetReportWorkflowStateSnapshot(),
-      error: null,
-    })
-    return true
-  },
   setWorkflowState: ({ status, currentStepNumber }) =>
     set((state) => ({
       ...state,
@@ -83,5 +38,10 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set) => ({
     set((state) => ({
       stepContents: updateReportWorkflowStepContent(state.stepContents, step, content),
     })),
+  clear: () =>
+    set({
+      ...createResetReportWorkflowStateSnapshot(),
+      error: null,
+    }),
   setError: (error) => set({ error }),
 }))

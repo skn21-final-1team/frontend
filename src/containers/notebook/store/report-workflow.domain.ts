@@ -1,10 +1,15 @@
-import { type ReportWorkflow } from '@/shared/api/report-workflow.api'
 import {
   type ReportWorkflowStateSnapshot,
   type ReportWorkflowStepContents,
   type ReportWorkflowStepDefinition,
   ReportWorkflowPurpose,
 } from './report-workflow.types'
+import { type WorkflowStatus } from './report-workflow.contract'
+
+export interface ReportWorkflowStepUiState {
+  status: 'working' | 'pending' | 'completed'
+  badgeLabel?: string
+}
 
 export const REPORT_WORKFLOW_STEP_DEFINITIONS: readonly ReportWorkflowStepDefinition[] = [
   {
@@ -60,25 +65,16 @@ export const createDefaultReportWorkflowStepContents = (): ReportWorkflowStepCon
     {} as ReportWorkflowStepContents,
   )
 
-const createReportWorkflowStepContents = (workflow: ReportWorkflow): ReportWorkflowStepContents =>
-  REPORT_WORKFLOW_STEP_DEFINITIONS.reduce<ReportWorkflowStepContents>(
-    (accumulator: ReportWorkflowStepContents, definition: ReportWorkflowStepDefinition) => {
-      accumulator[definition.purpose] = workflow[definition.contentField]
-      return accumulator
-    },
-    {} as ReportWorkflowStepContents,
-  )
-
-export const createReportWorkflowStateSnapshot = (
-  workflow: ReportWorkflow,
+export const createDefaultReportWorkflowStateSnapshot = (
+  overrides: Partial<ReportWorkflowStateSnapshot> = {},
 ): ReportWorkflowStateSnapshot => ({
-  status: workflow.status,
-  currentStepNumber: resolveReportWorkflowStepDefinition(workflow.current_step).stepNumber,
-  stepContents: createReportWorkflowStepContents(workflow),
+  status: overrides.status ?? 'idle',
+  currentStepNumber: resolveReportWorkflowStepDefinition(overrides.currentStepNumber).stepNumber,
+  stepContents: overrides.stepContents ?? createDefaultReportWorkflowStepContents(),
 })
 
 export const createResetReportWorkflowStateSnapshot = (): ReportWorkflowStateSnapshot => ({
-  status: 'cancelled',
+  status: 'idle',
   currentStepNumber: REPORT_WORKFLOW_STEP_DEFINITIONS[0].stepNumber,
   stepContents: createDefaultReportWorkflowStepContents(),
 })
@@ -99,4 +95,42 @@ export const updateReportWorkflowStepContent = (
     ...stepContents,
     [matchedStepDefinition.purpose]: content,
   }
+}
+
+export const resolveReportWorkflowStepUiState = (
+  workflowStatus: WorkflowStatus,
+  currentStepNumber: number,
+  stepDefinition: ReportWorkflowStepDefinition,
+): ReportWorkflowStepUiState => {
+  if (workflowStatus === 'idle') {
+    return { status: 'pending' }
+  }
+
+  if (stepDefinition.stepNumber < currentStepNumber) {
+    return { status: 'completed' }
+  }
+
+  if (stepDefinition.stepNumber > currentStepNumber) {
+    return { status: 'pending' }
+  }
+
+  if (workflowStatus === 'awaiting_review') {
+    return {
+      status: 'working',
+      badgeLabel: '승인 대기',
+    }
+  }
+
+  if (workflowStatus === 'in_progress') {
+    return {
+      status: 'working',
+      badgeLabel: '채팅 작성중',
+    }
+  }
+
+  if (workflowStatus === 'completed') {
+    return { status: 'completed' }
+  }
+
+  return { status: 'working' }
 }
