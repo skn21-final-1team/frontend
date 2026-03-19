@@ -58,3 +58,13 @@ export const deleteSource = async (sourceId: number) => {
   const response = await fetcher.delete(`/source/${sourceId}`)
   return response.data
 }
+
+export const renameDirectory = async (directoryId: number, title: string) => {
+  const response = await fetcher.patch<directory>(`/directory/${directoryId}`, { title })
+  return response.data
+}
+
+export const deleteDirectory = async (directoryId: number) => {
+  const response = await fetcher.delete(`/directory/${directoryId}`)
+  return response.data
+}

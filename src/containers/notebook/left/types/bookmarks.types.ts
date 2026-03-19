@@ -22,11 +22,17 @@ export type CheckedSource = {
   url: string
 }
 
+export type ErrorAlertState = {
+  title: string
+  description: string
+}
+
 export type BookmarkStore = {
   bookmarks: BookmarkState
   rootIds: number[]
   isLoading: boolean
   searchQuery: string
+  error: ErrorAlertState | null
   fetchAndInitialize: (notebookId: number) => Promise<void>
   toggleExpand: (id: number) => void
   toggleCheck: (id: number, isChecked: boolean) => void
@@ -34,4 +40,5 @@ export type BookmarkStore = {
   deleteBookmark: (id: number) => Promise<void>
   setSearchQuery: (query: string) => void
   renameBookmark: (id: number, title: string) => Promise<void>
+  clearError: () => void
 }

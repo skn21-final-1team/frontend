@@ -1,12 +1,27 @@
 import { create } from 'zustand'
 import { getDirectories } from '@/shared/api/directory.api'
-import { directory, source, updateSource, deleteSource } from '@/shared/api/directory.api'
+import {
+  directory,
+  source,
+  updateSource,
+  deleteSource,
+  renameDirectory,
+  deleteDirectory,
+} from '@/shared/api/directory.api'
 import type {
   BookmarkState,
   BookmarkStore,
   CheckedSource,
   FlatBookmarkNode,
 } from '../types/bookmarks.types'
+
+const showError = (
+  set: (state: Partial<BookmarkStore>) => void,
+  title: string,
+  description: string,
+) => {
+  set({ error: { title, description } })
+}
 
 const flattenDirectoryTree = (
   directories: directory[],
@@ -70,7 +85,6 @@ const flattenDirectoryTree = (
     flattenSource(src, null)
   })
 
-  // 후처리: 폴더 isChecked를 하위 전체 기준으로 재계산
   const recomputeChecked = (id: number): boolean => {
     const node = bookmarks[id]
     if (!node) return false
@@ -92,17 +106,21 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
   rootIds: [],
   isLoading: false,
   searchQuery: '',
+  error: null,
 
   setSearchQuery: (query: string) => set({ searchQuery: query }),
 
+  clearError: () => set({ error: null }),
+
   fetchAndInitialize: async (notebookId: number) => {
-    set({ isLoading: true })
+    set({ isLoading: true, error: null })
     try {
       const response = await getDirectories(notebookId)
       const { bookmarks, rootIds } = flattenDirectoryTree(response.directories, response.sources)
       set({ bookmarks, rootIds })
     } catch (error) {
       console.error('북마크 로딩 실패:', error)
+      showError(set, '북마크 로딩 실패', '북마크를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
       set({ isLoading: false })
     }
@@ -190,17 +208,27 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     const node = get().bookmarks[id]
     if (!node || !title.trim()) return
 
-    if (node.type === 'source') {
-      await updateSource(-id, { title })
-    }
+    try {
+      if (node.type === 'source') {
+        await updateSource(-id, { title })
+      } else if (node.type === 'folder') {
+        await renameDirectory(id, title)
+      }
 
-    set((state) => ({
-      bookmarks: {
-        ...state.bookmarks,
-        [id]: { ...state.bookmarks[id], title },
-      },
-      editingId: null,
-    }))
+      set((state) => ({
+        bookmarks: {
+          ...state.bookmarks,
+          [id]: { ...state.bookmarks[id], title },
+        },
+      }))
+    } catch (error) {
+      console.error('이름 변경 실패:', error)
+      showError(
+        set,
+        '이름 변경 실패',
+        `${node.type === 'folder' ? '폴더' : '북마크'} 이름을 변경하지 못했습니다. 잠시 후 다시 시도해주세요.`,
+      )
+    }
   },
 
   deleteBookmark: async (id: number) => {
@@ -209,46 +237,46 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     const node = bookmarks[id]
     if (!node) return
 
-    const sourceIdsToDelete: number[] = []
-    const collectSourceIds = (targetId: number) => {
-      const target = bookmarks[targetId]
-      if (!target) return
-      if (target.type === 'source') {
-        sourceIdsToDelete.push(-targetId)
+    try {
+      if (node.type === 'folder') {
+        await deleteDirectory(id)
+      } else if (node.type === 'source') {
+        await deleteSource(-id)
       }
-      target.children.forEach((childId) => collectSourceIds(childId))
-    }
-    collectSourceIds(id)
 
-    if (sourceIdsToDelete.length > 0) {
-      await Promise.all(sourceIdsToDelete.map((sourceId) => deleteSource(sourceId)))
-    }
+      set((state) => {
+        const newBookmarks = { ...state.bookmarks }
 
-    set((state) => {
-      const newBookmarks = { ...state.bookmarks }
-
-      if (node.parentId !== null) {
-        const parent = newBookmarks[node.parentId]
-        if (parent) {
-          newBookmarks[node.parentId] = {
-            ...parent,
-            children: parent.children.filter((childId) => childId !== id),
+        if (node.parentId !== null) {
+          const parent = newBookmarks[node.parentId]
+          if (parent) {
+            newBookmarks[node.parentId] = {
+              ...parent,
+              children: parent.children.filter((childId) => childId !== id),
+            }
           }
         }
-      }
 
-      const deleteChildren = (targetId: number) => {
-        const target = newBookmarks[targetId]
-        if (!target) return
-        delete newBookmarks[targetId]
-        target.children.forEach((childId) => deleteChildren(childId))
-      }
+        const deleteChildren = (targetId: number) => {
+          const target = newBookmarks[targetId]
+          if (!target) return
+          delete newBookmarks[targetId]
+          target.children.forEach((childId) => deleteChildren(childId))
+        }
 
-      deleteChildren(id)
+        deleteChildren(id)
 
-      const newRootIds = state.rootIds.filter((rootId) => rootId !== id)
+        const newRootIds = state.rootIds.filter((rootId) => rootId !== id)
 
-      return { bookmarks: newBookmarks, rootIds: newRootIds }
-    })
+        return { bookmarks: newBookmarks, rootIds: newRootIds }
+      })
+    } catch (error) {
+      console.error('삭제 실패:', error)
+      showError(
+        set,
+        '삭제 실패',
+        `${node.type === 'folder' ? '폴더' : '북마크'}를 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.`,
+      )
+    }
   },
 }))
