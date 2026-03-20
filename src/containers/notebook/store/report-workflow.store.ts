@@ -68,7 +68,7 @@ interface ReportWorkflowStore {
   appendAgentMessage: (message: Chat) => void
   clearAgentMessages: () => void
   initSession: (notebookId: number) => Promise<void>
-  sendAgentMessage: (message: string, notebookId: number) => Promise<boolean>
+  sendAgentMessage: (message: string, notebookId: number, modelName: string) => Promise<boolean>
   abortAgentSession: () => boolean
   resetReportWorkflowSession: () => Promise<boolean>
   resetWorkflow: () => void
@@ -198,7 +198,7 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
 
     setAgentModeStatus('working')
   },
-  sendAgentMessage: async (message, notebookId) => {
+  sendAgentMessage: async (message, notebookId, modelName) => {
     if (!isReportMode()) return false
 
     const normalizedMessage = message.trim()
@@ -266,6 +266,7 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
       data: {
         notebook_id: notebookId,
         message: normalizedMessage,
+        model_name: modelName,
       },
       signal: abortController.signal,
       onMessage: (event) => {

@@ -15,7 +15,7 @@ interface ChatStore {
   abortController: AbortController | null
 
   init: (notebookId: number) => Promise<void>
-  sendMessage: (message: string) => Promise<void>
+  sendMessage: (message: string, modelName: string) => Promise<void>
   setError: (error: ErrorAlertState | null) => void
   abort: () => void
 }
@@ -72,7 +72,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 
-  sendMessage: async (message) => {
+  sendMessage: async (message, modelName) => {
     const { notebookId, isLoading } = get()
     if (!message.trim() || !notebookId || isLoading) return
 
@@ -102,6 +102,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       data: {
         notebook_id: notebookId,
         message,
+        model_name: modelName,
       },
       signal: abortController.signal,
       onMessage: (event) => {

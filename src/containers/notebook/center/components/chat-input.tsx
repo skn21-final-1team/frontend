@@ -9,7 +9,7 @@ import { NeonGradientCard } from '@/shared/components/ui/neon-gradient-card'
 import * as S from './chat-input.style'
 
 interface ChatInputProps {
-  onSend: (message: string) => void
+  onSend: (message: string, modelId: string) => void
   onStop?: () => void
   disabled?: boolean
   isLoading?: boolean
@@ -23,7 +23,7 @@ function ChatInput({ onSend, onStop, disabled = false, isLoading = false }: Chat
   const handleSend = () => {
     if (!value.trim() || disabled) return
 
-    onSend(value)
+    onSend(value, model.id)
     setValue('')
   }
 

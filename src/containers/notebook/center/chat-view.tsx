@@ -49,13 +49,13 @@ function ChatView({ notebookId }: ChatViewProps) {
     clearChatError(null)
   }
 
-  const handleSend = (message: string) => {
+  const handleSend = (message: string, modelName: string) => {
     if (isAgentMode) {
-      void sendAgentMessage(message, notebookId)
+      void sendAgentMessage(message, notebookId, modelName)
       return
     }
 
-    void sendChatMessage(message)
+    void sendChatMessage(message, modelName)
   }
 
   const handleStop = () => {
