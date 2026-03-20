@@ -32,6 +32,8 @@ export const useNotebook = (notebookId: number): NotebookState => {
         setState({ notebook: null, isLoading: false, is404, isError: !is404 })
         clearMeta()
       })
+
+    return () => clearMeta()
   }, [notebookId, setMeta, clearMeta])
 
   return state
