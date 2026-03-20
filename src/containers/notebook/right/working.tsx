@@ -14,13 +14,15 @@ function WorkingSection() {
   const workflowStatus = useReportWorkflowStore((state) => state.status)
   const error = useReportWorkflowStore((state) => state.error)
   const setError = useReportWorkflowStore((state) => state.setError)
-  const clear = useReportWorkflowStore((state) => state.clear)
-  const abortAgentSession = useReportWorkflowStore((state) => state.abortAgentSession)
-  const handleConfirmExit = () => {
-    abortAgentSession()
-    clear()
+  const resetReportWorkflowSession = useReportWorkflowStore(
+    (state) => state.resetReportWorkflowSession,
+  )
+  const handleConfirmExit = async () => {
     setConfirmOpen(false)
-    setStatus('sleep')
+    const resetSucceeded = await resetReportWorkflowSession()
+    if (resetSucceeded) {
+      setStatus('sleep')
+    }
   }
 
   return (

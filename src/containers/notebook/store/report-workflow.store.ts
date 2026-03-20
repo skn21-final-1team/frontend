@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import {
   getReportWorkflowState,
+  resetReportWorkflowState,
   type ReportWorkflowState,
 } from '@/shared/api/report-workflow.api'
 import { type Chat } from '@/shared/api/chat.api'
@@ -39,6 +40,20 @@ const isReportMode = (): boolean => {
   return status === 'working' || status === 'ready'
 }
 
+const createReportWorkflowSnapshot = (state: ReportWorkflowState): Pick<
+  ReportWorkflowStore,
+  'status' | 'currentStepNumber' | 'stepContents'
+> => ({
+  status: state.workflowStatus,
+  currentStepNumber: resolveReportWorkflowStepDefinition(state.currentStep ?? undefined).stepNumber,
+  stepContents: {
+    requirementsAnalysis: state.stepOutputs.requirementsText,
+    outlineComposition: state.stepOutputs.outlineText,
+    draftWriting: state.stepOutputs.draftText,
+    finalDocumentWriting: state.stepOutputs.finalText,
+  },
+})
+
 interface ReportWorkflowStore {
   status: WorkflowStatus
   currentStepNumber: number
@@ -55,6 +70,7 @@ interface ReportWorkflowStore {
   initSession: (notebookId: number) => Promise<void>
   sendAgentMessage: (message: string, notebookId: number) => Promise<boolean>
   abortAgentSession: () => boolean
+  resetReportWorkflowSession: () => Promise<boolean>
   resetWorkflow: () => void
   clear: () => void
   setError: (error: ErrorAlertState | null) => void
@@ -161,17 +177,13 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
     if (workflowMutationRevision !== requestedRevision) return
 
     const { workflowStatus, currentStep, stepOutputs } = hydratedState
-    const nextStepNumber = resolveReportWorkflowStepDefinition(currentStep ?? undefined).stepNumber
     bumpWorkflowMutationRevision()
     set({
-      status: workflowStatus,
-      currentStepNumber: nextStepNumber,
-      stepContents: {
-        requirementsAnalysis: stepOutputs.requirementsText,
-        outlineComposition: stepOutputs.outlineText,
-        draftWriting: stepOutputs.draftText,
-        finalDocumentWriting: stepOutputs.finalText,
-      },
+      ...createReportWorkflowSnapshot({
+        workflowStatus,
+        currentStep,
+        stepOutputs,
+      }),
       isLoading: false,
       error: null,
     })
@@ -341,6 +353,54 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
       abortController: null,
     })
     return true
+  },
+  resetReportWorkflowSession: async () => {
+    const { abortController, notebookId } = get()
+    if (notebookId === null) {
+      set({
+        isLoading: false,
+        abortController: null,
+        error: {
+          title: '초기화 실패',
+          description: '리포트 워크플로우를 초기화할 노트북이 없습니다.',
+        },
+      })
+      return false
+    }
+
+    if (abortController) {
+      abortController.abort()
+      bumpWorkflowMutationRevision()
+      set({
+        isLoading: false,
+        abortController: null,
+      })
+    }
+
+    try {
+      const resetState = await resetReportWorkflowState(notebookId)
+      bumpWorkflowMutationRevision()
+      set({
+        ...createReportWorkflowSnapshot(resetState),
+        agentMessages: [],
+        notebookId,
+        isLoading: false,
+        abortController: null,
+        error: null,
+      })
+      return true
+    } catch {
+      bumpWorkflowMutationRevision()
+      set({
+        isLoading: false,
+        abortController: null,
+        error: {
+          title: '초기화 실패',
+          description: '리포트 워크플로우 상태를 초기화하지 못했습니다. 잠시 후 다시 시도해주세요.',
+        },
+      })
+      return false
+    }
   },
   resetWorkflow: () =>
     set((state) => {

@@ -45,3 +45,12 @@ export const getReportWorkflowState = async (
   const response = await fetcher.get<ReportWorkflowStateResponse>(`/report-workflow/${notebookId}`)
   return normalizeReportWorkflowState(response.data)
 }
+
+export const resetReportWorkflowState = async (
+  notebookId: number,
+): Promise<ReportWorkflowState> => {
+  const response = await fetcher.delete<ReportWorkflowStateResponse>(
+    `/report-workflow/${notebookId}/state`,
+  )
+  return normalizeReportWorkflowState(response.data)
+}

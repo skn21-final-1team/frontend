@@ -89,7 +89,7 @@ export const fetcher = {
     api.post<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
   patch: <T>(url: string, data?: unknown) =>
     api.patch<BaseResponse<T>>(apiUrl(url), data).then((res) => res.data),
-  delete: (url: string) => api.delete<BaseResponse<null>>(apiUrl(url)).then((res) => res.data),
+  delete: <T = null>(url: string) => api.delete<BaseResponse<T>>(apiUrl(url)).then((res) => res.data),
 }
 
 type RawAPIArgs = {
