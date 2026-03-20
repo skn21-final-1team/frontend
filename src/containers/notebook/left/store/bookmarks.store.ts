@@ -105,6 +105,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
   bookmarks: {},
   rootIds: [],
   isLoading: false,
+  isSyncing: false,
   searchQuery: '',
   error: null,
 
@@ -139,59 +140,56 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       }
     }),
 
-  toggleCheck: (id: number, isChecked: boolean) =>
-    set((state) => {
-      const previousBookmarks = state.bookmarks
-      const nextBookmarks = { ...state.bookmarks }
-      const node = nextBookmarks[id]
-      if (!node) return state
+  toggleCheck: async (id: number, isChecked: boolean) => {
+    if (get().isSyncing) return
 
-      const sourceIdsToSync: number[] = []
+    const previousBookmarks = get().bookmarks
+    const nextBookmarks = { ...previousBookmarks }
+    const node = nextBookmarks[id]
+    if (!node) return
 
-      const updateChildren = (targetId: number, checked: boolean) => {
-        const target = nextBookmarks[targetId]
-        if (!target) return
+    const sourceIdsToSync: number[] = []
 
-        nextBookmarks[targetId] = { ...target, isChecked: checked }
-        if (target.type === 'source') {
-          sourceIdsToSync.push(-targetId)
-        }
+    const updateChildren = (targetId: number, checked: boolean) => {
+      const target = nextBookmarks[targetId]
+      if (!target) return
+      nextBookmarks[targetId] = { ...target, isChecked: checked }
+      if (target.type === 'source') sourceIdsToSync.push(-targetId)
+      target.children.forEach((childId) => updateChildren(childId, checked))
+    }
 
-        target.children.forEach((childId) => updateChildren(childId, checked))
-      }
-
-      const updateParents = (childId: number) => {
-        const child = nextBookmarks[childId]
-        if (!child) return
-        if (child.parentId === null) return
-
-        const parent = nextBookmarks[child.parentId]
-        if (!parent) return
-
-        const allChildrenChecked = parent.children.every((cId) => {
-          const currentChild = nextBookmarks[cId]
-          return currentChild ? currentChild.isChecked : false
-        })
-
-        nextBookmarks[child.parentId] = { ...parent, isChecked: allChildrenChecked }
-        updateParents(child.parentId)
-      }
-
-      updateChildren(id, isChecked)
-      updateParents(id)
-
-      Promise.all(
-        sourceIdsToSync.map((sourceId) => updateSource(sourceId, { is_active: isChecked })),
-      ).catch((error) => {
-        console.error('북마크 체크 상태 동기화 실패:', error)
-        set({ bookmarks: previousBookmarks })
+    const updateParents = (childId: number) => {
+      const child = nextBookmarks[childId]
+      if (!child || child.parentId === null) return
+      const parent = nextBookmarks[child.parentId]
+      if (!parent) return
+      const allChildrenChecked = parent.children.every((cId) => {
+        const currentChild = nextBookmarks[cId]
+        return currentChild ? currentChild.isChecked : false
       })
+      nextBookmarks[child.parentId] = { ...parent, isChecked: allChildrenChecked }
+      updateParents(child.parentId)
+    }
 
-      return { bookmarks: nextBookmarks }
-    }),
+    updateChildren(id, isChecked)
+    updateParents(id)
+
+    set({ bookmarks: nextBookmarks, isSyncing: true })
+
+    try {
+      await Promise.all(
+        sourceIdsToSync.map((sourceId) => updateSource(sourceId, { is_active: isChecked })),
+      )
+    } catch (error) {
+      console.error('북마크 체크 상태 동기화 실패:', error)
+      set({ bookmarks: previousBookmarks })
+    } finally {
+      set({ isSyncing: false })
+    }
+  },
 
   toggleCheckAll: async (isChecked: boolean) => {
-    if (get().isLoading) return
+    if (get().isSyncing) return
 
     const previousBookmarks = get().bookmarks
     const nextBookmarks = { ...previousBookmarks }
@@ -204,7 +202,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       if (node.type === 'source') sourceIdsToSync.push(-id)
     }
 
-    set({ bookmarks: nextBookmarks, isLoading: true })
+    set({ bookmarks: nextBookmarks, isSyncing: true })
 
     try {
       await Promise.all(
@@ -214,7 +212,7 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
       console.error('전체 체크 상태 동기화 실패:', error)
       set({ bookmarks: previousBookmarks })
     } finally {
-      set({ isLoading: false })
+      set({ isSyncing: false })
     }
   },
 

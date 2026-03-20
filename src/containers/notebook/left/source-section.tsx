@@ -25,7 +25,7 @@ function SourceSection({ notebookId }: SourceSectionProps) {
         <div className={S.header()}>
           <div className={S.headerLeft()}>
             {hasBookmarks && (
-              <Checkbox className="border-border shadow-none data-[state=checked]:bg-border data-[state=checked]:text-foreground" checked={allChecked} onCheckedChange={(checked) => toggleCheckAll(!!checked)} />
+              <Checkbox className="border-muted-foreground shadow-none data-[state=checked]:bg-muted-foreground data-[state=checked]:text-background" checked={allChecked} onCheckedChange={(checked) => toggleCheckAll(!!checked)} />
             )}
             <span className={S.headerTitle()}>BOOKMARKS</span>
           </div>

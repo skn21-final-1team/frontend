@@ -21,7 +21,9 @@ export function ExtensionKey({ syncKey, expiresAt, isCopied, onCopy }: Extension
     if (!expiresAt) return
 
     const intervalId = setInterval(() => {
-      setTimeRemaining(getTimeRemaining(expiresAt))
+      const remaining = getTimeRemaining(expiresAt)
+      setTimeRemaining(remaining)
+      if (remaining === '만료됨') clearInterval(intervalId)
     }, 1000)
 
     return () => clearInterval(intervalId)
