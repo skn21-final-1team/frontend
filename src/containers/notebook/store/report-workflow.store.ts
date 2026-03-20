@@ -190,8 +190,8 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>((set, get) => 
 
     const { status: agentModeStatus, setStatus: setAgentModeStatus } = useAgentStatusStore.getState()
     if (workflowStatus === 'idle') {
-      if (agentModeStatus === 'working') {
-        setAgentModeStatus('ready')
+      if (agentModeStatus !== 'sleep') {
+        setAgentModeStatus('sleep')
       }
       return
     }
