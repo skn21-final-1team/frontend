@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { X } from 'lucide-react'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import * as S from './search-bookmark.style'
 
@@ -16,6 +17,12 @@ function SearchBookmark() {
     }, 250)
   }
 
+  const handleClear = () => {
+    setInputValue('')
+    setSearchQuery('')
+    if (timerRef.current) clearTimeout(timerRef.current)
+  }
+
   return (
     <div className={S.searchWrapper()}>
       <input
@@ -25,6 +32,11 @@ function SearchBookmark() {
         onChange={(e) => handleChange(e.target.value)}
         className={S.searchInput()}
       />
+      {inputValue && (
+        <button type="button" className={S.clearButton()} onClick={handleClear}>
+          <X size={14} />
+        </button>
+      )}
     </div>
   )
 }
