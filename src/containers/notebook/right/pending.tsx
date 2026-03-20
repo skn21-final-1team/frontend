@@ -26,9 +26,6 @@ function PendingSection() {
           <Button variant="ghost" onClick={changeChatMode} size="sm">
             채팅모드로 돌아가기
           </Button>
-          <Button variant="ghost" onClick={() => setStatus('working')} size="sm">
-            임의: go workflow
-          </Button>
         </>
       )}
       {status === 'sleep' && (
