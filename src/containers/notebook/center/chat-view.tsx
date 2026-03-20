@@ -73,7 +73,7 @@ function ChatView({ notebookId }: ChatViewProps) {
   }, [initChat, initReportWorkflowSession, notebookId])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' })
   }, [visibleMessages, streamingMessage])
 
   return (
@@ -95,7 +95,7 @@ function ChatView({ notebookId }: ChatViewProps) {
             ),
           )}
           {isLoading && !streamingMessage && <MessageAi isLoading={true} message="" />}
-          {streamingMessage && <MessageAi message={streamingMessage} />}
+          {streamingMessage && <MessageAi message={streamingMessage} isStreaming={true} />}
           <div ref={messagesEndRef} />
         </div>
         <div className={S.inputWrapper()}>

@@ -47,6 +47,13 @@ export const abortedText = cva(`
   italic
 `)
 
+export const streamingText = cva(`
+  whitespace-pre-wrap
+  break-words
+  text-[13px]
+  leading-6
+`)
+
 export const citationBadge = cva(`
   inline-flex
   items-center

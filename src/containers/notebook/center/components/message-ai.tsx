@@ -7,6 +7,7 @@ import * as S from './message-ai.style'
 interface MessageAiProps {
   message: string
   isLoading?: boolean
+  isStreaming?: boolean
   sources?: ChatSource[]
   aborted?: boolean
 }
@@ -71,7 +72,13 @@ function processChildren(children: React.ReactNode, sources: ChatSource[]): Reac
   return children
 }
 
-function MessageAi({ message, isLoading = false, sources, aborted = false }: MessageAiProps) {
+function MessageAi({
+  message,
+  isLoading = false,
+  isStreaming = false,
+  sources,
+  aborted = false,
+}: MessageAiProps) {
   const citationComponents = sources?.length
     ? {
         p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
@@ -92,6 +99,8 @@ function MessageAi({ message, isLoading = false, sources, aborted = false }: Mes
           </div>
         ) : aborted ? (
           <span className={S.abortedText()}>사용자가 답변 중단을 요청했습니다.</span>
+        ) : isStreaming ? (
+          <div className={S.streamingText()}>{message}</div>
         ) : (
           <Markdown text={message} components={citationComponents} />
         )}
