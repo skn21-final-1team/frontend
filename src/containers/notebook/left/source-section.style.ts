@@ -35,6 +35,12 @@ export const header = cva(`
   flex-shrink-0
 `)
 
+export const headerLeft = cva(`
+  flex
+  items-center
+  gap-2
+`)
+
 export const headerTitle = cva(`
   text-xs
   font-semibold
