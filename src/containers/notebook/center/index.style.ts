@@ -32,3 +32,24 @@ export const content = cva(`
   border-border
   bg-card
 `)
+
+export const body = cva(`
+  relative
+  flex-1
+  min-h-0
+`)
+
+export const view = cva(`
+  h-full
+  min-h-0
+`, {
+  variants: {
+    hidden: {
+      true: 'hidden',
+      false: 'block',
+    },
+  },
+  defaultVariants: {
+    hidden: false,
+  },
+})

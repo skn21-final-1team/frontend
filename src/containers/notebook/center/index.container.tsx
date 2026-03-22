@@ -72,11 +72,14 @@ function PlaygroundContainer({ notebookId }: Props) {
             onShowPreview={handleShowPreview}
           />
         </div>
-        {isPreviewMode ? (
-          <PreviewSection content={previewContent} />
-        ) : (
-          <ChatView notebookId={notebookId} />
-        )}
+        <div className={S.body()}>
+          <div className={S.view({ hidden: isPreviewMode })}>
+            <ChatView notebookId={notebookId} />
+          </div>
+          <div className={S.view({ hidden: !isPreviewMode })}>
+            <PreviewSection content={previewContent} />
+          </div>
+        </div>
       </div>
     </section>
   )
