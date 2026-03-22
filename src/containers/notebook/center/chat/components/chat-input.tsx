@@ -2,7 +2,7 @@ import { useState, type KeyboardEvent } from 'react'
 import { Button } from '@/shared/components'
 import { Send, Square } from 'lucide-react'
 import ModelSelector from './model-selector'
-import { DEFAULT_MODEL, type AIModel } from '../../constants/models-mock'
+import { DEFAULT_MODEL, type AIModel } from '@/containers/notebook/constants/models-mock'
 import { useAgentStatusStore } from '@/shared/store/agent-status-store'
 import { NeonGradientCard } from '@/shared/components/ui/neon-gradient-card'
 
