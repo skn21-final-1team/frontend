@@ -6,8 +6,6 @@ export const section = cva(`
   min-h-0
   flex-col
   overflow-hidden
-  px-2
-  py-4
 `)
 
 export const inner = cva(`
@@ -16,10 +14,6 @@ export const inner = cva(`
   min-h-0
   flex-col
   overflow-y-auto
-  rounded-2xl
-  border
-  border-border
-  bg-card
   p-6
 `)
 

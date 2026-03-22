@@ -5,8 +5,6 @@ export const group = cva(`
   items-center
   gap-2
   rounded-xl
-  border
-  border-border
-  bg-card
+  bg-muted/60
   p-1
 `)
