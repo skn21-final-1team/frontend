@@ -52,7 +52,7 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
   const [isHovered, setIsHovered] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isEscaping = useRef(false)
-  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     if (isEditing) inputRef.current?.focus()
