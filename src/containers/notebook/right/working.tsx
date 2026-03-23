@@ -1,13 +1,34 @@
 import AgentStep from '@/containers/notebook/right/components/agent-step'
-import { ConfirmationDialog } from '@/shared/components'
+import { Button, ConfirmationDialog } from '@/shared/components'
 import { ErrorAlert } from '@/shared/components/error-alert'
 import { useAgentStatusStore } from '@/shared/store/agent-status-store'
 import { useReportWorkflowStore } from '@/containers/notebook/store/report-workflow.store'
 import { useState } from 'react'
 import * as S from './working.style'
 
+type ExitAction = 'start_new_workflow' | 'return_to_chat'
+
+const EXIT_DIALOG_CONTENT: Record<
+  ExitAction,
+  {
+    title: string
+    description: string
+  }
+> = {
+  start_new_workflow: {
+    title: '새로운 워크플로우를 시작하시겠습니까?',
+    description:
+      '진행 중인 문서 워크플로우 세션이 삭제되고 새 워크플로우를 바로 시작할 수 있는 상태로 초기화됩니다.',
+  },
+  return_to_chat: {
+    title: '채팅 모드로 돌아가시겠습니까?',
+    description: '이전에 작성하던 문서 워크플로우 세션이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.',
+  },
+}
+
 function WorkingSection() {
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [exitAction, setExitAction] = useState<ExitAction>('return_to_chat')
   const { setStatus } = useAgentStatusStore()
   const stepContents = useReportWorkflowStore((state) => state.stepContents)
   const currentStepNumber = useReportWorkflowStore((state) => state.currentStepNumber)
@@ -21,8 +42,13 @@ function WorkingSection() {
     setConfirmOpen(false)
     const resetSucceeded = await resetReportWorkflowSession()
     if (resetSucceeded) {
-      setStatus('sleep')
+      setStatus(exitAction === 'start_new_workflow' ? 'ready' : 'sleep')
     }
+  }
+
+  const openConfirm = (action: ExitAction): void => {
+    setExitAction(action)
+    setConfirmOpen(true)
   }
 
   return (
@@ -30,8 +56,8 @@ function WorkingSection() {
       <ErrorAlert error={error} onClose={() => setError(null)} />
       <ConfirmationDialog
         open={confirmOpen}
-        title="채팅 모드로 돌아가시겠습니까?"
-        description="이전에 작성하던 문서 워크플로우 세션이 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+        title={EXIT_DIALOG_CONTENT[exitAction].title}
+        description={EXIT_DIALOG_CONTENT[exitAction].description}
         confirmLabel="확인"
         onOpenChange={setConfirmOpen}
         onConfirm={handleConfirmExit}
@@ -65,11 +91,24 @@ function WorkingSection() {
           currentStepNumber={currentStepNumber}
           stepNumber={4}
         />
+        <Button
+          className={S.newButton()}
+          onClick={() => openConfirm('start_new_workflow')}
+          type="button"
+          variant="outline"
+        >
+          새로운 워크플로우 시작하기
+        </Button>
       </div>
       <div className={S.actionArea()}>
-        <button className={S.exitButton()} onClick={() => setConfirmOpen(true)} type="button">
+        <Button
+          onClick={() => openConfirm('return_to_chat')}
+          type="button"
+          variant="ghost"
+          size="sm"
+        >
           채팅모드로 돌아가기
-        </button>
+        </Button>
       </div>
     </section>
   )

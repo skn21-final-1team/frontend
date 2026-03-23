@@ -21,19 +21,22 @@ export const content = cva(`
 `)
 
 export const actionArea = cva(`
+  flex
   shrink-0
+  justify-center
 `)
 
 export const notice = cva(`rounded-2xl border px-4 py-3 text-xs leading-relaxed`, {
   variants: {
     tone: {
       neutral: 'border-border bg-muted/60 text-foreground',
-      danger: 'border-red-300 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/50 dark:text-red-300',
+      danger:
+        'border-red-300 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/50 dark:text-red-300',
     },
   },
 })
 
-export const exitButton = cva(`
+export const newButton = cva(`
   rounded-xl
   border
   border-border
