@@ -37,6 +37,7 @@ export const titleButton = cva(`
   transition-colors
   cursor-pointer
   hover:text-primary
+  focus-visible:outline-none
 `)
 
 export const editInput = cva(`
