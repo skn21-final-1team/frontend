@@ -55,6 +55,9 @@ const createReportWorkflowSnapshot = (state: ReportWorkflowState): Pick<
   },
 })
 
+const hasActiveReportWorkflow = (state: ReportWorkflowState): boolean =>
+  state.workflowStatus !== 'idle'
+
 interface ReportWorkflowStore {
   status: WorkflowStatus
   currentStepNumber: number
@@ -190,6 +193,7 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>()(
         if (workflowMutationRevision !== requestedRevision) return
 
         const { workflowStatus, currentStep, stepOutputs } = hydratedState
+        const shouldKeepAgentMessages = hasActiveReportWorkflow(hydratedState)
         bumpWorkflowMutationRevision()
         set({
           ...createReportWorkflowSnapshot({
@@ -197,6 +201,7 @@ export const useReportWorkflowStore = create<ReportWorkflowStore>()(
             currentStep,
             stepOutputs,
           }),
+          agentMessages: shouldKeepAgentMessages ? get().agentMessages : [],
           isLoading: false,
           error: null,
         })
