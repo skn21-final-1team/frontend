@@ -68,3 +68,10 @@ export const deleteDirectory = async (directoryId: number) => {
   const response = await fetcher.delete(`/directory/${directoryId}`)
   return response.data
 }
+
+export const updateAllSourcesActive = async (notebookId: number, isActive: boolean) => {
+  const response = await fetcher.patch<source[]>(`/notebook/${notebookId}/sources/active`, {
+    is_active: isActive,
+  })
+  return response.data
+}

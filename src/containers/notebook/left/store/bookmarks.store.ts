@@ -4,6 +4,7 @@ import {
   directory,
   source,
   updateSource,
+  updateAllSourcesActive,
   deleteSource,
   renameDirectory,
   deleteDirectory,
@@ -188,26 +189,47 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
     }
   },
 
-  toggleCheckAll: async (isChecked: boolean) => {
+  toggleCheckAll: async (notebookId: number, isChecked: boolean) => {
     if (get().isSyncing) return
 
     const previousBookmarks = get().bookmarks
     const nextBookmarks = { ...previousBookmarks }
-    const sourceIdsToSync: number[] = []
 
     for (const id of Object.keys(nextBookmarks).map(Number)) {
       const node = nextBookmarks[id]
       if (!node) continue
       nextBookmarks[id] = { ...node, isChecked }
-      if (node.type === 'source') sourceIdsToSync.push(-id)
     }
 
     set({ bookmarks: nextBookmarks, isSyncing: true })
 
     try {
-      await Promise.all(
-        sourceIdsToSync.map((sourceId) => updateSource(sourceId, { is_active: isChecked })),
-      )
+      const updatedSources = await updateAllSourcesActive(notebookId, isChecked)
+      const reconciledBookmarks = { ...get().bookmarks }
+      const serverActiveMap = new Map(updatedSources.map((s) => [s.id, s.is_active]))
+
+      for (const [id, node] of Object.entries(reconciledBookmarks)) {
+        const numId = Number(id)
+        if (node.type === 'source') {
+          const serverActive = serverActiveMap.get(-numId)
+          if (serverActive !== undefined) {
+            reconciledBookmarks[numId] = { ...node, isChecked: serverActive }
+          }
+        }
+      }
+
+      const recomputeFolder = (id: number): boolean => {
+        const node = reconciledBookmarks[id]
+        if (!node) return false
+        if (node.type === 'source') return node.isChecked
+        if (node.children.length === 0) return true
+        const allChecked = node.children.every((childId) => recomputeFolder(childId))
+        reconciledBookmarks[id] = { ...node, isChecked: allChecked }
+        return allChecked
+      }
+      get().rootIds.forEach((id) => recomputeFolder(id))
+
+      set({ bookmarks: reconciledBookmarks })
     } catch (error) {
       console.error('전체 체크 상태 동기화 실패:', error)
       set({ bookmarks: previousBookmarks })
