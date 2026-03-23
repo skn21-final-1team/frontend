@@ -2,12 +2,9 @@ import { cva } from 'class-variance-authority'
 
 export const inner = cva(`
   h-full
+  min-h-0
   flex
   flex-col
-  rounded-2xl
-  bg-card
-  border
-  border-border
   p-4
   gap-4
 `)
@@ -42,8 +39,7 @@ export const workflowBanner = cva(`
 
 export const section = cva(`
   h-full
+  min-h-0
   gap-4
   overflow-hidden
-  px-2
-  py-4
 `)

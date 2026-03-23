@@ -11,7 +11,6 @@ import {
   ConfirmationDialog,
 } from '@/shared/components'
 
-import type { FlatBookmarkNode } from '../types/bookmarks.types'
 import { useBookmarkStore } from '../store/bookmarks.store'
 import { useSearchContext } from '../contexts/search-context'
 import HeaderActions from './hover-actions'

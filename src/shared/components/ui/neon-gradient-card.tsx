@@ -75,27 +75,38 @@ export const NeonGradientCard: React.FC<NeonGradientCardProps> = ({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 
   useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const { offsetWidth, offsetHeight } = containerRef.current
-        setDimensions({ width: offsetWidth, height: offsetHeight })
-      }
+    const containerElement = containerRef.current
+    if (!containerElement) return
+
+    const updateDimensions = (width: number, height: number) => {
+      setDimensions((prevDimensions) => {
+        if (prevDimensions.width === width && prevDimensions.height === height) {
+          return prevDimensions
+        }
+
+        return { width, height }
+      })
     }
 
-    updateDimensions()
-    window.addEventListener('resize', updateDimensions)
+    const syncDimensions = () => {
+      updateDimensions(containerElement.offsetWidth, containerElement.offsetHeight)
+    }
+
+    syncDimensions()
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const resizeEntry = entries[0]
+      if (!resizeEntry) return
+
+      updateDimensions(resizeEntry.contentRect.width, resizeEntry.contentRect.height)
+    })
+
+    resizeObserver.observe(containerElement)
 
     return () => {
-      window.removeEventListener('resize', updateDimensions)
+      resizeObserver.disconnect()
     }
   }, [])
-
-  useEffect(() => {
-    if (containerRef.current) {
-      const { offsetWidth, offsetHeight } = containerRef.current
-      setDimensions({ width: offsetWidth, height: offsetHeight })
-    }
-  }, [children])
 
   if (isOff) {
     return (

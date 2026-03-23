@@ -3,7 +3,7 @@
 import { notFound, useRouter } from 'next/navigation'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup, Spinner } from '@/shared/components'
 import { ErrorAlert } from '@/shared/components/error-alert'
-import ChatView from './center/chat-view'
+import PlaygroundContainer from './center/index.container'
 import SourceSection from './left/source-section'
 import { useNotebook } from './utils/use-notebook'
 import AgentSection from './right/agent'
@@ -45,7 +45,7 @@ export default function NotebookContainer({ notebookId }: NotebookContainerProps
         <ResizableHandle />
 
         <ResizablePanel defaultSize={50} minSize={30} className={s.resizablePanel()}>
-          <ChatView notebookId={notebookId} />
+          <PlaygroundContainer notebookId={notebookId} />
         </ResizablePanel>
 
         <ResizableHandle />

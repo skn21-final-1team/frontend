@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components'
-import { AI_MODELS, type AIModel } from '../../constants/models-mock'
+import { AI_MODELS, type AIModel } from '@/containers/notebook/constants/models-mock'
 import * as style from './model-selector.style'
 
 interface ModelSelectorProps {

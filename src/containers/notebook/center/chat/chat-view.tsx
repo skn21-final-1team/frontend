@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 import { ErrorAlert } from '@/shared/components/error-alert'
-import { useChatStore } from '../store/chat.store'
-import { useReportWorkflowStore } from '../store/report-workflow.store'
+import { useChatStore } from '@/containers/notebook/store/chat.store'
+import { useReportWorkflowStore } from '@/containers/notebook/store/report-workflow.store'
 import ChatInput from './components/chat-input'
 import MessageUser from './components/message-user'
 import MessageAi from './components/message-ai'
