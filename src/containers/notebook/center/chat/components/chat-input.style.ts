@@ -13,7 +13,6 @@ export const container = cva(
   focus-within:ring-1
   focus-within:ring-ring
   relative
-  p-2
 `,
 )
 

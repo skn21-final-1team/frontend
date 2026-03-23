@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from 'react'
+import { CSSProperties, ReactElement, ReactNode } from 'react'
 
 import { cn } from '@/shared/style/utils/index'
 
@@ -71,43 +71,6 @@ export const NeonGradientCard: React.FC<NeonGradientCardProps> = ({
   isOff = false,
   ...props
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
-
-  useEffect(() => {
-    const containerElement = containerRef.current
-    if (!containerElement) return
-
-    const updateDimensions = (width: number, height: number) => {
-      setDimensions((prevDimensions) => {
-        if (prevDimensions.width === width && prevDimensions.height === height) {
-          return prevDimensions
-        }
-
-        return { width, height }
-      })
-    }
-
-    const syncDimensions = () => {
-      updateDimensions(containerElement.offsetWidth, containerElement.offsetHeight)
-    }
-
-    syncDimensions()
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      const resizeEntry = entries[0]
-      if (!resizeEntry) return
-
-      updateDimensions(resizeEntry.contentRect.width, resizeEntry.contentRect.height)
-    })
-
-    resizeObserver.observe(containerElement)
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [])
-
   if (isOff) {
     return (
       <div className={className} {...props}>
@@ -117,29 +80,25 @@ export const NeonGradientCard: React.FC<NeonGradientCardProps> = ({
   }
   return (
     <div
-      ref={containerRef}
       style={
         {
           '--border-size': `${borderSize}px`,
           '--border-radius': `${borderRadius}px`,
           '--neon-first-color': neonColors.firstColor,
           '--neon-second-color': neonColors.secondColor,
-          '--card-width': `${dimensions.width}px`,
-          '--card-height': `${dimensions.height}px`,
           '--card-content-radius': `${borderRadius - borderSize}px`,
           '--pseudo-element-background-image': `linear-gradient(0deg, ${neonColors.firstColor}, ${neonColors.secondColor})`,
-          '--pseudo-element-width': `${dimensions.width + borderSize * 2}px`,
-          '--pseudo-element-height': `${dimensions.height + borderSize * 2}px`,
-          // "--after-blur": `${dimensions.width / 3}px`,
+          '--pseudo-element-width': `calc(100% + ${borderSize * 2}px)`,
+          '--pseudo-element-height': `calc(100% + ${borderSize * 2}px)`,
           '--after-blur': '8px',
         } as CSSProperties
       }
-      className={cn('relative z-10 size-full rounded-(--border-radius)')}
+      className={cn('relative z-10 w-full rounded-(--border-radius)', className)}
       {...props}
     >
       <div
         className={cn(
-          'relative size-full min-h-[inherit] rounded-(--card-content-radius) bg-gray-100 p-2',
+          'relative w-full rounded-(--card-content-radius) bg-gray-100',
           'before:absolute before:-top-(--border-size) before:-left-(--border-size) before:-z-10 before:block',
           "before:h-(--pseudo-element-height) before:w-(--pseudo-element-width) before:rounded-(--border-radius) before:content-['']",
           'before:bg-[linear-gradient(0deg,var(--neon-first-color),var(--neon-second-color))] before:bg-size-[100%_200%]',
