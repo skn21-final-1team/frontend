@@ -49,12 +49,16 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
 
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(data.title)
+  const [isHovered, setIsHovered] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const isEscaping = useRef(false)
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (isEditing) inputRef.current?.focus()
   }, [isEditing])
+
+  useEffect(() => () => clearTimeout(hoverTimer.current), [])
 
   const handleSubmit = () => {
     if (isEscaping.current) {
@@ -107,13 +111,26 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
             className={S.editInput()}
           />
         ) : (
-          <Popover>
+          <Popover open={isHovered} onOpenChange={setIsHovered}>
             <PopoverTrigger asChild>
-              <button type="button" className={S.titleButton()}>
+              <button
+                type="button"
+                className={S.titleButton()}
+                onClick={handleOpenUrl}
+                onMouseEnter={() => { hoverTimer.current = setTimeout(() => setIsHovered(true), 400) }}
+                onMouseLeave={() => { clearTimeout(hoverTimer.current); setIsHovered(false) }}
+              >
                 {data.title}
               </button>
             </PopoverTrigger>
-            <PopoverContent className={S.popoverContent()} side="right" align="start">
+            <PopoverContent
+              className={S.popoverContent()}
+              side="right"
+              align="start"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => { clearTimeout(hoverTimer.current); setIsHovered(false) }}
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
               <p className={S.summaryText()}>
                 {hasSummary ? data.summary : '요약 내용이 없습니다.'}
               </p>

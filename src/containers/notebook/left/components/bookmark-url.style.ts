@@ -57,5 +57,7 @@ export const summaryText = cva(`
   text-xs
   text-muted-foreground
   leading-relaxed
+  whitespace-normal
+  break-words
   p-3
 `)
