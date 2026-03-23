@@ -4,7 +4,8 @@ export const section = cva(`
   h-full
   flex
   flex-col
-  overflow-hidden
+  overflow-y-hidden
+  overflow-x-visible
   px-2
   py-4
 `)
@@ -14,13 +15,13 @@ export const inner = cva(`
   flex-col
   h-full
   gap-1
-  px-4
-  py-4
+  p-4
   rounded-2xl
   bg-card
   border
   border-border
-  overflow-hidden
+  overflow-y-hidden
+  overflow-x-visible
 `)
 
 export const header = cva(`
