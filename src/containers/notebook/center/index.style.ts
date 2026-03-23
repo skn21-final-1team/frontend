@@ -18,6 +18,7 @@ export const header = cva(`
   border-border
   px-4
   py-3
+  pb-0
 `)
 
 export const content = cva(`
@@ -39,17 +40,20 @@ export const body = cva(`
   min-h-0
 `)
 
-export const view = cva(`
+export const view = cva(
+  `
   h-full
   min-h-0
-`, {
-  variants: {
-    hidden: {
-      true: 'hidden',
-      false: 'block',
+`,
+  {
+    variants: {
+      hidden: {
+        true: 'hidden',
+        false: 'block',
+      },
+    },
+    defaultVariants: {
+      hidden: false,
     },
   },
-  defaultVariants: {
-    hidden: false,
-  },
-})
+)

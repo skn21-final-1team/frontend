@@ -17,17 +17,17 @@ function ViewModeToggle({
   return (
     <div className={S.group()}>
       <Button
+        className={S.TabButton({ isActive: !isPreviewMode })}
         type="button"
         size="sm"
-        variant={!isPreviewMode ? 'default' : 'outline'}
         onClick={onShowChat}
       >
         채팅
       </Button>
       <Button
+        className={S.TabButton({ isActive: isPreviewMode })}
         type="button"
         size="sm"
-        variant={isPreviewMode ? 'default' : 'outline'}
         onClick={onShowPreview}
         disabled={isPreviewDisabled}
       >
