@@ -127,6 +127,8 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
               className={S.popoverContent()}
               side="right"
               align="start"
+              alignOffset={25}
+              avoidCollisions={false}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => { clearTimeout(hoverTimer.current); setIsHovered(false) }}
               onOpenAutoFocus={(e) => e.preventDefault()}
