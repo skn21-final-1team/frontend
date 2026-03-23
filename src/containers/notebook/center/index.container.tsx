@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useReportWorkflowStore } from '@/containers/notebook/store/report-workflow.store'
 import usePreviewStore from '@/containers/notebook/store/preview.store'
 import { ReportWorkflowPurpose } from './utils/report-workflow.types'
@@ -45,6 +45,7 @@ function PlaygroundContainer({ notebookId }: Props) {
   const stepContents = useReportWorkflowStore((state) => state.stepContents)
   const previewContent = resolvePreviewContent(currentStepNumber, stepContents)
   const hasPreviewContent = previewContent.trim().length > 0
+  const previousWorkflowStatusRef = useRef<typeof workflowStatus | null>(null)
 
   const handleShowChat = (): void => {
     setPreviewMode(false)
@@ -63,9 +64,14 @@ function PlaygroundContainer({ notebookId }: Props) {
   }, [hasPreviewContent, isPreviewMode, setPreviewMode])
 
   useEffect(() => {
-    if (workflowStatus === 'completed' && hasPreviewContent && !isPreviewMode) {
+    const isCompletedTransition =
+      previousWorkflowStatusRef.current !== 'completed' && workflowStatus === 'completed'
+
+    if (isCompletedTransition && hasPreviewContent && !isPreviewMode) {
       setPreviewMode(true)
     }
+
+    previousWorkflowStatusRef.current = workflowStatus
   }, [hasPreviewContent, isPreviewMode, setPreviewMode, workflowStatus])
 
   return (

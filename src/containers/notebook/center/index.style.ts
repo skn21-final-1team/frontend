@@ -17,7 +17,7 @@ export const header = cva(`
   border-b
   border-border
   px-4
-  py-3
+  py-4
   pb-0
 `)
 
