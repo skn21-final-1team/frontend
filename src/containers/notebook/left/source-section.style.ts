@@ -27,12 +27,11 @@ export const header = cva(`
   flex
   items-center
   justify-between
-  px-2
   pb-3
   mb-2
   border-b
   border-border
-  flex-shrink-0
+  shrink-0
 `)
 
 export const headerLeft = cva(`

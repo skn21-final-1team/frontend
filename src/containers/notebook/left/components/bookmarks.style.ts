@@ -5,5 +5,4 @@ export const folderList = cva(`
   overflow-y-auto
   min-h-0
   space-y-1
-  pr-2
 `)

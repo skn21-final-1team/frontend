@@ -6,6 +6,7 @@ export const fileRow = cva(`
   flex
   justify-between
   w-full
+  min-h-[28px]
   group
 `)
 
@@ -17,7 +18,7 @@ export const fileInfo = cva(`
 `)
 
 export const faviconButton = cva(`
-  flex-shrink-0
+  shrink-0
   p-0.5
   rounded
   cursor-pointer
