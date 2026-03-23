@@ -48,7 +48,7 @@ function renderTabTrigger(tab: TabListItem): ReactNode {
   const { disabled, icon, label, value } = tab
 
   return (
-    <BaseTabsTrigger key={value} value={value} disabled={disabled}>
+    <BaseTabsTrigger key={value} value={value} disabled={disabled} className='gap-2'>
       {icon}
       <span>{label}</span>
     </BaseTabsTrigger>
