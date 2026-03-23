@@ -51,8 +51,8 @@ export const content = cva(`
 `)
 
 export const codeBlock = cva(`
-  min-w-full
-  min-h-full
+  w-full
+  h-full
   rounded-md
   bg-muted/30
   p-4
@@ -60,6 +60,7 @@ export const codeBlock = cva(`
   text-sm
   leading-6
   whitespace-pre
+  overflow-auto
 `)
 
 export const empty = cva(`

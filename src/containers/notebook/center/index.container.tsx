@@ -40,6 +40,7 @@ const resolvePreviewContent = (
 function PlaygroundContainer({ notebookId }: Props) {
   const isPreviewMode = usePreviewStore((state) => state.isPreviewMode)
   const setPreviewMode = usePreviewStore((state) => state.setPreviewMode)
+  const workflowStatus = useReportWorkflowStore((state) => state.status)
   const currentStepNumber = useReportWorkflowStore((state) => state.currentStepNumber)
   const stepContents = useReportWorkflowStore((state) => state.stepContents)
   const previewContent = resolvePreviewContent(currentStepNumber, stepContents)
@@ -60,6 +61,12 @@ function PlaygroundContainer({ notebookId }: Props) {
       setPreviewMode(false)
     }
   }, [hasPreviewContent, isPreviewMode, setPreviewMode])
+
+  useEffect(() => {
+    if (workflowStatus === 'completed' && hasPreviewContent && !isPreviewMode) {
+      setPreviewMode(true)
+    }
+  }, [hasPreviewContent, isPreviewMode, setPreviewMode, workflowStatus])
 
   return (
     <section className={S.section()}>
