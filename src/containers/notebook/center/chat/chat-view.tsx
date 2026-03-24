@@ -85,13 +85,13 @@ function ChatView({ notebookId }: ChatViewProps) {
           {visibleMessages.map((chat) =>
             chat.role === 'assistant' ? (
               <MessageAi
-                key={chat.id}
+                key={`ai-${chat.id}`}
                 message={chat.message}
                 sources={chat.sources}
                 aborted={chat.aborted}
               />
             ) : (
-              <MessageUser key={chat.id} message={chat.message} />
+              <MessageUser key={`user-${chat.id}`} message={chat.message} />
             ),
           )}
           {isLoading && !streamingMessage && <MessageAi isLoading={true} message="" />}
