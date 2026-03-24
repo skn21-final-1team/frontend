@@ -31,6 +31,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const isClient = useIsClient()
 
   useEffect(() => {
+    document.body.style.removeProperty('pointer-events')
+  }, [pathname])
+
+  useEffect(() => {
     if (!isClient) return
 
     if (isPublicPage(pathname)) return
