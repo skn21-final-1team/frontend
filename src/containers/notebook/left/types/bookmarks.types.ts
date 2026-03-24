@@ -1,3 +1,5 @@
+import type { SourceStatus } from '@/shared/api/directory.api'
+
 export type BookmarkNodeType = 'folder' | 'source'
 
 export type FlatBookmarkNode = {
@@ -6,6 +8,7 @@ export type FlatBookmarkNode = {
   title: string
   url: string | null
   summary: string | null
+  status: SourceStatus | null
   isExpanded: boolean
   isChecked: boolean
   parentId: number | null

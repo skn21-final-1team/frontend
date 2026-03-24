@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Globe } from 'lucide-react'
 
 import { Checkbox, Popover, PopoverContent, PopoverTrigger } from '@/shared/components'
+import { Spinner } from '@/shared/components/ui/spinner'
 
 import type { FlatBookmarkNode } from '../types/bookmarks.types'
 import { useBookmarkStore } from '../store/bookmarks.store'
@@ -43,6 +44,7 @@ interface BookmarkUrlProps {
 
 function BookmarkUrl({ data }: BookmarkUrlProps) {
   const isChecked = useBookmarkStore((s) => s.bookmarks[data.id]?.isChecked ?? false)
+  const status = useBookmarkStore((s) => s.bookmarks[data.id]?.status ?? 'completed')
   const toggleCheck = useBookmarkStore((s) => s.toggleCheck)
   const deleteBookmark = useBookmarkStore((s) => s.deleteBookmark)
   const renameBookmark = useBookmarkStore((s) => s.renameBookmark)
@@ -101,7 +103,9 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
         <button type="button" className={S.faviconButton()} onClick={handleOpenUrl}>
           <Favicon url={data.url} />
         </button>
-        {isEditing ? (
+        {status === 'failed' ? (
+          <span className={S.failedBadge()}>Fail crawling</span>
+        ) : isEditing ? (
           <input
             ref={inputRef}
             value={editValue}
@@ -141,10 +145,14 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
         )}
         <HoverActions onClickDelete={() => deleteBookmark(data.id)} onClickEdit={handleEditStart} />
       </div>
-      <Checkbox
-        checked={isChecked}
-        onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
-      />
+      {status === 'pending' ? (
+        <Spinner className="shrink-0 text-muted-foreground" />
+      ) : status !== 'failed' && (
+        <Checkbox
+          checked={isChecked}
+          onCheckedChange={(checked) => toggleCheck(data.id, !!checked)}
+        />
+      )}
     </div>
   )
 }

@@ -63,3 +63,14 @@ export const summaryText = cva(`
   break-words
   p-3
 `)
+
+export const failedBadge = cva(`
+  text-sm
+  text-red-500
+  rounded
+  px-[7px]
+  py-[2px]
+  bg-[#ffefef]
+  shrink-0
+  whitespace-nowrap
+`)
