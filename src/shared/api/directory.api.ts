@@ -15,12 +15,15 @@ export type directory = {
   sources: Array<source>
 }
 
+export type SourceStatus = 'pending' | 'completed' | 'failed'
+
 export type source = {
   id: number
   url: string
   title: string | null
   summary: string | null
   is_active: boolean
+  status: SourceStatus
 }
 
 export type DirectoryResponse = {

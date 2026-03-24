@@ -29,7 +29,7 @@ export default function RootLayout({
       <body className={`${notoSansKR.className} antialiased bg-background`}>
         <ThemeProvider>
           <AuthGuard>
-            <div className="min-w-5xl mt-16">
+            <div className="mt-16">
               <Header />
               <div className="h-[calc(100vh-64px)]">{children}</div>
             </div>
