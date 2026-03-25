@@ -44,7 +44,7 @@ interface BookmarkUrlProps {
 
 function BookmarkUrl({ data }: BookmarkUrlProps) {
   const isChecked = useBookmarkStore((s) => s.bookmarks[data.id]?.isChecked ?? false)
-  const status = useBookmarkStore((s) => s.bookmarks[data.id]?.status ?? 'completed')
+  const status = useBookmarkStore((s) => s.bookmarks[data.id]?.status ?? 'success')
   const toggleCheck = useBookmarkStore((s) => s.toggleCheck)
   const deleteBookmark = useBookmarkStore((s) => s.deleteBookmark)
   const renameBookmark = useBookmarkStore((s) => s.renameBookmark)
