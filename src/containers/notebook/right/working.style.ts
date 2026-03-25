@@ -39,13 +39,9 @@ export const notice = cva(`rounded-2xl border px-4 py-3 text-xs leading-relaxed`
 export const newButton = cva(`
   rounded-xl
   border
-  border-border
-  bg-background
-  px-3
-  py-2
   text-xs
   font-medium
-  text-muted-foreground
-  transition-colors
-  hover:bg-muted
+  bg-transparent
+  text-primary
+  hover:text-white
 `)

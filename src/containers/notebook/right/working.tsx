@@ -95,7 +95,6 @@ function WorkingSection() {
           className={S.newButton()}
           onClick={() => openConfirm('start_new_workflow')}
           type="button"
-          variant="outline"
         >
           새로운 워크플로우 시작하기
         </Button>
