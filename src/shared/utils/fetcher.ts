@@ -112,6 +112,7 @@ export const SSE = async ({ url, fetchConfig, data, onMessage, onError, signal }
       },
       body: JSON.stringify(data),
       signal,
+      openWhenHidden: true,
       onopen: async (res) => {
         if (res.ok) return
         if (res.status === 401) throw res
