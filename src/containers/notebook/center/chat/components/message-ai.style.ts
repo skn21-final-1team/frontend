@@ -54,25 +54,6 @@ export const streamingText = cva(`
   leading-6
 `)
 
-export const citationBadge = cva(`
-  inline-flex
-  items-center
-  justify-center
-  w-4
-  h-4
-  text-[10px]
-  font-semibold
-  rounded-full
-  bg-primary/15
-  text-primary
-  cursor-pointer
-  hover:bg-primary/30
-  transition-colors
-  mx-0.5
-  align-middle
-  flex-shrink-0
-`)
-
 export const popoverContent = cva(`
   p-0
   w-72
@@ -105,4 +86,30 @@ export const popoverLink = cva(`
   text-primary
   hover:underline
   truncate
+`)
+
+export const sourceList = cva(`
+  flex
+  flex-wrap
+  gap-2
+  mt-3
+  pt-3
+  border-t
+  border-border
+`)
+
+export const sourceIndex = cva(`
+  inline-flex
+  items-center
+  justify-center
+  w-5
+  h-5
+  text-[11px]
+  font-semibold
+  rounded-full
+  bg-primary/15
+  text-primary
+  cursor-pointer
+  hover:bg-primary/30
+  transition-colors
 `)
