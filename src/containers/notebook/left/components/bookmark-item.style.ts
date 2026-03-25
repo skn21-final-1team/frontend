@@ -4,6 +4,7 @@ export const fileLeft = cva(`
   flex
   items-center
   gap-2
+  truncate
 `)
 
 export const subList = cva(`
@@ -34,6 +35,8 @@ export const folder = cva(`
   hover:bg-accent
   hover:text-accent-foreground
   w-full
+  min-w-0
+  overflow-hidden
   justify-start
   transition-none
 `)
