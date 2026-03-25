@@ -8,7 +8,15 @@ export const fileRow = cva(`
   w-full
   min-h-[28px]
   group
-`)
+`, {
+  variants: {
+    status: {
+      default: '',
+      failed: 'bg-[#ffefef] dark:bg-[#4a1a1f] rounded pr-1',
+    },
+  },
+  defaultVariants: { status: 'default' },
+})
 
 export const fileInfo = cva(`
   flex
@@ -64,13 +72,9 @@ export const summaryText = cva(`
   p-3
 `)
 
-export const failedBadge = cva(`
+export const failedText = cva(`
   text-sm
   text-red-500
-  rounded
-  px-[7px]
-  py-[2px]
-  bg-[#ffefef]
-  shrink-0
+  dark:text-red-600
   whitespace-nowrap
 `)
