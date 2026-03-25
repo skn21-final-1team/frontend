@@ -91,8 +91,8 @@ function BookmarkItem({ id }: BookmarkItemProps) {
                 onClick={() => !isEditing && toggleExpand(data.id)}
               >
                 <span className={S.fileLeft()}>
-                  <ChevronRightIcon className={S.chevron()} />
-                  <FolderIcon />
+                  <ChevronRightIcon className={`shrink-0 ${S.chevron()}`} />
+                  <FolderIcon className="shrink-0" />
                   {isEditing ? (
                     <input
                       ref={inputRef}
@@ -104,7 +104,7 @@ function BookmarkItem({ id }: BookmarkItemProps) {
                       className={S.editInput()}
                     />
                   ) : (
-                    data.title
+                    <span className="truncate">{data.title}</span>
                   )}
                 </span>
                 <HeaderActions
