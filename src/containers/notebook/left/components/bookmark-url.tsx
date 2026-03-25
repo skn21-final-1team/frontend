@@ -98,13 +98,13 @@ function BookmarkUrl({ data }: BookmarkUrlProps) {
   const hasSummary = !!data.summary
 
   return (
-    <div className={S.fileRow()}>
+    <div className={S.fileRow({ status: status === 'failed' ? 'failed' : 'default' })}>
       <div className={S.fileInfo()}>
         <button type="button" className={S.faviconButton()} onClick={handleOpenUrl}>
           <Favicon url={data.url} />
         </button>
         {status === 'failed' ? (
-          <span className={S.failedBadge()}>Fail crawling</span>
+          <span className={S.failedText()}>Fail crawling</span>
         ) : isEditing ? (
           <input
             ref={inputRef}
