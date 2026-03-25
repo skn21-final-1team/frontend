@@ -16,6 +16,24 @@ function Bookmarks({ notebookId }: BookmarksProps) {
     fetchAndInitialize(notebookId)
   }, [notebookId, fetchAndInitialize])
 
+  const hasPending = useMemo(
+    () =>
+      Object.values(bookmarks).some(
+        (node) => node.type === 'source' && node.status === 'pending',
+      ),
+    [bookmarks],
+  )
+
+  useEffect(() => {
+    if (!hasPending) return
+
+    const id = setInterval(() => {
+      fetchAndInitialize(notebookId)
+    }, 5000)
+
+    return () => clearInterval(id)
+  }, [hasPending, notebookId, fetchAndInitialize])
+
   const matchedIds = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
     if (!query) return null

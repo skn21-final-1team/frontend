@@ -15,7 +15,7 @@ export type directory = {
   sources: Array<source>
 }
 
-export type SourceStatus = 'pending' | 'completed' | 'failed'
+export type SourceStatus = 'pending' | 'success' | 'failed'
 
 export type source = {
   id: number
