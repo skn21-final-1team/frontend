@@ -87,7 +87,7 @@ function ChatView({ notebookId }: ChatViewProps) {
               <MessageAi
                 key={`ai-${chat.id}`}
                 message={chat.message}
-                sources={chat.sources}
+                sources={chat.reference_source}
                 aborted={chat.aborted}
               />
             ) : (

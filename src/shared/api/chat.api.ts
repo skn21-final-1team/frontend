@@ -13,7 +13,7 @@ export interface Chat {
   message: string
   created_at: string
   notebook_id: number
-  sources?: ChatSource[]
+  reference_source?: ChatSource[]
   aborted?: boolean
 }
 

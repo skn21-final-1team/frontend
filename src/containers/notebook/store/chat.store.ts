@@ -64,7 +64,11 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     })
     try {
       const chats = await getChatsByNotebook(notebookId)
-      set({ chatMessages: chats })
+      const normalized = chats.map((chat) => ({
+        ...chat,
+        reference_source: chat.reference_source?.map((s, i) => ({ ...s, index: s.index ?? i + 1 })),
+      }))
+      set({ chatMessages: normalized })
     } catch {
       set({
         error: { title: '불러오기 실패', description: '채팅 내역을 불러오는데 실패했습니다.' },
@@ -118,7 +122,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }
         if (event.event === 'sources') {
           try {
-            streamingSources = JSON.parse(event.data)
+            const parsed: ChatSource[] = JSON.parse(event.data)
+            streamingSources = parsed.map((s, i) => ({ ...s, index: s.index ?? i + 1 }))
           } catch {
             streamingSources = []
           }
@@ -150,7 +155,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           message: aiMessage.trim(),
           created_at: new Date().toISOString(),
           notebook_id: notebookId,
-          sources: streamingSources.length > 0 ? streamingSources : undefined,
+          reference_source: streamingSources.length > 0 ? streamingSources : undefined,
         },
       ],
       streamingMessage: '',
