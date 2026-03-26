@@ -117,10 +117,17 @@ export const useBookmarkStore = create<BookmarkStore>((set, get) => ({
   clearError: () => set({ error: null }),
 
   fetchAndInitialize: async (notebookId: number) => {
-    set({ isLoading: true, error: null })
+    const hasData = Object.keys(get().bookmarks).length > 0
+    set({ isLoading: !hasData, error: null })
     try {
       const response = await getDirectories(notebookId)
       const { bookmarks, rootIds } = flattenDirectoryTree(response.directories, response.sources)
+      const prev = get().bookmarks
+      for (const id of Object.keys(bookmarks).map(Number)) {
+        if (prev[id]?.isExpanded) {
+          bookmarks[id] = { ...bookmarks[id], isExpanded: true }
+        }
+      }
       set({ bookmarks, rootIds })
     } catch (error) {
       console.error('북마크 로딩 실패:', error)
